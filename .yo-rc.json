@@ -1,0 +1,42 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "jp.ac.keio.ae.comp.vitz.annotator",
+      "nativeLanguage": "ja"
+    },
+    "jhipsterVersion": "4.14.4",
+    "baseName": "ConcreteSlabAnnotator",
+    "packageName": "jp.ac.keio.ae.comp.vitz.annotator",
+    "packageFolder": "jp/ac/keio/ae/comp/vitz/annotator",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "cacheProvider": "ehcache",
+    "enableHibernateCache": true,
+    "websocket": false,
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "prodDatabaseType": "mysql",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": false,
+    "buildTool": "gradle",
+    "enableSocialSignIn": true,
+    "enableSwaggerCodegen": true,
+    "jwtSecretKey": "03e23b6517e40026d23715a75ed198c3f776d085",
+    "clientFramework": "angularX",
+    "useSass": false,
+    "clientPackageManager": "yarn",
+    "applicationType": "monolith",
+    "testFrameworks": [
+      "cucumber",
+      "protractor"
+    ],
+    "jhiPrefix": "jhi",
+    "enableTranslation": true,
+    "nativeLanguage": "ja",
+    "languages": [
+      "ja",
+      "en"
+    ]
+  }
+}
