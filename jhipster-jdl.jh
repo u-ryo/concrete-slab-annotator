@@ -1,0 +1,49 @@
+entity Image {
+    filename String required,
+    width Integer,
+    height Integer,
+    focalLength Integer,
+    distance Double,
+    camera Camera
+}
+
+entity Annotation {
+    squareSize Integer required,
+    defect DefectName required
+}
+
+entity Rectangle {
+    x Integer required,
+    y Integer required,
+    width Integer required,
+    height Integer required,
+    coordinateX Integer,
+    coordinateY Integer,
+    pending Boolean,
+    comment String
+}
+
+enum DefectName {
+    CRACK,
+    EFFLORESCENCE,
+    DONT_CARE,
+    SPALLING,
+    POPOUT,
+    SCALING,
+    CHALK,
+    WETTING,
+    RUST_FLUID,
+    REINFORCEMENT_EXPOSURE,
+    HONEY_COMB,
+    AIR_VOID,
+    STAIN_DISCOLORATION
+}
+
+relationship OneToMany {
+    Image{annotations} to Annotation{image}
+    Annotation{rectangles} to Rectangle{annotation}
+}
+
+enum Camera {
+    IXU1000
+}
