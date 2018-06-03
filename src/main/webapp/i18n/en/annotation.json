@@ -1,0 +1,25 @@
+
+{
+    "concreteSlabAnnotatorApp": {
+        "annotation" : {
+            "home": {
+                "title": "Annotations",
+                "createLabel": "Create a new Annotation",
+                "createOrEditLabel": "Create or edit a Annotation"
+            },
+            "created": "A new Annotation is created with identifier {{ param }}",
+            "updated": "A Annotation is updated with identifier {{ param }}",
+            "deleted": "A Annotation is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Annotation {{ id }}?"
+            },
+            "detail": {
+                "title": "Annotation"
+            },
+            "squareSize": "Square Size",
+            "defect": "Defect",
+            "rectangles": "Rectangles",
+            "image": "Image"
+        }
+    }
+}

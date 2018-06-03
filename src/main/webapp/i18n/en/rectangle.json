@@ -1,0 +1,30 @@
+
+{
+    "concreteSlabAnnotatorApp": {
+        "rectangle" : {
+            "home": {
+                "title": "Rectangles",
+                "createLabel": "Create a new Rectangle",
+                "createOrEditLabel": "Create or edit a Rectangle"
+            },
+            "created": "A new Rectangle is created with identifier {{ param }}",
+            "updated": "A Rectangle is updated with identifier {{ param }}",
+            "deleted": "A Rectangle is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Rectangle {{ id }}?"
+            },
+            "detail": {
+                "title": "Rectangle"
+            },
+            "x": "X",
+            "y": "Y",
+            "width": "Width",
+            "height": "Height",
+            "coordinateX": "Coordinate X",
+            "coordinateY": "Coordinate Y",
+            "pending": "Pending",
+            "comment": "Comment",
+            "annotation": "Annotation"
+        }
+    }
+}

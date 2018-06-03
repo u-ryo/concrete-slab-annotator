@@ -1,0 +1,46 @@
+
+<div *ngIf="image">
+    <h2><span jhiTranslate="concreteSlabAnnotatorApp.image.detail.title">Image</span> {{image.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.image.filename">Filename</span></dt>
+        <dd>
+            <span>{{image.filename}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.image.width">Width</span></dt>
+        <dd>
+            <span>{{image.width}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.image.height">Height</span></dt>
+        <dd>
+            <span>{{image.height}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.image.focalLength">Focal Length</span></dt>
+        <dd>
+            <span>{{image.focalLength}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.image.distance">Distance</span></dt>
+        <dd>
+            <span>{{image.distance}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.image.camera">Camera</span></dt>
+        <dd>
+            <span jhiTranslate="{{'concreteSlabAnnotatorApp.Camera.' + image.camera}}">{{image.camera}}</span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span jhiTranslate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'image/'+ image.id + '/edit'} }]"
+            replaceUrl="true"
+            queryParamsHandling="merge"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span jhiTranslate="entity.action.edit"> Edit</span>
+    </button>
+</div>

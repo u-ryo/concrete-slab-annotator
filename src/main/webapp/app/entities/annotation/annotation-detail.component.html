@@ -1,0 +1,36 @@
+
+<div *ngIf="annotation">
+    <h2><span jhiTranslate="concreteSlabAnnotatorApp.annotation.detail.title">Annotation</span> {{annotation.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.annotation.squareSize">Square Size</span></dt>
+        <dd>
+            <span>{{annotation.squareSize}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.annotation.defect">Defect</span></dt>
+        <dd>
+            <span jhiTranslate="{{'concreteSlabAnnotatorApp.DefectName.' + annotation.defect}}">{{annotation.defect}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.annotation.image">Image</span></dt>
+        <dd>
+            <div *ngIf="annotation.image">
+                <a [routerLink]="['/image', annotation.image?.id]">{{annotation.image?.id}}</a>
+            </div>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span jhiTranslate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'annotation/'+ annotation.id + '/edit'} }]"
+            replaceUrl="true"
+            queryParamsHandling="merge"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span jhiTranslate="entity.action.edit"> Edit</span>
+    </button>
+</div>

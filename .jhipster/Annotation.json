@@ -1,0 +1,40 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "rectangles",
+            "otherEntityName": "rectangle",
+            "otherEntityRelationshipName": "annotation"
+        },
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "image",
+            "otherEntityName": "image",
+            "otherEntityField": "id"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "squareSize",
+            "fieldType": "Integer",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "defect",
+            "fieldType": "DefectName",
+            "fieldValues": "CRACK,EFFLORESCENCE,DONT_CARE,SPALLING,POPOUT,SCALING,CHALK,WETTING,RUST_FLUID,REINFORCEMENT_EXPOSURE,HONEY_COMB,AIR_VOID,STAIN_DISCOLORATION",
+            "fieldValidateRules": [
+                "required"
+            ]
+        }
+    ],
+    "changelogDate": "20180603181916",
+    "entityTableName": "annotation",
+    "dto": "no",
+    "pagination": "no",
+    "service": "no",
+    "jpaMetamodelFiltering": false
+}

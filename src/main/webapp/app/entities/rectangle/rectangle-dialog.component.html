@@ -1,0 +1,112 @@
+<form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+
+    <div class="modal-header">
+        <h4 class="modal-title" id="myRectangleLabel" jhiTranslate="concreteSlabAnnotatorApp.rectangle.home.createOrEditLabel">Create or edit a Rectangle</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                (click)="clear()">&times;</button>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" [hidden]="!rectangle.id">
+            <label for="id" jhiTranslate="global.field.id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                   [(ngModel)]="rectangle.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.rectangle.x" for="field_x">X</label>
+            <input type="number" class="form-control" name="x" id="field_x"
+                [(ngModel)]="rectangle.x" required/>
+            <div [hidden]="!(editForm.controls.x?.dirty && editForm.controls.x?.invalid)">
+                <small class="form-text text-danger"
+                   [hidden]="!editForm.controls.x?.errors?.required" jhiTranslate="entity.validation.required">
+                   This field is required.
+                </small>
+                <small class="form-text text-danger"
+                    [hidden]="!editForm.controls.x?.errors?.number" jhiTranslate="entity.validation.number">
+                    This field should be a number.
+                </small>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.rectangle.y" for="field_y">Y</label>
+            <input type="number" class="form-control" name="y" id="field_y"
+                [(ngModel)]="rectangle.y" required/>
+            <div [hidden]="!(editForm.controls.y?.dirty && editForm.controls.y?.invalid)">
+                <small class="form-text text-danger"
+                   [hidden]="!editForm.controls.y?.errors?.required" jhiTranslate="entity.validation.required">
+                   This field is required.
+                </small>
+                <small class="form-text text-danger"
+                    [hidden]="!editForm.controls.y?.errors?.number" jhiTranslate="entity.validation.number">
+                    This field should be a number.
+                </small>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.rectangle.width" for="field_width">Width</label>
+            <input type="number" class="form-control" name="width" id="field_width"
+                [(ngModel)]="rectangle.width" required/>
+            <div [hidden]="!(editForm.controls.width?.dirty && editForm.controls.width?.invalid)">
+                <small class="form-text text-danger"
+                   [hidden]="!editForm.controls.width?.errors?.required" jhiTranslate="entity.validation.required">
+                   This field is required.
+                </small>
+                <small class="form-text text-danger"
+                    [hidden]="!editForm.controls.width?.errors?.number" jhiTranslate="entity.validation.number">
+                    This field should be a number.
+                </small>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.rectangle.height" for="field_height">Height</label>
+            <input type="number" class="form-control" name="height" id="field_height"
+                [(ngModel)]="rectangle.height" required/>
+            <div [hidden]="!(editForm.controls.height?.dirty && editForm.controls.height?.invalid)">
+                <small class="form-text text-danger"
+                   [hidden]="!editForm.controls.height?.errors?.required" jhiTranslate="entity.validation.required">
+                   This field is required.
+                </small>
+                <small class="form-text text-danger"
+                    [hidden]="!editForm.controls.height?.errors?.number" jhiTranslate="entity.validation.number">
+                    This field should be a number.
+                </small>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.rectangle.coordinateX" for="field_coordinateX">Coordinate X</label>
+            <input type="number" class="form-control" name="coordinateX" id="field_coordinateX"
+                [(ngModel)]="rectangle.coordinateX" />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.rectangle.coordinateY" for="field_coordinateY">Coordinate Y</label>
+            <input type="number" class="form-control" name="coordinateY" id="field_coordinateY"
+                [(ngModel)]="rectangle.coordinateY" />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.rectangle.pending" for="field_pending">Pending</label>
+            <input type="checkbox" class="form-control" name="pending" id="field_pending"
+                [(ngModel)]="rectangle.pending" />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.rectangle.comment" for="field_comment">Comment</label>
+            <input type="text" class="form-control" name="comment" id="field_comment"
+                [(ngModel)]="rectangle.comment" />
+        </div>
+
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.rectangle.annotation" for="field_annotation">Annotation</label>
+            <select class="form-control" id="field_annotation" name="annotation" [(ngModel)]="rectangle.annotation" >
+                <option [ngValue]="null"></option>
+                <option [ngValue]="annotationOption.id === rectangle.annotation?.id ? rectangle.annotation : annotationOption" *ngFor="let annotationOption of annotations; trackBy: trackAnnotationById">{{annotationOption.id}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
+            <span class="fa fa-ban"></span>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+        <button type="submit" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+            <span class="fa fa-save"></span>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+    </div>
+</form>

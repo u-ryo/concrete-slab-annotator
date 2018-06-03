@@ -1,0 +1,30 @@
+
+{
+    "concreteSlabAnnotatorApp": {
+        "rectangle" : {
+            "home": {
+                "title": "Rectangles",
+                "createLabel": "Rectangle を追加",
+                "createOrEditLabel": "Rectangleを追加または編集"
+            },
+            "created": "A new Rectangle is created with identifier {{ param }}",
+            "updated": "A Rectangle is updated with identifier {{ param }}",
+            "deleted": "A Rectangle is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Rectangle {{ id }}を削除してもよろしいですか？"
+            },
+            "detail": {
+                "title": "Rectangle"
+            },
+            "x": "X",
+            "y": "Y",
+            "width": "Width",
+            "height": "Height",
+            "coordinateX": "Coordinate X",
+            "coordinateY": "Coordinate Y",
+            "pending": "Pending",
+            "comment": "Comment",
+            "annotation": "Annotation"
+        }
+    }
+}

@@ -1,0 +1,78 @@
+<div>
+    <h2>
+        <span jhiTranslate="concreteSlabAnnotatorApp.rectangle.home.title">Rectangles</span>
+        <button class="btn btn-primary float-right jh-create-entity create-rectangle" [routerLink]="['/', { outlets: { popup: ['rectangle-new'] } }]">
+            <span class="fa fa-plus"></span>
+            <span  jhiTranslate="concreteSlabAnnotatorApp.rectangle.home.createLabel">
+            Create new Rectangle
+            </span>
+        </button>
+    </h2>
+    <jhi-alert></jhi-alert>
+    <div class="row">
+    </div>
+    <br/>
+    <div class="table-responsive" *ngIf="rectangles">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+            <th><span jhiTranslate="global.field.id">ID</span></th>
+            <th><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.x">X</span></th>
+            <th><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.y">Y</span></th>
+            <th><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.width">Width</span></th>
+            <th><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.height">Height</span></th>
+            <th><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.coordinateX">Coordinate X</span></th>
+            <th><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.coordinateY">Coordinate Y</span></th>
+            <th><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.pending">Pending</span></th>
+            <th><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.comment">Comment</span></th>
+            <th><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.annotation">Annotation</span></th>
+            <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let rectangle of rectangles ;trackBy: trackId">
+                <td><a [routerLink]="['../rectangle', rectangle.id ]">{{rectangle.id}}</a></td>
+                <td>{{rectangle.x}}</td>
+                <td>{{rectangle.y}}</td>
+                <td>{{rectangle.width}}</td>
+                <td>{{rectangle.height}}</td>
+                <td>{{rectangle.coordinateX}}</td>
+                <td>{{rectangle.coordinateY}}</td>
+                <td>{{rectangle.pending}}</td>
+                <td>{{rectangle.comment}}</td>
+                <td>
+                    <div *ngIf="rectangle.annotation">
+                        <a [routerLink]="['../annotation', rectangle.annotation?.id ]" >{{rectangle.annotation?.id}}</a>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group flex-btn-group-container">
+                        <button type="submit"
+                                [routerLink]="['../rectangle', rectangle.id ]"
+                                class="btn btn-info btn-sm">
+                            <span class="fa fa-eye"></span>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'rectangle/'+ rectangle.id + '/edit'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-primary btn-sm">
+                            <span class="fa fa-pencil"></span>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'rectangle/'+ rectangle.id + '/delete'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-danger btn-sm">
+                            <span class="fa fa-remove"></span>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

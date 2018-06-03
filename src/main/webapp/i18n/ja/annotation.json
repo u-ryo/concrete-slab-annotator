@@ -1,0 +1,25 @@
+
+{
+    "concreteSlabAnnotatorApp": {
+        "annotation" : {
+            "home": {
+                "title": "Annotations",
+                "createLabel": "Annotation を追加",
+                "createOrEditLabel": "Annotationを追加または編集"
+            },
+            "created": "A new Annotation is created with identifier {{ param }}",
+            "updated": "A Annotation is updated with identifier {{ param }}",
+            "deleted": "A Annotation is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Annotation {{ id }}を削除してもよろしいですか？"
+            },
+            "detail": {
+                "title": "Annotation"
+            },
+            "squareSize": "Square Size",
+            "defect": "Defect",
+            "rectangles": "Rectangles",
+            "image": "Image"
+        }
+    }
+}

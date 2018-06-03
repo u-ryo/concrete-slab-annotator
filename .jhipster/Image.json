@@ -1,0 +1,47 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "annotations",
+            "otherEntityName": "annotation",
+            "otherEntityRelationshipName": "image"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "filename",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "width",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "height",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "focalLength",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "distance",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "camera",
+            "fieldType": "Camera",
+            "fieldValues": "IXU1000"
+        }
+    ],
+    "changelogDate": "20180603181915",
+    "entityTableName": "image",
+    "dto": "no",
+    "pagination": "no",
+    "service": "no",
+    "jpaMetamodelFiltering": false
+}

@@ -39,6 +39,11 @@ public class CacheConfiguration {
             cm.createCache(jp.ac.keio.ae.comp.vitz.annotator.domain.Authority.class.getName(), jcacheConfiguration);
             cm.createCache(jp.ac.keio.ae.comp.vitz.annotator.domain.User.class.getName() + ".authorities", jcacheConfiguration);
             cm.createCache(jp.ac.keio.ae.comp.vitz.annotator.domain.SocialUserConnection.class.getName(), jcacheConfiguration);
+            cm.createCache(jp.ac.keio.ae.comp.vitz.annotator.domain.Image.class.getName(), jcacheConfiguration);
+            cm.createCache(jp.ac.keio.ae.comp.vitz.annotator.domain.Image.class.getName() + ".annotations", jcacheConfiguration);
+            cm.createCache(jp.ac.keio.ae.comp.vitz.annotator.domain.Annotation.class.getName(), jcacheConfiguration);
+            cm.createCache(jp.ac.keio.ae.comp.vitz.annotator.domain.Annotation.class.getName() + ".rectangles", jcacheConfiguration);
+            cm.createCache(jp.ac.keio.ae.comp.vitz.annotator.domain.Rectangle.class.getName(), jcacheConfiguration);
             // jhipster-needle-ehcache-add-entry
         };
     }

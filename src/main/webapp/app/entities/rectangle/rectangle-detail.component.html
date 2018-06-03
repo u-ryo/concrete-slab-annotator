@@ -1,0 +1,60 @@
+
+<div *ngIf="rectangle">
+    <h2><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.detail.title">Rectangle</span> {{rectangle.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.x">X</span></dt>
+        <dd>
+            <span>{{rectangle.x}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.y">Y</span></dt>
+        <dd>
+            <span>{{rectangle.y}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.width">Width</span></dt>
+        <dd>
+            <span>{{rectangle.width}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.height">Height</span></dt>
+        <dd>
+            <span>{{rectangle.height}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.coordinateX">Coordinate X</span></dt>
+        <dd>
+            <span>{{rectangle.coordinateX}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.coordinateY">Coordinate Y</span></dt>
+        <dd>
+            <span>{{rectangle.coordinateY}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.pending">Pending</span></dt>
+        <dd>
+            <span>{{rectangle.pending}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.comment">Comment</span></dt>
+        <dd>
+            <span>{{rectangle.comment}}</span>
+        </dd>
+        <dt><span jhiTranslate="concreteSlabAnnotatorApp.rectangle.annotation">Annotation</span></dt>
+        <dd>
+            <div *ngIf="rectangle.annotation">
+                <a [routerLink]="['/annotation', rectangle.annotation?.id]">{{rectangle.annotation?.id}}</a>
+            </div>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span jhiTranslate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'rectangle/'+ rectangle.id + '/edit'} }]"
+            replaceUrl="true"
+            queryParamsHandling="merge"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span jhiTranslate="entity.action.edit"> Edit</span>
+    </button>
+</div>

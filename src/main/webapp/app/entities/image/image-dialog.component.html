@@ -1,0 +1,62 @@
+<form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+
+    <div class="modal-header">
+        <h4 class="modal-title" id="myImageLabel" jhiTranslate="concreteSlabAnnotatorApp.image.home.createOrEditLabel">Create or edit a Image</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                (click)="clear()">&times;</button>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" [hidden]="!image.id">
+            <label for="id" jhiTranslate="global.field.id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                   [(ngModel)]="image.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.image.filename" for="field_filename">Filename</label>
+            <input type="text" class="form-control" name="filename" id="field_filename"
+                [(ngModel)]="image.filename" required/>
+            <div [hidden]="!(editForm.controls.filename?.dirty && editForm.controls.filename?.invalid)">
+                <small class="form-text text-danger"
+                   [hidden]="!editForm.controls.filename?.errors?.required" jhiTranslate="entity.validation.required">
+                   This field is required.
+                </small>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.image.width" for="field_width">Width</label>
+            <input type="number" class="form-control" name="width" id="field_width"
+                [(ngModel)]="image.width" />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.image.height" for="field_height">Height</label>
+            <input type="number" class="form-control" name="height" id="field_height"
+                [(ngModel)]="image.height" />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.image.focalLength" for="field_focalLength">Focal Length</label>
+            <input type="number" class="form-control" name="focalLength" id="field_focalLength"
+                [(ngModel)]="image.focalLength" />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.image.distance" for="field_distance">Distance</label>
+            <input type="number" class="form-control" name="distance" id="field_distance"
+                [(ngModel)]="image.distance" />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.image.camera" for="field_camera">Camera</label>
+            <select class="form-control" name="camera" [(ngModel)]="image.camera" id="field_camera" >
+                <option value="IXU1000">{{'concreteSlabAnnotatorApp.Camera.IXU1000' | translate}}</option>
+            </select>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
+            <span class="fa fa-ban"></span>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+        <button type="submit" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+            <span class="fa fa-save"></span>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+    </div>
+</form>
