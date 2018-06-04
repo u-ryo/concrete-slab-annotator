@@ -24,7 +24,7 @@
             },
             "admin": {
                 "main": "管理",
-                "userManagement": "ユーザー管理",
+                "userManagement": "ユーザ管理",
                 "tracker": "ユーザートラッカー",
                 "metrics": "メトリクス",
                 "health": "ヘルスステータス",
@@ -50,7 +50,7 @@
         "messages": {
             "info": {
                 "authenticated": {
-                    "prefix": "まずは",
+                    "prefix": "Concrete Slab Annotatorへようこそ。<br/>アノテーションを開始するには",
                     "link": "ログイン",
                     "suffix": "して下さい。"
                 },

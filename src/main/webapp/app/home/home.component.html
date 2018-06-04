@@ -22,12 +22,6 @@
       <span jhiTranslate="global.messages.info.authenticated.suffix">
         first.</span>
     </p>
-    <p>
-      <span jhiTranslate="global.messages.info.register.noaccount">
-        If you are a new comer, please</span>
-      <a class="alert-link" routerLink="register"
-         jhiTranslate="global.messages.info.register.link">
-        register a new account.</a>
-    </p>
+    <button (click)="login()"><span jhiTranslate="global.messages.info.authenticated.link">Login</span></button>
   </div>
 </div>
