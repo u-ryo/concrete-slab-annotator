@@ -1,28 +1,27 @@
-
 {
     "concreteSlabAnnotatorApp": {
         "image" : {
             "home": {
-                "title": "Images",
-                "createLabel": "Image を追加",
-                "createOrEditLabel": "Imageを追加または編集"
+                "title": "画像情報",
+                "createLabel": "画像情報を追加",
+                "createOrEditLabel": "画像情報を追加または編集"
             },
-            "created": "A new Image is created with identifier {{ param }}",
-            "updated": "A Image is updated with identifier {{ param }}",
-            "deleted": "A Image is deleted with identifier {{ param }}",
+            "created": "画像情報({{ param }})が新規作成されました",
+            "updated": "画像情報({{ param }})が更新されました",
+            "deleted": "画像情報({{ param }})が削除されました",
             "delete": {
-                "question": "Image {{ id }}を削除してもよろしいですか？"
+                "question": "画像情報(ID:{{ id }})を削除してもよろしいですか？"
             },
             "detail": {
-                "title": "Image"
+                "title": "画像情報"
             },
-            "filename": "Filename",
-            "width": "Width",
-            "height": "Height",
-            "focalLength": "Focal Length",
-            "distance": "Distance",
-            "camera": "Camera",
-            "annotations": "Annotations"
+            "fileUrl": "画像ファイルURL",
+            "width": "幅",
+            "height": "高さ",
+            "focalLength": "焦点距離",
+            "distance": "距離",
+            "camera": "カメラ",
+            "annotations": "アノテーション"
         }
     }
 }

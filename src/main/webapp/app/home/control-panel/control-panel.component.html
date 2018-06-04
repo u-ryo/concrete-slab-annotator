@@ -1,0 +1,79 @@
+<form [formGroup]="inputForm" class="form-inline w-100">
+  <div class="col-md-9 form-inline">
+    <div class="form-group w-100">
+      <mat-form-field class="col-md-12">
+        <input matInput type="text" name="filename" [placeholder]="'home.imageFileUrl'|translate" formControlName="fileUrlField" list="fileUrls"/>
+        <datalist id="fileUrls">
+          <option *ngFor="let image of images">
+            {{image.filename}}
+          </option>
+        </datalist>
+      </mat-form-field>
+    </div>
+    <div class="col-md-2">
+      <mat-form-field class="w-100">
+        <mat-select [placeholder]="'home.defect'|translate" formControlName="defect">
+          <mat-option *ngFor="let defect of defects" [value]="defect">
+            {{'concreteSlabAnnotatorApp.DefectName.' + defect | translate}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="form-inline col-md-2">
+      <mat-slide-toggle formControlName="pending" color="primary" class="w-100"><span class="w-25 h6" jhiTranslate="home.pending">Pending</span></mat-slide-toggle>
+    </div>
+    <div class="form-inline col-md-5">
+      <label class="w-100"><span class="w-25 text-right" jhiTranslate="home.brightness">Brightness:</span>
+        <mat-slider [thumb-label]="true" [tick-interval]="auto" formControlName="brightnessLevel" class="w-100" placeholder="Brightness" max="200"></mat-slider>
+      </label>
+    </div>
+    <div class="form-inline col-md-3">
+      <mat-expansion-panel class="w-100">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span jhiTranslate="home.attributes">Attributes</span>
+          </mat-panel-title>
+          <mat-panel-description>
+            <span jhiTranslate="home.settings">Settings</span>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="form-group">
+          <mat-form-field class="w-100">
+            <input matInput type="number" formControlName="squareSize" min="1" [placeholder]="'home.squareSize'|translate"/>
+          </mat-form-field>
+        </div>
+        <div class="form-group">
+          <mat-form-field class="w-100">
+            <input matInput type="number" formControlName="focalLength" min="1" step="10" [placeholder]="'home.focalLength'|translate"/>
+          </mat-form-field>
+        </div>
+        <div class="form-group">
+          <mat-form-field class="w-100">
+            <input matInput type="number" formControlName="distance" min="0.1" step="0.1" [placeholder]="'home.distance'|translate"/>
+          </mat-form-field>
+        </div>
+        <div class="form-group">
+          <mat-form-field class="w-100">
+            <mat-select id="camera" formControlName="camera" [placeholder]="'home.camera'|translate">
+              <mat-option *ngFor="let camera of cameras" [value]="camera">{{('concreteSlabAnnotatorApp.Camera.' + camera) | translate}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="form-group">
+          <mat-form-field style="width:43%">
+            <input matInput type="number" [placeholder]="'home.columns'|translate" min="10" step="1" formControlName="columns"/>
+          </mat-form-field>
+          <span class="p-1">x</span>
+          <mat-form-field style="width:43%">
+            <input matInput type="number" [placeholder]="'home.rows'|translate" min="10" step="1" formControlName="rows"/>
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <mat-form-field class="w-100">
+      <textarea matInput [placeholder]="'home.comment'|translate:coordinate" formControlName="comment" matTextareaAutosize matAutosizeMaxRows="5" matAutosizeMinRows="5">{{comment}}</textarea>
+    </mat-form-field>
+  </div>
+</form>

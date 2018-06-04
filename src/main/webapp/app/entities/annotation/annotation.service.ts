@@ -42,6 +42,16 @@ export class AnnotationService {
         return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response'});
     }
 
+    queryWithImageIdDefectAndSquareSize(imageId: any, squareSize: any, defect: any): Observable<HttpResponse<Annotation>> {
+        return this.http.get<Annotation>(`${this.resourceUrl}/${imageId}/${squareSize}/${defect}`, { observe: 'response' })
+            .map((res: HttpResponse<Annotation>) => this.convertResponse(res));
+    }
+
+    queryWithImageId(imageId: any): Observable<HttpResponse<Map<number, Annotation>>> {
+        return this.http.get<Map<number, Annotation>>(`${this.resourceUrl}/image/${imageId}`, { observe: 'response' })
+            .map((res: HttpResponse<Map<number, Annotation>>) => this.convertMapResponse(res));
+    }
+
     private convertResponse(res: EntityResponseType): EntityResponseType {
         const body: Annotation = this.convertItemFromServer(res.body);
         return res.clone({body});
@@ -53,6 +63,15 @@ export class AnnotationService {
         for (let i = 0; i < jsonResponse.length; i++) {
             body.push(this.convertItemFromServer(jsonResponse[i]));
         }
+        return res.clone({body});
+    }
+
+    private convertMapResponse(res: HttpResponse<Map<number, Annotation>>): HttpResponse<Map<number, Annotation>> {
+        const jsonResponse: Map<number, Annotation> = res.body;
+        const body: Map<number, Annotation> = new Map();
+        Object.keys(jsonResponse).forEach((key) => {
+            body[key] = this.convertItemFromServer(jsonResponse[key]);
+        });
         return res.clone({body});
     }
 

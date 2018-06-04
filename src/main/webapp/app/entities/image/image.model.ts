@@ -1,6 +1,6 @@
 import { BaseEntity } from './../../shared';
 
-export const enum Camera {
+export enum Camera {
     'IXU1000'
 }
 

@@ -42,6 +42,18 @@ export class RectangleService {
         return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response'});
     }
 
+    queryWithAnnotationId(annotationId: any): Observable<HttpResponse<Map<string, Rectangle>>> {
+        return this.http.get<Map<string, Rectangle>>(`${this.resourceUrl}/annotation/${annotationId}`, { observe: 'response' })
+            .map((res: HttpResponse<Map<string, Rectangle>>) => this.convertMapResponse(res));
+    }
+
+    saveRectangles(annotationId: any, rectangles: any): Observable<HttpResponse<Map<string, Rectangle>>> {
+        const copy = Observable.from(rectangles).map((rectangle) => this.convert(rectangle));
+        console.dir(`rectangles:${JSON.stringify(rectangles)}, copy: ${JSON.stringify(copy)}`);
+        return this.http.post<Map<string, Rectangle>>(`${this.resourceUrl}/annotation/${annotationId}`, rectangles, { observe: 'response' })
+            .map((res: HttpResponse<Map<string, Rectangle>>) => this.convertMapResponse(res));
+    }
+
     private convertResponse(res: EntityResponseType): EntityResponseType {
         const body: Rectangle = this.convertItemFromServer(res.body);
         return res.clone({body});
@@ -53,6 +65,15 @@ export class RectangleService {
         for (let i = 0; i < jsonResponse.length; i++) {
             body.push(this.convertItemFromServer(jsonResponse[i]));
         }
+        return res.clone({body});
+    }
+
+    private convertMapResponse(res: HttpResponse<Map<string, Rectangle>>): HttpResponse<Map<string, Rectangle>> {
+        const jsonResponse: Map<string, Rectangle> = res.body;
+        const body: Map<string, Rectangle> = new Map();
+        Object.keys(jsonResponse).forEach((key) => {
+            body[key] = this.convertItemFromServer(jsonResponse[key]);
+        });
         return res.clone({body});
     }
 

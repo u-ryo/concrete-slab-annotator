@@ -3,23 +3,23 @@
     "concreteSlabAnnotatorApp": {
         "annotation" : {
             "home": {
-                "title": "Annotations",
-                "createLabel": "Annotation を追加",
-                "createOrEditLabel": "Annotationを追加または編集"
+                "title": "アノテーション",
+                "createLabel": "アノテーションを追加",
+                "createOrEditLabel": "アノテーションを追加または編集"
             },
-            "created": "A new Annotation is created with identifier {{ param }}",
-            "updated": "A Annotation is updated with identifier {{ param }}",
-            "deleted": "A Annotation is deleted with identifier {{ param }}",
+            "created": "新規アノテーション({{ param }})が作成されました",
+            "updated": "アノテーション({{ param }})が変更されました",
+            "deleted": "アノテーション({{ param }})が削除されました",
             "delete": {
-                "question": "Annotation {{ id }}を削除してもよろしいですか？"
+                "question": "アノテーション({{ id }})を削除してもよろしいですか？"
             },
             "detail": {
-                "title": "Annotation"
+                "title": "アノテーション"
             },
-            "squareSize": "Square Size",
-            "defect": "Defect",
-            "rectangles": "Rectangles",
-            "image": "Image"
+            "squareSize": "マス目サイズ",
+            "defect": "変状等の種類",
+            "rectangles": "変状位置情報",
+            "image": "画像情報"
         }
     }
 }

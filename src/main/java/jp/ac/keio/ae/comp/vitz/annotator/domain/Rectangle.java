@@ -63,6 +63,11 @@ public class Rectangle implements Serializable {
         this.id = id;
     }
 
+    public Rectangle id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public Integer getX() {
         return x;
     }

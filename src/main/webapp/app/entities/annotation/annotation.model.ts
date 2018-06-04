@@ -1,19 +1,19 @@
 import { BaseEntity } from './../../shared';
 
-export const enum DefectName {
-    'CRACK',
-    'EFFLORESCENCE',
-    'DONT_CARE',
-    'SPALLING',
-    'POPOUT',
-    'SCALING',
-    'CHALK',
-    'WETTING',
-    'RUST_FLUID',
-    'REINFORCEMENT_EXPOSURE',
-    'HONEY_COMB',
-    'AIR_VOID',
-    'STAIN_DISCOLORATION'
+export enum DefectName {
+    CRACK = 'CRACK',
+    EFFLORESCENCE = 'EFFLORESCENCE',
+    DONT_CARE = 'DONT_CARE',
+    SPALLING = 'SPALLING',
+    POPOUT = 'POPOUT',
+    SCALING = 'SCALING',
+    CHALK = 'CHALK',
+    WETTING = 'WETTING',
+    RUST_FLUID = 'RUST_FLUID',
+    REINFORCEMENT_EXPOSURE = 'REINFORCEMENT_EXPOSURE',
+    HONEY_COMB = 'HONEY_COMB',
+    AIR_VOID = 'AIR_VOID',
+    STAIN_DISCOLORATION = 'STAIN_DISCOLORATION'
 }
 
 export class Annotation implements BaseEntity {

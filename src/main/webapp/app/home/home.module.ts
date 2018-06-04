@@ -5,13 +5,35 @@ import { ConcreteSlabAnnotatorSharedModule } from '../shared';
 
 import { HOME_ROUTE, HomeComponent } from './';
 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatExpansionModule, MatInputModule, MatFormFieldModule,
+         MatSelectModule, MatSliderModule, MatSlideToggleModule
+       } from '@angular/material';
+import { MouseWheelDirective } from '../shared/mousewheel.directive';
+
+import { ControlPanelComponent } from './control-panel/control-panel.component';
+import { ViewPanelComponent } from './view-panel/view-panel.component';
+
 @NgModule({
     imports: [
         ConcreteSlabAnnotatorSharedModule,
+        FormsModule,
+        ReactiveFormsModule,
+        BrowserAnimationsModule,
+        MatExpansionModule,
+        MatInputModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        MatSliderModule,
+        MatSlideToggleModule,
         RouterModule.forChild([ HOME_ROUTE ])
     ],
     declarations: [
         HomeComponent,
+        ControlPanelComponent,
+        ViewPanelComponent,
+        MouseWheelDirective
     ],
     entryComponents: [
     ],

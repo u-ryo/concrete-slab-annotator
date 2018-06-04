@@ -2,19 +2,19 @@
     "concreteSlabAnnotatorApp": {
         "DefectName" : {
             "null": "",
-            "CRACK": "CRACK",
-            "EFFLORESCENCE": "EFFLORESCENCE",
-            "DONT_CARE": "DONT_CARE",
-            "SPALLING": "SPALLING",
-            "POPOUT": "POPOUT",
-            "SCALING": "SCALING",
-            "CHALK": "CHALK",
-            "WETTING": "WETTING",
-            "RUST_FLUID": "RUST_FLUID",
-            "REINFORCEMENT_EXPOSURE": "REINFORCEMENT_EXPOSURE",
-            "HONEY_COMB": "HONEY_COMB",
-            "AIR_VOID": "AIR_VOID",
-            "STAIN_DISCOLORATION": "STAIN_DISCOLORATION"
+            "CRACK": "ひび割れ",
+            "EFFLORESCENCE": "エフロレッセンス",
+            "DONT_CARE": "分析対象外",
+            "SPALLING": "剥離",
+            "POPOUT": "ポップアウト",
+            "SCALING": "スケーリング",
+            "CHALK": "チョーク",
+            "WETTING": "濡れ",
+            "RUST_FLUID": "錆び汁",
+            "REINFORCEMENT_EXPOSURE": "鉄筋露出",
+            "HONEY_COMB": "豆板",
+            "AIR_VOID": "表面気泡",
+            "STAIN_DISCOLORATION": "汚れ変色"
         }
     }
 }

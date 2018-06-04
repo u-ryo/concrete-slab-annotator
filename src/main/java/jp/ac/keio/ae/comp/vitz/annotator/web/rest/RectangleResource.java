@@ -1,8 +1,10 @@
 package jp.ac.keio.ae.comp.vitz.annotator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import jp.ac.keio.ae.comp.vitz.annotator.domain.Annotation;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Rectangle;
 
+import jp.ac.keio.ae.comp.vitz.annotator.repository.AnnotationRepository;
 import jp.ac.keio.ae.comp.vitz.annotator.repository.RectangleRepository;
 import jp.ac.keio.ae.comp.vitz.annotator.web.rest.errors.BadRequestAlertException;
 import jp.ac.keio.ae.comp.vitz.annotator.web.rest.util.HeaderUtil;
@@ -17,7 +19,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing Rectangle.
@@ -30,9 +35,12 @@ public class RectangleResource {
 
     private static final String ENTITY_NAME = "rectangle";
 
+    private final AnnotationRepository annotationRepository;
     private final RectangleRepository rectangleRepository;
 
-    public RectangleResource(RectangleRepository rectangleRepository) {
+    public RectangleResource(AnnotationRepository annotationRepository,
+                             RectangleRepository rectangleRepository) {
+        this.annotationRepository = annotationRepository;
         this.rectangleRepository = rectangleRepository;
     }
 
@@ -116,5 +124,64 @@ public class RectangleResource {
         log.debug("REST request to delete Rectangle : {}", id);
         rectangleRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    }
+
+    /**
+     * GET  /rectangles/annotation/{annotationId} : get the rectangles which belong to the annotation with the specified annotationId.
+     *
+     * @param annotationId the annotationId of the rectangles belong to
+     * @return the ResponseEntity with status 200 (OK) and the list of rectangles in body
+     */
+    @GetMapping("/rectangles/annotation/{annotationId}")
+    @Timed
+    public Map<String, Rectangle> getRectanglesWithAnnotationId
+        (@PathVariable Long annotationId) {
+        log.debug("REST request to get Rectangles with annotationId:{}",
+                  annotationId);
+        return rectangleRepository.findWithAnnotationId(annotationId).stream()
+            .collect(Collectors.toMap
+                     (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
+                      r -> r,
+                      (r1, r2) -> r2));
+    }
+
+    /**
+     * POST  /rectangles/annotation/{annotationId} : save the rectangles which belong to the annotation with the specified annotationId.
+     *
+     * @param annotationId annotationId of rectangles belong to
+     * @return the ResponseEntity with status 200 (OK)
+s in body
+     */
+    @PostMapping("/rectangles/annotation/{annotationId}")
+    @Timed
+    public Map<String, Rectangle> saveRectanglesWithAnnotationId
+        (@PathVariable Long annotationId,
+         @Valid @RequestBody Set<Rectangle> rectangles) {
+        log.debug("REST request to save Rectangles with annotationId:{}, {}",
+                  annotationId, rectangles);
+        Map<String, Rectangle> rectangleMap =
+            rectangleRepository.findWithAnnotationId(annotationId).stream()
+            .collect(Collectors.toMap
+                     (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
+                      r -> r, (r1, r2) -> r2));
+        Annotation annotation = annotationRepository.findOne(annotationId);
+        log.debug("annotation:{}", annotation);
+        rectangles =
+            rectangles.stream()
+            .map(r -> rectangleRepository.save
+                 (r.id(Optional.ofNullable
+                       (rectangleMap.get(r.getCoordinateX() + ","
+                                         + r.getCoordinateY()))
+                       .orElse(new Rectangle()).getId())
+                  .annotation(annotation)))
+            .collect(Collectors.toSet());
+        rectangleMap.values().removeAll(rectangles);
+        rectangleMap.values().stream()
+            .forEach(r -> rectangleRepository.delete(r.getId()));
+        return rectangles.stream()
+            .collect(Collectors.toMap
+                     (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
+                      r -> r,
+                      (r1, r2) -> r2));
     }
 }

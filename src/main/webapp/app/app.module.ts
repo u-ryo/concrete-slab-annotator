@@ -1,7 +1,8 @@
 import './vendor.ts';
 
 import { NgModule, Injector } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HammerGestureConfig,
+         HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Ng2Webstorage, LocalStorageService, SessionStorageService  } from 'ngx-webstorage';
 import { JhiEventManager } from 'ng-jhipster';
@@ -16,7 +17,10 @@ import { ConcreteSlabAnnotatorHomeModule } from './home/home.module';
 import { ConcreteSlabAnnotatorAdminModule } from './admin/admin.module';
 import { ConcreteSlabAnnotatorAccountModule } from './account/account.module';
 import { ConcreteSlabAnnotatorEntityModule } from './entities/entity.module';
+import { DataService } from './shared/data.service';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PaginationConfig } from './blocks/config/uib-pagination.config';
+import * as Hammer from 'hammerjs';
 // jhipster-needle-angular-add-module-import JHipster will add new module here
 import {
     JhiMainComponent,
@@ -27,6 +31,15 @@ import {
     ActiveMenuDirective,
     ErrorComponent
 } from './layouts';
+
+export class MyHammerConfig extends HammerGestureConfig  {
+    overrides = <any>{
+        // override hammerjs default configuration
+        'swipe': { direction: Hammer.DIRECTION_ALL },
+        'pan': { direction: Hammer.DIRECTION_ALL },
+        'pinch': { direction: Hammer.DIRECTION_ALL }
+    };
+}
 
 @NgModule({
     imports: [
@@ -39,6 +52,7 @@ import {
         ConcreteSlabAnnotatorAccountModule,
         ConcreteSlabAnnotatorEntityModule,
         // jhipster-needle-angular-add-module JHipster will add new module here
+        NgbModule.forRoot()
     ],
     declarations: [
         JhiMainComponent,
@@ -84,7 +98,9 @@ import {
             deps: [
                 Injector
             ]
-        }
+        },
+        DataService,
+        { provide: HAMMER_GESTURE_CONFIG,  useClass: MyHammerConfig }
     ],
     bootstrap: [ JhiMainComponent ]
 })

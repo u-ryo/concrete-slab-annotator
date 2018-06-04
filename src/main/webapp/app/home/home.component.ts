@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
+import { JhiLanguageService } from 'ng-jhipster';
+import { LoginService } from '../shared';
+import { Router } from '@angular/router';
 
 import { Account, LoginModalService, Principal } from '../shared';
 
@@ -15,11 +18,15 @@ import { Account, LoginModalService, Principal } from '../shared';
 export class HomeComponent implements OnInit {
     account: Account;
     modalRef: NgbModalRef;
+    language = 'en';
 
     constructor(
         private principal: Principal,
+        private languageService: JhiLanguageService,
         private loginModalService: LoginModalService,
-        private eventManager: JhiEventManager
+        private eventManager: JhiEventManager,
+        private loginService: LoginService,
+        private router: Router
     ) {
     }
 
@@ -44,5 +51,15 @@ export class HomeComponent implements OnInit {
 
     login() {
         this.modalRef = this.loginModalService.open();
+    }
+
+    changeLanguage(languageKey: string) {
+        this.language = this.language === 'ja' ? 'en' : 'ja';
+        this.languageService.changeLanguage(languageKey);
+    }
+
+    logout() {
+        this.loginService.logout();
+        this.router.navigate(['']);
     }
 }

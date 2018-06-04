@@ -2,8 +2,10 @@ package jp.ac.keio.ae.comp.vitz.annotator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Annotation;
+import jp.ac.keio.ae.comp.vitz.annotator.domain.enumeration.DefectName;
 
 import jp.ac.keio.ae.comp.vitz.annotator.repository.AnnotationRepository;
+import jp.ac.keio.ae.comp.vitz.annotator.repository.ImageRepository;
 import jp.ac.keio.ae.comp.vitz.annotator.web.rest.errors.BadRequestAlertException;
 import jp.ac.keio.ae.comp.vitz.annotator.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -31,9 +33,12 @@ public class AnnotationResource {
     private static final String ENTITY_NAME = "annotation";
 
     private final AnnotationRepository annotationRepository;
+    private final ImageRepository imageRepository;
 
-    public AnnotationResource(AnnotationRepository annotationRepository) {
+    public AnnotationResource(AnnotationRepository annotationRepository,
+                              ImageRepository imageRepository) {
         this.annotationRepository = annotationRepository;
+        this.imageRepository = imageRepository;
     }
 
     /**
@@ -116,5 +121,33 @@ public class AnnotationResource {
         log.debug("REST request to delete Annotation : {}", id);
         annotationRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    }
+
+    /**
+     * GET  /annotations/:imageId/:squareSize/:defect : get annotation with
+     * the specified "imageId", "squareSize", and "defect".
+     *
+     * @param imageId the imageId of the annotation to retrieve
+     * @param squareSize the squareSize of the annotation to retrieve
+     * @param defect the defect of the annotation to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the annotation, or with status 404 (Not Found)
+     */
+    @GetMapping("/annotations/{imageId}/{squareSize}/{defect}")
+    @Timed
+    public ResponseEntity<Annotation>
+        getAnnotationWithImageIdSquareSizeAndDefect
+        (@PathVariable Long imageId, @PathVariable Integer squareSize,
+         @PathVariable String defect) {
+        log.debug("REST request to get Annotation : imageId:{}, squareSize:{}, "
+                  + "defect:{}", imageId, squareSize, defect);
+        Annotation annotation =
+            annotationRepository.findWithImageIdSquareSizeAndDefect
+            (imageId, squareSize, DefectName.valueOf(defect))
+            .orElseGet(() -> annotationRepository
+                       .save(new Annotation()
+                             .image(imageRepository.findOne(imageId))
+                             .squareSize(squareSize)
+                             .defect(DefectName.valueOf(defect))));
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(annotation));
     }
 }
