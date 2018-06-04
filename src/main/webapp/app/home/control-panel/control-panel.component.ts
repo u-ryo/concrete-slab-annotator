@@ -17,17 +17,19 @@ import { Subscription } from 'rxjs/Subscription';
     styles: []
 })
 export class ControlPanelComponent implements OnDestroy, OnInit {
-    private inputForm: FormGroup;
+    inputForm: FormGroup;
     private subscription: Subscription;
-    private cameras = Object.keys(Camera);
-    private defects = Object.keys(DefectName);
-    private images;
+    cameras = Object.keys(Camera);
+    defects = Object.keys(DefectName);
+    images;
     private image: Image;
-    private coordinate = { coordinate: 'this image' };
+    coordinate = { coordinate: 'this image' };
     private focalLength = 0;
     private distance = 0;
     private squareSize = 2;
     private annotation: Annotation;
+    auto;
+    comment;
 
     constructor(private annotationService: AnnotationService,
                 private dataService: DataService,

@@ -1,26 +1,26 @@
 {
     "reset": {
         "request": {
-            "title": "Reset your password",
+            "title": "パスワードリセット",
             "form": {
-                "button": "Reset password"
+                "button": "パスワードリセット"
             },
             "messages": {
-                "info": "Enter the email address you used to register",
-                "success": "Check your emails for details on how to reset your password.",
-                "notfound": "<strong>Email address isn't registered!</strong> Please check and try again"
+                "info": "登録したメールアドレスを入力して下さい",
+                "success": "パスワードリセット方法についてはメールをチェックして下さい。",
+                "notfound": "<strong>メールアドレスが登録されていません。</strong> 確認して再度試して下さい。"
             }
         },
         "finish" : {
-            "title": "Reset password",
+            "title": "パスワードリセット",
             "form": {
-                "button": "Validate new password"
+                "button": "新しいパスワードを検証"
             },
             "messages": {
-                "info": "Choose a new password",
-                "success": "<strong>Your password has been reset.</strong> Please ",
-                "keymissing": "The reset key is missing.",
-                "error": "Your password couldn't be reset. Remember a password request is only valid for 24 hours."
+                "info": "新しいパスワードを選んで下さい",
+                "success": "<strong>パスワードがリセットされました。</strong> ",
+                "keymissing": "リセットキーがありません。",
+                "error": "パスワードがリセット出来ませんでした。パスワードリクエストの有効期間は24時間です。"
             }
         }
     }

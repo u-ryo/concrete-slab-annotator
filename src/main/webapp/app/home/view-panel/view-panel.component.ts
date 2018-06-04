@@ -31,16 +31,15 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     private rectangles = new Map<string, Rectangle>();
     private rightEnd = 1;
     private bottomEnd = 1;
-    private fileUrl;
+    fileUrl;
     private rate = 1;
-    private loading = true;
+    loading = true;
     private virtualImageWidth = 1;
     private virtualImageHeight = 1;
     private MINIMUM_MAGNIFICATION = 0.3;
     private MAGNIFICATION_START = 2;
     private coordinate = '';
-    private brightness =
-        this.sanitizer.bypassSecurityTrustStyle(`brightness(100%)`);
+    brightness = this.sanitizer.bypassSecurityTrustStyle(`brightness(100%)`);
     // private defect = undefined;
     private clickCounter = 0;
     // private mouseMoveSubscription: Subscription;
