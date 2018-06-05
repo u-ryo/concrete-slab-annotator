@@ -174,7 +174,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     }
 
     setImage(fileUrl) {
-        console.log('fileUrl:', fileUrl);
+        // console.log('fileUrl:', fileUrl);
         const imgs = this.images.filter((i) => i.filename === fileUrl);
         // console.log('imgs:', imgs);
         if (imgs.length === 0) {

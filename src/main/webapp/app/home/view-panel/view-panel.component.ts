@@ -78,13 +78,14 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             this.canvas.nativeElement, 'mousemove', (event) => {
                 // console.log('event:', event);
                 if (event.ctrlKey && !event.shiftKey) {
-                    this.onclick(event, false);
+                    this.click(event, false);
                 } else if (!event.ctrlKey && event.shiftKey) {
-                    this.onclick(event, true);
-                }
-                if (this.isMouseDown) {
+                    this.click(event, true);
+                } else if (this.isMouseDown) {
                     this.drag(event.layerX, event.layerY,
                               event.movementX, event.movementY);
+                } else {
+                    this.checkComment(event.layerX, event.layerY);
                 }
             });
         this.renderer.listen(this.canvas.nativeElement, 'click',
@@ -293,18 +294,25 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                         i * this.intervalX - this.cropX,
                         j * this.intervalY - this.cropY,
                         this.intervalX, this.intervalY);
+                    if (this.rectangles[coordinate].comment) {
+                        this.drawFrame(i, j, 'rgba(180, 192, 77, 0.8)');
+                    }
                 }
                 if (this.coordinate === coordinate) {
-                    this.context.lineWidth = 5;
-                    this.context.strokeStyle = 'rgba(77, 192, 80, 0.8)';
-                    this.context.strokeRect(i * this.intervalX - this.cropX,
-                                            j * this.intervalY - this.cropY,
-                                            this.intervalX, this.intervalY);
-                    this.context.lineWidth = 1;
-                    this.context.strokeStyle = 'rgba(0, 0, 0, 1)';
+                    this.drawFrame(i, j, 'rgba(77, 192, 80, 0.8)');
                 }
             }
         }
+    }
+
+    private drawFrame(i, j, color) {
+        this.context.lineWidth = 5;
+        this.context.strokeStyle = color;
+        this.context.strokeRect(i * this.intervalX - this.cropX,
+                                j * this.intervalY - this.cropY,
+                                this.intervalX, this.intervalY);
+        this.context.lineWidth = 1;
+        this.context.strokeStyle = 'rgba(0, 0, 0, 1)';
     }
 
     mouseWheel(event) {
@@ -597,6 +605,20 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                     console.error(res.message);
                     this.onError(res.message);
                 });
+    }
+
+    private checkComment(x, y) {
+        const rectangleX = Math.floor((x + this.cropX) / this.intervalX);
+        const rectangleY = Math.floor((y + this.cropY) / this.intervalY);
+        const coordinate = rectangleX + ',' + rectangleY;
+        if (this.rectangles[coordinate]
+            && this.rectangles[coordinate].comment) {
+            this.dataService.notifyComment({
+                coordinate: this.coordinate,
+                comment: this.rectangles[coordinate].comment
+            });
+            // console.log(`comment: ${this.rectangles[coordinate].comment}`);
+        }
     }
 
     private onError(error) {
