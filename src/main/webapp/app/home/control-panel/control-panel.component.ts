@@ -44,7 +44,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         this.imageService.query().subscribe(
             (res: HttpResponse<Image[]>) => {
                 this.images = res.body;
-                console.log('images:', this.images);
+                // console.log('images:', this.images);
                 this.image = this.images[0];
                 this.distance = this.image.distance;
                 this.focalLength = this.image.focalLength;
@@ -143,7 +143,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             || this.dataService.image.naturalWidth === 0) {
             return;
         }
-        console.log('squareSize:', this.squareSize, 'annotation:', this.annotation);
+        // console.log('squareSize:', this.squareSize, 'annotation:', this.annotation);
         if (this.squareSize !== this.annotation.squareSize) {
             this.loadAnnotation(this.inputForm.value.defect);
         }
@@ -200,7 +200,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             this.image.id, this.squareSize, defect).subscribe(
                 (res: HttpResponse<Annotation>) => {
                 this.annotation = res.body;
-                console.log('annotation:', this.annotation);
+                // console.log('annotation:', this.annotation);
                 this.changeAnnotation();
             },
             (res: HttpErrorResponse) => {
@@ -220,7 +220,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         this.rectangleService.queryWithAnnotationId(this.annotation.id)
             .subscribe(
                 (res: HttpResponse<Map<string, Rectangle>>) => {
-                    console.log('rectangles:', res.body);
+                    // console.log('rectangles:', res.body);
                     this.dataService.rectangles = res.body;
                     this.dataService.notifyRedraw();
                 },

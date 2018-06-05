@@ -63,7 +63,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 * this.magnification / this.dataService.form.value.columns;
             this.intervalY = this.canvas.nativeElement.height
                 * this.magnification / this.dataService.form.value.rows;
-            console.log('redraw intervalX:', this.intervalX);
+            // console.log('redraw intervalX:', this.intervalX);
             this.drawCanvas();
         });
         this.renderer.listen(this.canvas.nativeElement, 'mouseup', (event) => {
@@ -212,13 +212,13 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             this.img.nativeElement.naturalWidth / this.magnification;
         this.virtualImageHeight =
             this.img.nativeElement.naturalHeight / this.magnification;
-        console.log('canvas height:', this.canvas.nativeElement.height,
-        //             'offsetHeight:', this.canvas.nativeElement.offsetHeight,
-                    'loading:', this.loading,
-        //             'naturalWidth:', this.img.nativeElement.naturalWidth,
-        //             'magnification:', this.magnification,
-        //             'rightEnd:', this.rightEnd,
-                    'intervalX:', this.intervalX);
+        // console.log('canvas height:', this.canvas.nativeElement.height,
+        // //             'offsetHeight:', this.canvas.nativeElement.offsetHeight,
+        //             'loading:', this.loading,
+        // //             'naturalWidth:', this.img.nativeElement.naturalWidth,
+        // //             'magnification:', this.magnification,
+        // //             'rightEnd:', this.rightEnd,
+        //             'intervalX:', this.intervalX);
         this.rectangles = this.dataService.rectangles;
         // console.log('defects from dataService:', this.dataService.defects);
         this.drawCanvas();
@@ -377,8 +377,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     onclick(event, isSingleClick) {
         this.clickCounter++;
         setTimeout(() => {
-            console.log('onclick event:', event, 'isSingleClick:',
-                        isSingleClick, this.clickCounter);
+            // console.log('onclick event:', event, 'isSingleClick:',
+            //             isSingleClick, this.clickCounter);
             if (isSingleClick && this.clickCounter === 1) {
                 this.click(event, true);
             } else if (!isSingleClick) {
@@ -389,8 +389,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     click(event, isSingleClick) {
-        console.log('click event:', event, 'isSingleClick:', isSingleClick,
-                    this.clickCounter);
+        // console.log('click event:', event, 'isSingleClick:', isSingleClick,
+        //             this.clickCounter);
         if (this.magnification <= this.MAGNIFICATION_START) {
             return;
         }
@@ -438,7 +438,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
 
     setPending(pending) {
         if (this.magnification > this.MAGNIFICATION_START && this.coordinate) {
-            console.log(`rectangles: ${this.rectangles[this.coordinate]}`);
+            // console.log(`rectangles: ${this.rectangles[this.coordinate]}`);
             if (!this.rectangles[this.coordinate]) {
                 // console.log(`pending: ${pending}, rectangles: ${this.rectangles[this.coordinate]}`);
                 this.createRectangle(pending,
@@ -585,12 +585,12 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     // }
 
     saveRectangles(x) {
-        console.log(`Next: ${x}, rectangles: ${JSON.stringify(Object.keys(this.rectangles))}`);
+        // console.log(`Next: ${x}, rectangles: ${JSON.stringify(Object.keys(this.rectangles))}`);
         this.rectangleService.saveRectangles(
             this.dataService.annotation.id, Object.keys(this.rectangles).map((k) => this.rectangles[k]))
             .subscribe(
                 (res) => {
-                    console.log(`res:${res}`);
+                    // console.log(`res:${res}`);
                     this.dirty = false;
                 },
                 (res: HttpErrorResponse) => {
