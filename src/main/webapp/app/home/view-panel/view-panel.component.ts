@@ -614,7 +614,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         if (this.rectangles[coordinate]
             && this.rectangles[coordinate].comment) {
             this.dataService.notifyComment({
-                coordinate: this.coordinate,
+                coordinate: coordinate,
                 comment: this.rectangles[coordinate].comment
             });
             // console.log(`comment: ${this.rectangles[coordinate].comment}`);
