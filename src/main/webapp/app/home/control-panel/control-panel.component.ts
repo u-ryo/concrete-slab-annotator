@@ -7,6 +7,7 @@ import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@ang
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { ImageService } from '../../entities/image/image.service';
 import { JhiAlertService } from 'ng-jhipster';
+import { LocalStorage } from 'ngx-store';
 import { Rectangle } from '../../entities/rectangle/rectangle.model';
 import { RectangleService } from '../../entities/rectangle/rectangle.service';
 import { Subscription } from 'rxjs/Subscription';
@@ -22,12 +23,12 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     cameras = Object.keys(Camera);
     defects = Object.keys(DefectName);
     images;
-    private image: Image;
+    @LocalStorage() image: Image;
     coordinate = { coordinate: 'this image' };
     private focalLength = 0;
     private distance = 0;
     private squareSize = 2;
-    private annotation: Annotation;
+    @LocalStorage() annotation: Annotation;
     auto;
     comment;
 
@@ -45,7 +46,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             (res: HttpResponse<Image[]>) => {
                 this.images = res.body;
                 // console.log('images:', this.images);
-                this.image = this.images[0];
+                this.image = this.image ? this.image : this.images[0];
                 this.distance = this.image.distance;
                 this.focalLength = this.image.focalLength;
                 this.rebuildForm();
@@ -118,14 +119,17 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
 
     rebuildForm() {
         this.inputForm.reset({
-            fileUrlField: this.images[0].filename,
+            fileUrlField: this.image
+                ? this.image.filename : this.images[0].filename,
             distance: this.distance,
             focalLength: this.focalLength,
-            squareSize: this.squareSize,
-            camera: this.images[0].camera,
+            squareSize: (this.annotation && this.annotation.squareSize)
+                ? this.annotation.squareSize : this.squareSize,
+            camera: this.image ? this.image.camera : this.images[0].camera,
             columns: 153,
             rows: 115,
-            defect: this.defects[0],
+            defect: (this.annotation && this.annotation.defect)
+                ? this.annotation.defect : this.defects[0],
             pending: false,
             brightnessLevel: 100,
             comment: ''
@@ -181,17 +185,18 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             return;
         }
         this.image = imgs[0];
-        this.focalLength = imgs[0].focalLength;
-        this.distance = imgs[0].distance;
-        this.inputForm.controls['focalLength'].setValue(imgs[0].focalLength,
+        this.focalLength = this.image.focalLength;
+        this.distance = this.image.distance;
+        this.inputForm.controls['focalLength'].setValue(this.image.focalLength,
                                                         {emitEvent: false});
-        this.inputForm.controls['distance'].setValue(imgs[0].distance,
+        this.inputForm.controls['distance'].setValue(this.image.distance,
                                                      {emitEvent: false});
-        this.inputForm.controls['camera'].setValue(imgs[0].camera,
+        this.inputForm.controls['camera'].setValue(this.image.camera,
                                                    {emitEvent: false});
-        this.inputForm.controls['defect'].setValue(this.defects[0],
-                                                   {emitEvent: false});
-        this.squareSize = 2;
+        this.inputForm.controls['defect'].setValue(
+            this.annotation ? this.annotation.defect : this.defects[0],
+            {emitEvent: false});
+        this.squareSize = this.annotation ? this.annotation.squareSize : 2;
         this.loadAnnotation(this.inputForm.value.defect);
     }
 
@@ -199,14 +204,14 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         this.annotationService.queryWithImageIdDefectAndSquareSize(
             this.image.id, this.squareSize, defect).subscribe(
                 (res: HttpResponse<Annotation>) => {
-                this.annotation = res.body;
-                // console.log('annotation:', this.annotation);
-                this.changeAnnotation();
-            },
-            (res: HttpErrorResponse) => {
-                console.error(res.message);
-                this.onError(res.message);
-            });
+                    this.annotation = res.body;
+                    // console.log('annotation:', this.annotation);
+                    this.changeAnnotation();
+                },
+                (res: HttpErrorResponse) => {
+                    console.error(res.message);
+                    this.onError(res.message);
+                });
     }
 
     changeAnnotation() {

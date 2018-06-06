@@ -610,14 +610,14 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     private checkComment(x, y) {
         const rectangleX = Math.floor((x + this.cropX) / this.intervalX);
         const rectangleY = Math.floor((y + this.cropY) / this.intervalY);
-        const coordinate = rectangleX + ',' + rectangleY;
-        if (this.rectangles[coordinate]
-            && this.rectangles[coordinate].comment) {
+        const localCoordinate = rectangleX + ',' + rectangleY;
+        if (this.rectangles[localCoordinate]
+            && this.rectangles[localCoordinate].comment) {
             this.dataService.notifyComment({
-                coordinate: coordinate,
-                comment: this.rectangles[coordinate].comment
+                coordinate: localCoordinate,
+                comment: this.rectangles[localCoordinate].comment
             });
-            // console.log(`comment: ${this.rectangles[coordinate].comment}`);
+            // console.log(`comment: ${this.rectangles[localCoordinate].comment}`);
         }
     }
 
