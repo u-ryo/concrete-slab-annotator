@@ -46,6 +46,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     private subscription: Subscription;
     private dirty = false;
     private timerObservable = Observable.interval(this.CHECK_INTERVAL);
+    private cursor = 'auto';
 
     constructor(private dataService: DataService,
                 private sanitizer: DomSanitizer,
@@ -68,6 +69,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         });
         this.renderer.listen(this.canvas.nativeElement, 'mouseup', (event) => {
             this.isMouseDown = false;
+            this.cursor = 'auto';
         });
         this.renderer.listen(
             this.canvas.nativeElement, 'mousedown', (event) => {
@@ -77,14 +79,29 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         this.renderer.listen(
             this.canvas.nativeElement, 'mousemove', (event) => {
                 // console.log('event:', event);
-                if (event.ctrlKey && !event.shiftKey) {
-                    this.click(event, false);
+                if (event.ctrlKey && event.shiftKey) {
+                    if (this.magnification > this.MAGNIFICATION_START) {
+                        this.cursor = 'brush';
+                        this.click(event, true, true);
+                    }
+                } else if (event.ctrlKey && !event.shiftKey) {
+                    if (this.magnification > this.MAGNIFICATION_START) {
+                        this.cursor = 'eraser';
+                        this.click(event, false, false);
+                    }
                 } else if (!event.ctrlKey && event.shiftKey) {
-                    this.click(event, true);
+                    if (this.magnification > this.MAGNIFICATION_START) {
+                        this.cursor = 'pencil';
+                        this.click(event, true, false);
+                    }
                 } else if (this.isMouseDown) {
-                    this.drag(event.layerX, event.layerY,
-                              event.movementX, event.movementY);
+                    if (this.magnification > 1) {
+                        this.cursor = 'move';
+                        this.drag(event.layerX, event.layerY,
+                                  event.movementX, event.movementY);
+                    }
                 } else {
+                    this.cursor = 'auto';
                     this.checkComment(event.layerX, event.layerY);
                 }
             });
@@ -389,15 +406,15 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             // console.log('onclick event:', event, 'isSingleClick:',
             //             isSingleClick, this.clickCounter);
             if (isSingleClick && this.clickCounter === 1) {
-                this.click(event, true);
+                this.click(event, true, false);
             } else if (!isSingleClick) {
-                this.click(event, false);
+                this.click(event, false, false);
             }
             this.clickCounter = 0;
         }, 200);
     }
 
-    click(event, isSingleClick) {
+    click(event, isSingleClick, isThick) {
         // console.log('click event:', event, 'isSingleClick:', isSingleClick,
         //             this.clickCounter);
         if (this.magnification <= this.MAGNIFICATION_START) {
@@ -417,14 +434,13 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
               (this.rectangles[this.coordinate]
                ? this.rectangles[this.coordinate].comment : '') });
         if (isSingleClick) {
-            if (!this.rectangles[this.coordinate]) {
-                this.createRectangle(this.dataService.form.value.pending, '');
-                this.dirty = true;
-            } else if (this.rectangles[this.coordinate].pending
-                       !== this.dataService.form.value.pending) {
-                this.rectangles[this.coordinate].pending =
-                    this.dataService.form.value.pending;
-                this.dirty = true;
+            if (!isThick) {
+                this.drawCreateRectangle(rectangleX, rectangleY);
+            } else {
+                Observable.from([-1, 0, 1]).forEach(
+                    (i) => Observable.from([-1, 0, 1]).forEach(
+                        (j) => this.drawCreateRectangle(
+                            rectangleX + i, rectangleY + j)));
             }
             // console.log('rectangles[', this.coordinate, ']:',
             //             this.rectangles[this.coordinate]);
@@ -443,6 +459,25 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             this.dirty = true;
         }
         this.drawCanvas();
+    }
+
+    drawCreateRectangle(x, y) {
+        // console.log(`drawCreateRectangle(${x},${y})`);
+        if (x < 0 || y < 0 || x > this.dataService.form.value.columns
+            || y > this.dataService.form.value.rows) {
+            return;
+        }
+        const coordinate = `${x},${y}`;
+        if (!this.rectangles[coordinate]) {
+            this.createRectangleXY(
+                this.dataService.form.value.pending, '', x, y);
+            this.dirty = true;
+        } else if (this.rectangles[coordinate].pending
+                   !== this.dataService.form.value.pending) {
+            this.rectangles[coordinate].pending =
+                this.dataService.form.value.pending;
+            this.dirty = true;
+        }
     }
 
     setPending(pending) {
@@ -474,7 +509,11 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     private createRectangle(pending, comment) {
         const rectangleX = parseInt(this.coordinate.split(',')[0], 10);
         const rectangleY = parseInt(this.coordinate.split(',')[1], 10);
-        this.rectangles[this.coordinate] = <Rectangle>{
+        this.createRectangleXY(pending, comment, rectangleX, rectangleY);
+    }
+
+    private createRectangleXY(pending, comment, rectangleX, rectangleY) {
+        this.rectangles[`${rectangleX},${rectangleY}`] = <Rectangle>{
             // annotation: this.dataService.annotation,
             x: rectangleX * this.intervalX,
             y: rectangleY * this.intervalY,

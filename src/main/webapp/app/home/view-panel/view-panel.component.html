@@ -1,4 +1,4 @@
 <div class="m-3" style="position:relative">
-  <canvas #canvas [hidden]="loading" jhiMouseWheel (mouseWheel)="mouseWheel($event)" class="w-100" style="position:absolute" [style.filter]="brightness"></canvas>
+  <canvas #canvas [hidden]="loading" jhiMouseWheel (mouseWheel)="mouseWheel($event)" style="position:absolute" [style.filter]="brightness" [class]="cursor"></canvas>
   <img #img [hidden]="!loading" class="w-100" (load)="afterLoading()" src="{{fileUrl}}" style="position:absolute">
 </div>

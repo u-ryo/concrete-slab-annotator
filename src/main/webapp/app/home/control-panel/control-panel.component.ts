@@ -205,7 +205,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             {emitEvent: false});
         this.brightness = 100;
         this.inputForm.controls['brightnessLevel'].setValue(this.brightness);
-        console.log(`brightness:${this.brightness},brightnessLevel:${this.inputForm.value.brightnessLevel}`);
+        // console.log(`brightness:${this.brightness},brightnessLevel:${this.inputForm.value.brightnessLevel}`);
         this.squareSize = this.annotation ? this.annotation.squareSize : 2;
         this.loadAnnotation(this.inputForm.value.defect);
     }
