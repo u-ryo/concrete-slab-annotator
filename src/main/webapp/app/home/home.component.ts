@@ -3,7 +3,8 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 import { JhiLanguageService } from 'ng-jhipster';
 import { LoginService } from '../shared';
-import { Router } from '@angular/router';
+import { SharedStorage } from 'ngx-store';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Account, LoginModalService, Principal } from '../shared';
 
@@ -13,12 +14,12 @@ import { Account, LoginModalService, Principal } from '../shared';
     styleUrls: [
         'home.css'
     ]
-
 })
 export class HomeComponent implements OnInit {
     account: Account;
     modalRef: NgbModalRef;
     language = 'en';
+    @SharedStorage() filename: string;
 
     constructor(
         private principal: Principal,
@@ -26,8 +27,11 @@ export class HomeComponent implements OnInit {
         private loginModalService: LoginModalService,
         private eventManager: JhiEventManager,
         private loginService: LoginService,
+        private route: ActivatedRoute,
         private router: Router
     ) {
+        this.route.queryParams.subscribe(
+            (params) => this.filename = params['filename']);
     }
 
     ngOnInit() {

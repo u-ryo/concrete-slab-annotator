@@ -7,7 +7,7 @@ import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@ang
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { ImageService } from '../../entities/image/image.service';
 import { JhiAlertService } from 'ng-jhipster';
-import { LocalStorage } from 'ngx-store';
+import { LocalStorage, SharedStorage } from 'ngx-store';
 import { Rectangle } from '../../entities/rectangle/rectangle.model';
 import { RectangleService } from '../../entities/rectangle/rectangle.service';
 import { Subscription } from 'rxjs/Subscription';
@@ -24,6 +24,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     defects = Object.keys(DefectName);
     images;
     @LocalStorage() image: Image;
+    @SharedStorage() filename: string;
     coordinate = { coordinate: 'this image' };
     private focalLength = 0;
     private distance = 0;
@@ -47,7 +48,15 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             (res: HttpResponse<Image[]>) => {
                 this.images = res.body;
                 // console.log('images:', this.images);
-                this.image = this.image ? this.image : this.images[0];
+                if (this.filename) {
+                    const img = this.images.filter(
+                        (i) => i.filename === this.filename);
+                    if (img) {
+                        this.image = img;
+                    }
+                } else if (!this.image) {
+                    this.image = this.images[0];
+                }
                 this.distance = this.image.distance;
                 this.focalLength = this.image.focalLength;
                 this.rebuildForm();
