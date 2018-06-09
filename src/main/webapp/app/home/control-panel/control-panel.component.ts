@@ -29,6 +29,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     private distance = 0;
     private squareSize = 2;
     @LocalStorage() annotation: Annotation;
+    @LocalStorage() brightness: number;
     auto;
     comment;
 
@@ -87,7 +88,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             camera: this.cameras[0],
             defect: this.defects[0],
             pending: false,
-            brightnessLevel: 100,
+            brightnessLevel: this.brightness,
             comment: ''
         });
         this.inputForm.get('squareSize').valueChanges
@@ -112,8 +113,11 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             .debounceTime(500)
             .subscribe((defect) => this.loadAnnotation(defect));
         this.inputForm.get('fileUrlField').valueChanges
-            .debounceTime(500)
+            .debounceTime(1000)
             .subscribe((fileUrl) => this.setImage(fileUrl));
+        this.inputForm.get('brightnessLevel').valueChanges
+            .debounceTime(500)
+            .forEach((brightness) => this.brightness = brightness);
         this.dataService.form = this.inputForm;
     }
 
@@ -131,7 +135,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             defect: (this.annotation && this.annotation.defect)
                 ? this.annotation.defect : this.defects[0],
             pending: false,
-            brightnessLevel: 100,
+            brightnessLevel: this.brightness,
             comment: ''
         },
                              {
@@ -178,9 +182,12 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     }
 
     setImage(fileUrl) {
-        // console.log('fileUrl:', fileUrl);
+        // console.log(`fileUrl:${fileUrl}`);
+        if (!fileUrl.endsWith('jpg') && !fileUrl.endsWith('png')) {
+            return;
+        }
         const imgs = this.images.filter((i) => i.filename === fileUrl);
-        // console.log('imgs:', imgs);
+        // console.log('imgs:', imgs, 'images:', this.images);
         if (imgs.length === 0) {
             return;
         }
@@ -196,6 +203,9 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         this.inputForm.controls['defect'].setValue(
             this.annotation ? this.annotation.defect : this.defects[0],
             {emitEvent: false});
+        this.brightness = 100;
+        this.inputForm.controls['brightnessLevel'].setValue(this.brightness);
+        console.log(`brightness:${this.brightness},brightnessLevel:${this.inputForm.value.brightnessLevel}`);
         this.squareSize = this.annotation ? this.annotation.squareSize : 2;
         this.loadAnnotation(this.inputForm.value.defect);
     }

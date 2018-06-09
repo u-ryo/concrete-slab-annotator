@@ -103,8 +103,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             (url) => {
                 this.loading = true;
                 this.fileUrl = url;
-                this.brightness =
-                    this.sanitizer.bypassSecurityTrustStyle(`brightness(100%)`);
+                this.brightness = this.sanitizer.bypassSecurityTrustStyle(
+                    `brightness(${this.dataService.form.value.brightnessLevel}%)`);
                 this.magnification = 1;
                 this.cropX = 0;
                 this.cropY = 0;
@@ -113,6 +113,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 console.log('url:', url);
                 this.dataService.form.controls['fileUrlField'].setValue(
                     url, {emitEvent: false});
+                // this.dataService.form.controls['brightnessLevel'].setValue(100);
             });
         this.dataService.form.get('columns').valueChanges
             .debounceTime(500)
