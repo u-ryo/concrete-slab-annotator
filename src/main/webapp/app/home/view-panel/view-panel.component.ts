@@ -46,7 +46,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     private subscription: Subscription;
     private dirty = false;
     private timerObservable = Observable.interval(this.CHECK_INTERVAL);
-    private cursor = 'auto';
+    cursor = 'auto';
 
     constructor(private dataService: DataService,
                 private sanitizer: DomSanitizer,
