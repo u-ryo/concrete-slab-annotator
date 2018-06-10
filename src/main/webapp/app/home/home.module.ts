@@ -8,7 +8,7 @@ import { HOME_ROUTE, HomeComponent } from './';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatExpansionModule, MatInputModule, MatFormFieldModule,
-         MatSelectModule, MatSliderModule, MatSlideToggleModule
+         MatMenuModule, MatSelectModule, MatSliderModule, MatSlideToggleModule
        } from '@angular/material';
 import { WebStorageModule } from 'ngx-store';
 import { MouseWheelDirective } from '../shared/mousewheel.directive';
@@ -25,6 +25,7 @@ import { ViewPanelComponent } from './view-panel/view-panel.component';
         MatExpansionModule,
         MatInputModule,
         MatFormFieldModule,
+        MatMenuModule,
         MatSelectModule,
         MatSliderModule,
         MatSlideToggleModule,
