@@ -34,7 +34,11 @@
                 "apidocs": "API",
                 "database": "Database",
                 "download": "Downloads",
-                "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)"
+                "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)",
+                "downloads": {
+                    "accesslog": "Access Log",
+                    "annotationxml": "Annotation XML"
+                }
             },
             "language": "Language"
         },
