@@ -129,10 +129,17 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 this.cropY = 0;
                 this.isMouseDown = false;
                 this.hasMouseMoved = false;
-                console.log('url:', url);
+                console.log(`url:${url}`);
                 this.dataService.form.controls['fileUrlField'].setValue(
                     url, {emitEvent: false});
                 // this.dataService.form.controls['brightnessLevel'].setValue(100);
+                setTimeout(() => {
+                    // console.log(`img.offsetHeight:`
+                    //             + `${this.img.nativeElement.offsetHeight}`);
+                    if (this.img.nativeElement.offsetHeight > 0) {
+                        this.loading = false;
+                    }
+                }, 500);
             });
         this.dataService.form.get('columns').valueChanges
             .debounceTime(500)
@@ -435,10 +442,12 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         const rectangleY =
             Math.floor((event.layerY + this.cropY) / this.intervalY);
         this.coordinate = rectangleX + ',' + rectangleY;
-        this.dataService.notifyComment(
-            { coordinate: this.coordinate, comment:
-              (this.rectangles[this.coordinate]
-               ? this.rectangles[this.coordinate].comment : '') });
+        this.dataService.notifyComment({
+            coordinate: this.coordinate,
+            comment: (this.rectangles[this.coordinate]
+                      ? this.rectangles[this.coordinate].comment : ''),
+            showOnly: false
+        });
         if (isSingleClick) {
             if (!isThick) {
                 this.drawCreateRectangle(rectangleX, rectangleY);
@@ -510,6 +519,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         // this.saveRectangle(false);
         // console.log('setComment:', comment, this.dataService.form.value.comment,
         //             'coordinate:', this.coordinate);
+        this.dirty = true;
     }
 
     private createRectangle(pending, comment) {
@@ -661,7 +671,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             && this.rectangles[localCoordinate].comment) {
             this.dataService.notifyComment({
                 coordinate: localCoordinate,
-                comment: this.rectangles[localCoordinate].comment
+                comment: this.rectangles[localCoordinate].comment,
+                showOnly: true
             });
             // console.log(`comment: ${this.rectangles[localCoordinate].comment}`);
         }

@@ -2,7 +2,7 @@
   <!-- <p jhiTranslate="footer">This is your footer</p> -->
   <div style="position:relative" [hidden]="!isAuthenticated()">
     <img #img (load)="afterLoading()" class="footer-image" src={{fileUrl}} [hidden]="isMinimized">
-    <canvas #canvas class="footer-canvas" [style.cursor]="cursor"></canvas>
+    <canvas #canvas class="footer-canvas" [style.cursor]="cursor" [hidden]="isMinimized"></canvas>
     <img #minimizer [hidden]="isMinimized" class="footer-icon" width="20px" src="../../../content/images/Antu_minimize_hover.png">
     <img #maximizer [hidden]="!isMinimized" class="footer-icon" width="20px" src="../../../content/images/Antu_maximize_hover.png">
   </div>

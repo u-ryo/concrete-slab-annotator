@@ -51,7 +51,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                 if (this.filename) {
                     const imgs = this.images.filter(
                         (i) => i.filename === this.filename);
-                    console.log('imgs:', imgs);
+                    // console.log('imgs:', imgs);
                     if (imgs.length > 0) {
                         this.image = imgs[0];
                         // console.log('image00.filename:', this.image,
@@ -108,7 +108,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             defect: this.defects[0],
             pending: false,
             brightnessLevel: this.brightness,
-            comment: ''
+            comment: { value: '', disabled: true }
         });
         this.inputForm.get('squareSize').valueChanges
             .debounceTime(500)
@@ -155,7 +155,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                 ? this.annotation.defect : this.defects[0],
             pending: false,
             brightnessLevel: this.brightness,
-            comment: ''
+            comment: { value: '', disabled: true }
         },
                              {
             emitEvent: false,
@@ -197,6 +197,11 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         this.inputForm.controls['comment'].setValue(comment.comment,
                                                     {emitEvent: false});
         this.coordinate = { coordinate: comment.coordinate };
+        if (comment.showOnly) {
+            this.inputForm.controls['comment'].disable({emitEvent: false});
+        } else {
+            this.inputForm.controls['comment'].enable({emitEvent: false});
+        }
         // console.log('comment from view:', comment);
     }
 
