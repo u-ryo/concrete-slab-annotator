@@ -267,3 +267,24 @@ Social Buttons
 .auto {
     cursor: auto;
 }
+.right-footer {
+    position: fixed;
+    bottom: 3px;
+    right: 3px;
+    width: 10%;
+    box-shadow: 3px 3px 9px 1px black;
+}
+.footer-image {
+    width: 100%;
+}
+.footer-icon, .footer-canvas {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+}
+.minimized-footer {
+    position: fixed;
+    right: 5px;
+    width: 0.1%;
+}

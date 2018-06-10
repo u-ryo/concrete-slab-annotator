@@ -7,6 +7,7 @@ import { JhiAlertService } from 'ng-jhipster';
 import { Observable } from 'rxjs/Observable';
 import { Rectangle } from '../../entities/rectangle/rectangle.model';
 import { RectangleService } from '../../entities/rectangle/rectangle.service';
+import { SharedStorage, SharedStorageService } from 'ngx-store';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/observable/fromEvent';
 import 'rxjs/Rx';
@@ -21,21 +22,21 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     @ViewChild('img') img;
     @ViewChild('canvas') canvas;
     private CHECK_INTERVAL = 5000;
-    private cropX = 0;
-    private cropY = 0;
+    @SharedStorage() cropX = 0;
+    @SharedStorage() cropY = 0;
     private intervalX = 0;
     private intervalY = 0;
     private magnification = 1;
     private isMouseDown = false;
     private hasMouseMoved = false;
     private rectangles = new Map<string, Rectangle>();
-    private rightEnd = 1;
-    private bottomEnd = 1;
-    fileUrl;
-    private rate = 1;
+    @SharedStorage() rightEnd = 1;
+    @SharedStorage() bottomEnd = 1;
+    @SharedStorage() fileUrl;
+    @SharedStorage() rate = 1;
     loading = true;
-    private virtualImageWidth = 1;
-    private virtualImageHeight = 1;
+    @SharedStorage() virtualImageWidth = 1;
+    @SharedStorage() virtualImageHeight = 1;
     private MINIMUM_MAGNIFICATION = 0.3;
     private MAGNIFICATION_START = 2;
     private coordinate = '';
@@ -52,7 +53,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 private sanitizer: DomSanitizer,
                 private jhiAlertService: JhiAlertService,
                 private rectangleService: RectangleService,
-                private renderer: Renderer2) {}
+                private renderer: Renderer2,
+                private sharedStorageService: SharedStorageService) {}
 
     ngOnInit() {
         this.subscription = this.dataService.redrawData$.subscribe(() => {
@@ -173,6 +175,10 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 });
         // this.defect = this.dataService.form.value.defect;
         // console.log('defect:', this.defect);
+        this.sharedStorageService.observe('cropX').subscribe(
+            (x) => this.drawCanvas());
+        this.sharedStorageService.observe('cropY').subscribe(
+            (y) => this.drawCanvas());
         this.timerObservable.filter((x) => this.dirty).subscribe(
             (x) => this.saveRectangles(x),
             (error) => console.error(`Error: ${error}`),
@@ -210,10 +216,10 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     afterLoading() {
         this.dataService.image = this.img.nativeElement;
         this.canvas.nativeElement.style.width =
-            this.img.nativeElement.offsetWidth + 'px';
+            `${this.img.nativeElement.offsetWidth}px`;
         this.canvas.nativeElement.width = this.img.nativeElement.offsetWidth;
         this.canvas.nativeElement.style.height =
-            this.img.nativeElement.offsetHeight + 'px';
+            `${this.img.nativeElement.offsetHeight}px`;
         this.canvas.nativeElement.height = this.img.nativeElement.offsetHeight;
         this.rate = this.img.nativeElement.naturalWidth
             / (this.canvas.nativeElement.width * this.magnification);

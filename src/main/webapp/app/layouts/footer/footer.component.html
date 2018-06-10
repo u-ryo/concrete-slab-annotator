@@ -1,3 +1,9 @@
-<div class="footer">
-    <p jhiTranslate="footer">This is your footer</p>
+<div [class]="footerClass">
+  <!-- <p jhiTranslate="footer">This is your footer</p> -->
+  <div style="position:relative" [hidden]="!isAuthenticated()">
+    <img #img (load)="afterLoading()" class="footer-image" src={{fileUrl}} [hidden]="isMinimized">
+    <canvas #canvas class="footer-canvas" [hidden]="isMinimized" [style.cursor]="cursor"></canvas>
+    <img #minimizer [hidden]="isMinimized" class="footer-icon" width="20px" src="../../../content/images/Antu_minimize_hover.png">
+    <img #maximizer [hidden]="!isMinimized" class="footer-icon" width="20px" src="../../../content/images/Antu_maximize_hover.png">
+  </div>
 </div>
