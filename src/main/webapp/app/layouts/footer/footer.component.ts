@@ -92,11 +92,14 @@ export class FooterComponent implements OnInit {
         // console.log('x:', x, 'cropX:', this.cropX);
         this.context.clearRect(0, 0, this.canvas.nativeElement.width,
                                this.canvas.nativeElement.height);
-        // console.log(`cropX:${this.cropX}, `
-        //             + `cropX*ratio:${this.cropX * this.ratio}, `
-        //             + `cropX*rate:${this.cropX * this.rate}, `
-        //             + `cropX*ratio*rate:${this.cropX * this.ratio * this.rate}`
-        //            );
+        console.log(
+            // `cropX:${this.cropX}, `
+            //     + `cropX*ratio:${this.cropX * this.ratio}, `
+            //     + `cropX*rate:${this.cropX * this.rate}, `
+            //     + `cropX*ratio*rate:${this.cropX * this.ratio * this.rate}`
+            `virtualImageWidth:${this.virtualImageWidth},`
+                + `ratio:${this.ratio},`
+        );
         this.context.fillRect(this.cropX * this.ratio * this.rate,
                               this.cropY * this.ratio * this.rate,
                               this.virtualImageWidth * this.ratio,

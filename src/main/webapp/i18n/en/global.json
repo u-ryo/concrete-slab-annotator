@@ -16,7 +16,7 @@
             "account": {
                 "main": "Account",
                 "settings": "Settings",
-                "password": "Password",
+                "password": "Change Password",
                 "sessions": "Sessions",
                 "login": "Sign in",
                 "logout": "Sign out",
@@ -33,6 +33,7 @@
                 "audits": "Audits",
                 "apidocs": "API",
                 "database": "Database",
+                "download": "Downloads",
                 "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)"
             },
             "language": "Language"
