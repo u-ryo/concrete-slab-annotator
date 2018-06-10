@@ -47,19 +47,29 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         this.imageService.query().subscribe(
             (res: HttpResponse<Image[]>) => {
                 this.images = res.body;
-                // console.log('images:', this.images);
+                // console.log(`filename:${this.filename}, images:`, this.images);
                 if (this.filename) {
-                    const img = this.images.filter(
+                    const imgs = this.images.filter(
                         (i) => i.filename === this.filename);
-                    if (img) {
-                        this.image = img;
+                    console.log('imgs:', imgs);
+                    if (imgs.length > 0) {
+                        this.image = imgs[0];
+                        // console.log('image00.filename:', this.image,
+                        //             'imgs[0].filename:', imgs[0].filename);
                     }
-                } else if (!this.image) {
+                }
+                // console.log('image0:', this.image,
+                //             'image.filename:', this.image.filename);
+                if (!this.image) {
                     this.image = this.images[0];
                 }
+                // console.log('image1:', this.image,
+                //             'image.filename:', this.image.filename);
                 this.distance = this.image.distance;
                 this.focalLength = this.image.focalLength;
                 this.rebuildForm();
+                // console.log('image:', this.image,
+                //             'image.filename:', this.image.filename);
                 this.inputForm.controls['fileUrlField'].setValue(
                     this.image.filename);
             },
@@ -192,7 +202,10 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
 
     setImage(fileUrl) {
         // console.log(`fileUrl:${fileUrl}`);
-        if (!fileUrl.endsWith('jpg') && !fileUrl.endsWith('png')) {
+        const index = (fileUrl ? fileUrl.length : 0) - 4;
+        // console.log(`fileUrl.indexOf(jpg):${fileUrl.indexOf('.jpg', index)}`);
+        if (index < 0 || (fileUrl.indexOf('.jpg', index) < 0
+                          && fileUrl.indexOf('.png', index) < 0)) {
             return;
         }
         const imgs = this.images.filter((i) => i.filename === fileUrl);

@@ -30,11 +30,14 @@ export class HomeComponent implements OnInit {
         private route: ActivatedRoute,
         private router: Router
     ) {
-        this.route.queryParams.subscribe(
-            (params) => this.filename = params['filename']);
     }
 
     ngOnInit() {
+        this.route.queryParams.subscribe(
+            (params) => {
+                this.filename = params['filename'];
+                // console.log('params:',params);
+            });
         this.principal.identity().then((account) => {
             this.account = account;
         });
