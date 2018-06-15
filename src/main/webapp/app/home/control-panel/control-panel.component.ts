@@ -174,7 +174,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         if (this.squareSize !== this.annotation.squareSize) {
             this.loadAnnotation(this.inputForm.value.defect);
         }
-        const baseValue = this.distance * 0.45988223999999995 / this.focalLength
+        const baseValue = this.distance * 0.46 / this.focalLength
             / this.squareSize;
         // console.log('squareSize:', this.inputForm.value.squareSize,
         //             'image.naturalWidth:', this.dataService.image.naturalWidth,
