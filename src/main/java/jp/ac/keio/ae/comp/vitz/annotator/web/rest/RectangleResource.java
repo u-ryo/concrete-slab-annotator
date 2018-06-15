@@ -1,28 +1,39 @@
 package jp.ac.keio.ae.comp.vitz.annotator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import jp.ac.keio.ae.comp.vitz.annotator.domain.AccessLog;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Annotation;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Rectangle;
+import jp.ac.keio.ae.comp.vitz.annotator.domain.User;
 
+import jp.ac.keio.ae.comp.vitz.annotator.repository.AccessLogRepository;
 import jp.ac.keio.ae.comp.vitz.annotator.repository.AnnotationRepository;
 import jp.ac.keio.ae.comp.vitz.annotator.repository.RectangleRepository;
+import jp.ac.keio.ae.comp.vitz.annotator.service.UserService;
 import jp.ac.keio.ae.comp.vitz.annotator.web.rest.errors.BadRequestAlertException;
 import jp.ac.keio.ae.comp.vitz.annotator.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.Sort.Direction.*;
 
 /**
  * REST controller for managing Rectangle.
@@ -34,14 +45,23 @@ public class RectangleResource {
     private final Logger log = LoggerFactory.getLogger(RectangleResource.class);
 
     private static final String ENTITY_NAME = "rectangle";
+    private static final ZoneId TOKYO = ZoneId.of("Asia/Tokyo");
+    private static final Pageable TOP_TO = new PageRequest(0, 1, DESC, "to");
+    private static final int INTERVAL = 5;
 
+    private final AccessLogRepository accessLogRepository;
     private final AnnotationRepository annotationRepository;
     private final RectangleRepository rectangleRepository;
+    private final UserService userService;
 
-    public RectangleResource(AnnotationRepository annotationRepository,
-                             RectangleRepository rectangleRepository) {
+    public RectangleResource(AccessLogRepository accessLogRepository,
+                             AnnotationRepository annotationRepository,
+                             RectangleRepository rectangleRepository,
+                             UserService userService) {
+        this.accessLogRepository = accessLogRepository;
         this.annotationRepository = annotationRepository;
         this.rectangleRepository = rectangleRepository;
+        this.userService = userService;
     }
 
     /**
@@ -178,6 +198,22 @@ s in body
         rectangleMap.values().removeAll(rectangles);
         rectangleMap.values().stream()
             .forEach(r -> rectangleRepository.delete(r.getId()));
+
+        List<AccessLog> accessLogs =
+            accessLogRepository
+            .findByUserIsCurrentUserAndAnnotationId(annotationId, TOP_TO);
+        ZonedDateTime now = ZonedDateTime.now(TOKYO);
+        log.debug("accessLogs:{}, isAfter?{}", accessLogs,
+                  accessLogs.isEmpty() ? "EMPTY"
+                  : accessLogs.get(0).getTo().plusMinutes(INTERVAL).isBefore(now));
+        if (accessLogs.isEmpty()
+            || accessLogs.get(0).getTo().plusMinutes(INTERVAL).isBefore(now)) {
+            User user = userService.getUserWithAuthorities().orElse(null);
+            accessLogRepository.save(new AccessLog().from(now).to(now)
+                                     .user(user).annotation(annotation));
+        } else {
+            accessLogRepository.save(accessLogs.get(0).to(now));
+        }
         return rectangles.stream()
             .collect(Collectors.toMap
                      (r -> r.getCoordinateX() + "," + r.getCoordinateY(),

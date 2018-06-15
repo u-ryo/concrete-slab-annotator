@@ -155,6 +155,7 @@ configurations {
 repositories {
     mavenLocal()
     jcenter()
+    mavenCentral()
 }
 
 dependencies {
@@ -174,6 +175,7 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-annotations"
     compile "com.fasterxml.jackson.core:jackson-databind"
     compile "com.fasterxml.jackson.module:jackson-module-afterburner"
+    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-csv"
     compile "com.ryantenney.metrics:metrics-spring"
     compile "javax.cache:cache-api"
     compile "org.hibernate:hibernate-core"
@@ -219,6 +221,7 @@ dependencies {
     compile "org.springframework.social:spring-social-google"
     compile "org.springframework.social:spring-social-facebook"
     compile "org.springframework.social:spring-social-twitter"
+    compileOnly 'org.projectlombok:lombok:1.18.0'
     testCompile "com.jayway.jsonpath:json-path"
     testCompile "info.cukes:cucumber-junit"
     testCompile "info.cukes:cucumber-spring"
@@ -236,6 +239,8 @@ dependencies {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
     //jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
+
+    apt 'org.projectlombok:lombok:1.18.0'
 }
 
 task cleanResources(type: Delete) {

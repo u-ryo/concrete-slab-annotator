@@ -1,0 +1,47 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "user",
+            "otherEntityName": "user",
+            "relationshipType": "many-to-one",
+            "relationshipValidateRules": [
+                "required"
+            ],
+            "otherEntityField": "login",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "accessLog"
+        },
+        {
+            "relationshipName": "annotation",
+            "otherEntityName": "annotation",
+            "relationshipType": "many-to-one",
+            "relationshipValidateRules": [
+                "required"
+            ],
+            "otherEntityField": "defect"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "from",
+            "fieldType": "ZonedDateTime",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "to",
+            "fieldType": "ZonedDateTime",
+            "fieldValidateRules": [
+                "required"
+            ]
+        }
+    ],
+    "changelogDate": "20180612144245",
+    "dto": "no",
+    "service": "no",
+    "entityTableName": "access_log",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}

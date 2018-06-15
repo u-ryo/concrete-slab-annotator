@@ -7,6 +7,7 @@ import { SharedStorage } from 'ngx-store';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Account, LoginModalService, Principal } from '../shared';
+import { DownloadFileService } from '../shared/downloadFile.service';
 
 @Component({
     selector: 'jhi-home',
@@ -22,6 +23,7 @@ export class HomeComponent implements OnInit {
     @SharedStorage() filename: string;
 
     constructor(
+        private downloadFileService: DownloadFileService,
         private principal: Principal,
         private languageService: JhiLanguageService,
         private loginModalService: LoginModalService,
@@ -68,5 +70,9 @@ export class HomeComponent implements OnInit {
     logout() {
         this.loginService.logout();
         this.router.navigate(['']);
+    }
+
+    downloadCsv() {
+        this.downloadFileService.results('api/access-logs/csv');
     }
 }

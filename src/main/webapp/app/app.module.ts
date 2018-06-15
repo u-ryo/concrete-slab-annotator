@@ -18,6 +18,7 @@ import { ConcreteSlabAnnotatorAdminModule } from './admin/admin.module';
 import { ConcreteSlabAnnotatorAccountModule } from './account/account.module';
 import { ConcreteSlabAnnotatorEntityModule } from './entities/entity.module';
 import { DataService } from './shared/data.service';
+import { DownloadFileService } from './shared/downloadFile.service';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PaginationConfig } from './blocks/config/uib-pagination.config';
 import * as Hammer from 'hammerjs';
@@ -100,6 +101,7 @@ export class MyHammerConfig extends HammerGestureConfig  {
             ]
         },
         DataService,
+        DownloadFileService,
         { provide: HAMMER_GESTURE_CONFIG,  useClass: MyHammerConfig }
     ],
     bootstrap: [ JhiMainComponent ]

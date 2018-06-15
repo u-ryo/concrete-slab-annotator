@@ -44,6 +44,7 @@ public class CacheConfiguration {
             cm.createCache(jp.ac.keio.ae.comp.vitz.annotator.domain.Annotation.class.getName(), jcacheConfiguration);
             cm.createCache(jp.ac.keio.ae.comp.vitz.annotator.domain.Annotation.class.getName() + ".rectangles", jcacheConfiguration);
             cm.createCache(jp.ac.keio.ae.comp.vitz.annotator.domain.Rectangle.class.getName(), jcacheConfiguration);
+            cm.createCache(jp.ac.keio.ae.comp.vitz.annotator.domain.AccessLog.class.getName(), jcacheConfiguration);
             // jhipster-needle-ehcache-add-entry
         };
     }
