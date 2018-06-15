@@ -130,6 +130,7 @@ public class AccessLogResource {
 
     /**
      * GET  /access-logs/csv : get all the accessLogs with CSV.
+     * ref. https://qiita.com/yo1000/items/050c5c47daabf7a10e10
      *
      * @return the CSV File
      */

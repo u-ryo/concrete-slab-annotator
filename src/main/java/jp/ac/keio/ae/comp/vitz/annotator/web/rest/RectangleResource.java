@@ -3,6 +3,7 @@ package jp.ac.keio.ae.comp.vitz.annotator.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.AccessLog;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Annotation;
+import jp.ac.keio.ae.comp.vitz.annotator.domain.AnnotationXml;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Rectangle;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.User;
 
@@ -18,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -46,6 +46,9 @@ public class RectangleResource {
 
     private static final String ENTITY_NAME = "rectangle";
     private static final ZoneId TOKYO = ZoneId.of("Asia/Tokyo");
+    // https://github.com/yamkazu/springdata-jpa-example/blob/pageable/src/test/java/org/yamkazu/springdata/EmpRepositoryTest.java
+    // https://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-part-seven-pagination/
+    // https://stackoverflow.com/questions/9314078/setmaxresults-for-spring-data-jpa-annotation?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
     private static final Pageable TOP_TO = new PageRequest(0, 1, DESC, "to");
     private static final int INTERVAL = 5;
 
@@ -158,7 +161,7 @@ public class RectangleResource {
         (@PathVariable Long annotationId) {
         log.debug("REST request to get Rectangles with annotationId:{}",
                   annotationId);
-        return rectangleRepository.findWithAnnotationId(annotationId).stream()
+        return rectangleRepository.findByAnnotationId(annotationId).stream()
             .collect(Collectors.toMap
                      (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
                       r -> r,
@@ -180,7 +183,7 @@ s in body
         log.debug("REST request to save Rectangles with annotationId:{}, {}",
                   annotationId, rectangles);
         Map<String, Rectangle> rectangleMap =
-            rectangleRepository.findWithAnnotationId(annotationId).stream()
+            rectangleRepository.findByAnnotationId(annotationId).stream()
             .collect(Collectors.toMap
                      (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
                       r -> r, (r1, r2) -> r2));
@@ -203,6 +206,8 @@ s in body
             accessLogRepository
             .findByUserIsCurrentUserAndAnnotationId(annotationId, TOP_TO);
         ZonedDateTime now = ZonedDateTime.now(TOKYO);
+        // https://qiita.com/kurukurupapa@github/items/f55395758eba03d749c9
+        // http://www.atmarkit.co.jp/ait/articles/1501/29/news016_2.html
         log.debug("accessLogs:{}, isAfter?{}", accessLogs,
                   accessLogs.isEmpty() ? "EMPTY"
                   : accessLogs.get(0).getTo().plusMinutes(INTERVAL).isBefore(now));
@@ -219,5 +224,52 @@ s in body
                      (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
                       r -> r,
                       (r1, r2) -> r2));
+    }
+
+    
+    /**
+     * GET  /rectangles/xml/annotation/{annotationId} : get the rectangles XML which belong to the annotation with the specified annotationId.
+     * ref. http://blog.rakugakibox.net/entry/2014/11/23/java_spring_boot_rest
+     *
+     * @param annotationId annotationId of rectangles belong to
+     * @return the ResponseEntity with status 200 (OK)
+s in body
+     */
+    @GetMapping("/rectangles/xml/annotation/{annotationId}")
+    @Timed
+    public AnnotationXml getAnnotationXml(@PathVariable Long annotationId) {
+        log.debug("REST request to get AnnotationXml with annotationId:{}",
+                  annotationId);
+        Annotation annotation = annotationRepository.findOne(annotationId);
+        String filename = annotation.getImage().getFilename();
+        int index = filename.indexOf("/", 8);
+        int lastIndex = filename.lastIndexOf("/");
+        String folder = filename;
+        if (index > 0 && lastIndex > 0) {
+            folder = filename.substring(index, lastIndex);
+        }
+
+        AnnotationXml annotationXml = new AnnotationXml()
+            .folder(folder)
+            .filename(filename.substring(lastIndex + 1))
+            .size(new AnnotationXml.Size()
+                  .width(annotation.getImage().getWidth())
+                  .height(annotation.getImage().getHeight())
+                  .depth(3))
+            .object(rectangleRepository.findByAnnotationId(annotationId)
+                    .stream()
+                    .filter(r -> !r.isPending())
+                    .map(r -> new AnnotationXml.Obj()
+                         .name(annotation.getDefect().name())
+                         .pose("Unspecified")
+                         .truncated(0)
+                         .difficult(0)
+                         .bndbox(new AnnotationXml.Bndbox()
+                                 .xmin(r.getX())
+                                 .ymin(r.getY())
+                                 .xmax(r.getX() + r.getWidth())
+                                 .ymax(r.getY() + r.getHeight())))
+                    .collect(Collectors.toList()));
+        return annotationXml;
     }
 }

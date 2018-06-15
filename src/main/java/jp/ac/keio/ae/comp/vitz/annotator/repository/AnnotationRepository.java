@@ -17,10 +17,10 @@ import java.util.Set;
 @Repository
 public interface AnnotationRepository extends JpaRepository<Annotation, Long> {
     @Query("SELECT a FROM Annotation a WHERE a.image.id = :imageId")
-    Set<Annotation> findWithImageId(@Param("imageId") Long imageId);
+    Set<Annotation> findByImageId(@Param("imageId") Long imageId);
 
     @Query("SELECT a FROM Annotation a WHERE a.image.id = :imageId AND a.squareSize = :squareSize AND a.defect = :defect")
-    Optional<Annotation> findWithImageIdSquareSizeAndDefect
+    Optional<Annotation> findByImageIdSquareSizeAndDefect
         (@Param("imageId") Long imageId,
          @Param("squareSize") Integer squareSize,
          @Param("defect") DefectName defect);

@@ -6,20 +6,21 @@ import java.time.ZonedDateTime;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+// https://projectlombok.org/features/experimental/Accessors
 @Data
 @Accessors(fluent = true)
 @JsonPropertyOrder({"login", "filename", "defect", "squareSize", "from", "to"})
 public class AccessLogBean {
-    @JsonProperty("login")
+    @JsonProperty
     private String login;
-    @JsonProperty("filename")
+    @JsonProperty
     private String filename;
-    @JsonProperty("defect")
+    @JsonProperty
     private String defect;
-    @JsonProperty("squareSize")
+    @JsonProperty
     private int squareSize;
-    @JsonProperty("from")
+    @JsonProperty
     private String from;
-    @JsonProperty("to")
+    @JsonProperty
     private String to;
 }

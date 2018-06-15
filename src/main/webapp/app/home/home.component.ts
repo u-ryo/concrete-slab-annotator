@@ -5,6 +5,7 @@ import { JhiLanguageService } from 'ng-jhipster';
 import { LoginService } from '../shared';
 import { SharedStorage } from 'ngx-store';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Annotation } from '../entities/annotation/annotation.model';
 
 import { Account, LoginModalService, Principal } from '../shared';
 import { DownloadFileService } from '../shared/downloadFile.service';
@@ -21,6 +22,7 @@ export class HomeComponent implements OnInit {
     modalRef: NgbModalRef;
     language = 'en';
     @SharedStorage() filename: string;
+    @SharedStorage() annotation: Annotation;
 
     constructor(
         private downloadFileService: DownloadFileService,
@@ -73,6 +75,13 @@ export class HomeComponent implements OnInit {
     }
 
     downloadCsv() {
-        this.downloadFileService.results('api/access-logs/csv');
+        this.downloadFileService.results(
+            'api/access-logs/csv', 'accesslog.csv');
+    }
+
+    downloadXml() {
+        this.downloadFileService.results(
+            `api/rectangles/xml/annotation/${this.annotation.id}`,
+            'annotation.xml');
     }
 }

@@ -141,7 +141,7 @@ public class AnnotationResource {
         log.debug("REST request to get Annotation : imageId:{}, squareSize:{}, "
                   + "defect:{}", imageId, squareSize, defect);
         Annotation annotation =
-            annotationRepository.findWithImageIdSquareSizeAndDefect
+            annotationRepository.findByImageIdSquareSizeAndDefect
             (imageId, squareSize, DefectName.valueOf(defect))
             .orElseGet(() -> annotationRepository
                        .save(new Annotation()

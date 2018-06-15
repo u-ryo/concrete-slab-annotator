@@ -16,16 +16,16 @@ import java.util.Set;
 @Repository
 public interface RectangleRepository extends JpaRepository<Rectangle, Long> {
     @Query("SELECT r FROM Rectangle r WHERE r.annotation.id = :annotationId")
-    Set<Rectangle> findWithAnnotationId(@Param("annotationId") Long annotationId);
+    Set<Rectangle> findByAnnotationId(@Param("annotationId") Long annotationId);
 
     @Query("DELETE FROM Rectangle r WHERE r.annotation.id = :annotationId AND r.coordinateX = :coordinateX AND r.coordinateY = :coordinateY")
-    Integer deleteWithAnnotationIdAndCoordinate
+    Integer deleteByAnnotationIdAndCoordinate
         (@Param("annotationId") Long annotationId,
          @Param("coordinateX") Integer coordinateX,
          @Param("coordinateY") Integer coordinateY);
 
     @Query("SELECT r FROM Rectangle r WHERE r.annotation.id = :annotationId AND r.coordinateX = :coordinateX AND r.coordinateY = :coordinateY")
-    Set<Rectangle> findWithCoordinate(@Param("annotationId") Long annotationId,
-                                      @Param("coordinateX") Integer coordinateX,
-                                      @Param("coordinateY") Integer coordinateY);
+    Set<Rectangle> findByCoordinate(@Param("annotationId") Long annotationId,
+                                    @Param("coordinateX") Integer coordinateX,
+                                    @Param("coordinateY") Integer coordinateY);
 }
