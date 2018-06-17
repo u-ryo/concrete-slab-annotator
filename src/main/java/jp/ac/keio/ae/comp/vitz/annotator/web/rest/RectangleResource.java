@@ -51,6 +51,7 @@ public class RectangleResource {
     // https://stackoverflow.com/questions/9314078/setmaxresults-for-spring-data-jpa-annotation?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
     private static final Pageable TOP_TO = new PageRequest(0, 1, DESC, "to");
     private static final int INTERVAL = 5;
+    private static final double RATE = 0.46;
 
     private final AccessLogRepository accessLogRepository;
     private final AnnotationRepository annotationRepository;
@@ -249,6 +250,17 @@ s in body
             folder = filename.substring(index, lastIndex);
         }
 
+        int squareSize = annotation.getSquareSize();
+        int width = annotation.getImage().getWidth();
+        double distance = annotation.getImage().getDistance();
+        int focalLength = annotation.getImage().getFocalLength();
+        double rate = distance * RATE / focalLength / squareSize;
+        int columns = (int) Math.round(rate * width);
+        int interval = width / columns;
+        log.debug("squareSize:{},width:{},distance:{},focalLength:{},rate:{},"
+                  + "columns:{},interval:{}", squareSize, width, distance,
+                  focalLength, rate, columns, interval);
+
         AnnotationXml annotationXml = new AnnotationXml()
             .folder(folder)
             .filename(filename.substring(lastIndex + 1))
@@ -258,6 +270,7 @@ s in body
                   .depth(3))
             .object(rectangleRepository.findByAnnotationId(annotationId)
                     .stream()
+                    .parallel()
                     .filter(r -> !r.isPending())
                     .map(r -> new AnnotationXml.Obj()
                          .name(annotation.getDefect().name())
@@ -265,10 +278,10 @@ s in body
                          .truncated(0)
                          .difficult(0)
                          .bndbox(new AnnotationXml.Bndbox()
-                                 .xmin(r.getX())
-                                 .ymin(r.getY())
-                                 .xmax(r.getX() + r.getWidth())
-                                 .ymax(r.getY() + r.getHeight())))
+                                 .xmin(r.getCoordinateX() * interval)
+                                 .ymin(r.getCoordinateY() * interval)
+                                 .xmax((r.getCoordinateX() + 1) * interval)
+                                 .ymax((r.getCoordinateY() + 1) * interval)))
                     .collect(Collectors.toList()));
         return annotationXml;
     }

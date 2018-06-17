@@ -529,12 +529,13 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     private createRectangleXY(pending, comment, rectangleX, rectangleY) {
+        // console.log(`createRectangleXY().x:${rectangleX * this.intervalX * this.rate}`);
         this.rectangles[`${rectangleX},${rectangleY}`] = <Rectangle>{
             // annotation: this.dataService.annotation,
-            x: rectangleX * this.intervalX,
-            y: rectangleY * this.intervalY,
-            width: this.intervalX,
-            height: this.intervalY,
+            x: rectangleX * this.intervalX * this.rate,
+            y: rectangleY * this.intervalY * this.rate,
+            width: this.intervalX * this.rate,
+            height: this.intervalY * this.rate,
             coordinateX: rectangleX,
             coordinateY: rectangleY,
             pending,

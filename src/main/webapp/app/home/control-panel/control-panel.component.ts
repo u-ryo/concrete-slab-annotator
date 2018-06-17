@@ -67,6 +67,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                 //             'image.filename:', this.image.filename);
                 this.distance = this.image.distance;
                 this.focalLength = this.image.focalLength;
+                this.filename = this.image.filename;
                 this.rebuildForm();
                 // console.log('image:', this.image,
                 //             'image.filename:', this.image.filename);

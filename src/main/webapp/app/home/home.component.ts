@@ -39,7 +39,9 @@ export class HomeComponent implements OnInit {
     ngOnInit() {
         this.route.queryParams.subscribe(
             (params) => {
-                this.filename = params['filename'];
+                if (params['filename']) {
+                    this.filename = params['filename'];
+                }
                 // console.log('params:',params);
             });
         this.principal.identity().then((account) => {
@@ -80,8 +82,10 @@ export class HomeComponent implements OnInit {
     }
 
     downloadXml() {
+        console.log(`filename:${this.filename}`);
+        const f = this.filename.substring(this.filename.lastIndexOf('/') + 1);
         this.downloadFileService.results(
             `api/rectangles/xml/annotation/${this.annotation.id}`,
-            'annotation.xml');
+            `${f}.${this.annotation.defect}.${this.annotation.squareSize}.xml`);
     }
 }
