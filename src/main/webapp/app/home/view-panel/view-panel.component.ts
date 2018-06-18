@@ -221,6 +221,9 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     afterLoading() {
+        if (this.img.nativeElement.offsetWidth === 0) {
+            return;
+        }
         this.dataService.image = this.img.nativeElement;
         this.canvas.nativeElement.style.width =
             `${this.img.nativeElement.offsetWidth}px`;
@@ -233,8 +236,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         this.rightEnd = 0;
         this.bottomEnd = 0;
         this.context = this.canvas.nativeElement.getContext('2d');
-        this.context.font = '38px "Courier"';
-        this.context.fillText('Now loading...', 10, 40);
+        // this.context.font = '38px "Courier"';
+        // this.context.fillText('Now loading...', 10, 40);
         this.loading = false;
         this.intervalX = this.canvas.nativeElement.width
             / this.dataService.form.value.columns;
@@ -244,8 +247,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             this.img.nativeElement.naturalWidth / this.magnification;
         this.virtualImageHeight =
             this.img.nativeElement.naturalHeight / this.magnification;
-        // console.log('canvas height:', this.canvas.nativeElement.height,
-        // //             'offsetHeight:', this.canvas.nativeElement.offsetHeight,
+        // console.log(`canvas height:${this.canvas.nativeElement.height}`,
+        //             `img offsetHeight:${this.img.nativeElement.offsetHeight}`,
         //             'loading:', this.loading,
         // //             'naturalWidth:', this.img.nativeElement.naturalWidth,
         // //             'magnification:', this.magnification,
