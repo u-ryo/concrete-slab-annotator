@@ -31,6 +31,8 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     private squareSize = 2;
     @LocalStorage() annotation: Annotation;
     @LocalStorage() brightness: number;
+    auto;
+    comment;
 
     constructor(private annotationService: AnnotationService,
                 private dataService: DataService,
