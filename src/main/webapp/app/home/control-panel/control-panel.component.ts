@@ -31,8 +31,6 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     private squareSize = 2;
     @LocalStorage() annotation: Annotation;
     @LocalStorage() brightness: number;
-    auto;
-    comment;
 
     constructor(private annotationService: AnnotationService,
                 private dataService: DataService,
@@ -211,7 +209,9 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         const index = (fileUrl ? fileUrl.length : 0) - 4;
         // console.log(`fileUrl.indexOf(jpg):${fileUrl.indexOf('.jpg', index)}`);
         if (index < 0 || (fileUrl.indexOf('.jpg', index) < 0
-                          && fileUrl.indexOf('.png', index) < 0)) {
+                          && fileUrl.indexOf('.png', index) < 0
+                          && fileUrl.indexOf('.tif', index) < 0
+                          && fileUrl.indexOf('.gif', index) < 0)) {
             return;
         }
         const imgs = this.images.filter((i) => i.filename === fileUrl);

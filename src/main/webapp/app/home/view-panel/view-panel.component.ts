@@ -118,8 +118,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             .subscribe((comment) => this.setComment(comment));
         this.dataService.form.get('fileUrlField').valueChanges
             .debounceTime(1000)
-            .forEach(
-            (url) => {
+            .forEach((url) => {
                 this.loading = true;
                 this.fileUrl = url;
                 this.brightness = this.sanitizer.bypassSecurityTrustStyle(
@@ -133,13 +132,13 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 this.dataService.form.controls['fileUrlField'].setValue(
                     url, {emitEvent: false});
                 // this.dataService.form.controls['brightnessLevel'].setValue(100);
-                setTimeout(() => {
-                    // console.log(`img.offsetHeight:`
-                    //             + `${this.img.nativeElement.offsetHeight}`);
-                    if (this.img.nativeElement.offsetHeight > 0) {
-                        this.loading = false;
-                    }
-                }, 500);
+                // setTimeout(() => {
+                //     console.log('img.offsetHeight:',
+                //                 this.img.nativeElement.offsetHeight);
+                //     if (this.img.nativeElement.offsetHeight > 0) {
+                //         this.loading = false;
+                //     }
+                // }, 500);
             });
         this.dataService.form.get('columns').valueChanges
             .debounceTime(500)
@@ -221,7 +220,10 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     afterLoading() {
-        if (this.img.nativeElement.offsetWidth === 0) {
+        // console.log(`img.offsetHeight:${this.img.nativeElement.offsetHeight},loading:${this.loading}`);
+        if (this.img.nativeElement.offsetHeight === 0) {
+            this.loading = false;
+            this.drawCanvas();
             return;
         }
         this.dataService.image = this.img.nativeElement;
@@ -249,11 +251,11 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             this.img.nativeElement.naturalHeight / this.magnification;
         // console.log(`canvas height:${this.canvas.nativeElement.height}`,
         //             `img offsetHeight:${this.img.nativeElement.offsetHeight}`,
-        //             'loading:', this.loading,
+        //             `loading:${this.loading}`,
         // //             'naturalWidth:', this.img.nativeElement.naturalWidth,
         // //             'magnification:', this.magnification,
         // //             'rightEnd:', this.rightEnd,
-        //             'intervalX:', this.intervalX);
+        //             `intervalX:${this.intervalX}`);
         this.rectangles = this.dataService.rectangles;
         // console.log('defects from dataService:', this.dataService.defects);
         this.drawCanvas();

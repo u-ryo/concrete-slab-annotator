@@ -4,7 +4,7 @@ import { JhiEventManager } from 'ng-jhipster';
 import { JhiLanguageService } from 'ng-jhipster';
 import { LoginService } from '../shared';
 import { SharedStorage } from 'ngx-store';
-import { ActivatedRoute, Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { Annotation } from '../entities/annotation/annotation.model';
 
 import { Account, LoginModalService, Principal } from '../shared';
@@ -31,19 +31,18 @@ export class HomeComponent implements OnInit {
         private loginModalService: LoginModalService,
         private eventManager: JhiEventManager,
         private loginService: LoginService,
-        private route: ActivatedRoute,
         private router: Router
     ) {
     }
 
     ngOnInit() {
-        this.route.queryParams.subscribe(
-            (params) => {
-                if (params['filename']) {
-                    this.filename = params['filename'];
-                }
-                // console.log('params:',params);
-            });
+        // this.router.events.filter((event) => event instanceof NavigationEnd)
+        //     .subscribe((event: NavigationEnd) => {
+        //         console.log(`event.url:${event.url}`);
+        //         if (event.url.lastIndexOf('/?filename=', 0) === 0) {
+        //             this.filename = event.url.substring('/?filename='.length);
+        //         }
+        //     });
         this.principal.identity().then((account) => {
             this.account = account;
         });
