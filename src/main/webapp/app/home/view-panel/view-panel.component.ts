@@ -190,6 +190,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             (error) => console.error(`Error: ${error}`),
             () => console.log('Completed')
         );
+        this.renderer.listen(
+            this.img.nativeElement, 'click', (event) => this.loading = false);
     }
 
     // ngAfterViewInit() {
