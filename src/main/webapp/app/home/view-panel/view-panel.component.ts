@@ -20,7 +20,7 @@ import 'rxjs/Rx';
 })
 export class ViewPanelComponent implements OnDestroy, OnInit {
     context: CanvasRenderingContext2D;
-    @ViewChild('img') img;
+    @SharedStorage() @ViewChild('img') img;
     @ViewChild('canvas') canvas;
     private CHECK_INTERVAL = 5000;
     @SharedStorage() cropX = 0;
@@ -57,9 +57,10 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 private sharedStorageService: SharedStorageService) {}
 
     ngOnInit() {
-        this.subscription = this.dataService.redrawData$.subscribe(() => {
+        this.subscription = this.dataService.redrawData$.subscribe((r) => {
+            this.rectangles = r;
+
             this.log.d('subscribe called');
-            this.rectangles = this.dataService.rectangles;
             this.intervalX = this.canvas.nativeElement.width
                 * this.magnification / this.dataService.form.value.columns;
             this.intervalY = this.canvas.nativeElement.height
@@ -213,7 +214,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                    `img offsetHeight:${this.img.nativeElement.offsetHeight}`,
                    `loading:${this.loading}`,
                    `intervalX:${this.intervalX}`);
-        this.rectangles = this.dataService.rectangles;
         this.drawCanvas();
     }
 

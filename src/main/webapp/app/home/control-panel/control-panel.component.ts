@@ -275,14 +275,12 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             .subscribe(
                 (res: HttpResponse<Map<string, Rectangle>>) => {
                     this.log.d('rectangles:', res.body);
-                    this.dataService.rectangles = res.body;
-                    this.dataService.notifyRedraw();
+                    this.dataService.notifyRedraw(res.body);
                 },
                 (res: HttpErrorResponse) => {
                     this.onError(res.message);
                     this.log.er(res.message);
-                    this.dataService.rectangles = new Map<string, Rectangle>();
-                    this.dataService.notifyRedraw();
+                    this.dataService.notifyRedraw(new Map<string, Rectangle>());
                 });
     }
 }
