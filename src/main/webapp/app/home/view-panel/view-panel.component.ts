@@ -42,9 +42,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     private MAGNIFICATION_START = 2;
     private coordinate = '';
     brightness = this.sanitizer.bypassSecurityTrustStyle(`brightness(100%)`);
-    // private defect = undefined;
     private clickCounter = 0;
-    // private mouseMoveSubscription: Subscription;
     private subscription: Subscription;
     private dirty = false;
     private timerObservable = Observable.interval(this.CHECK_INTERVAL);
@@ -62,8 +60,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         this.subscription = this.dataService.redrawData$.subscribe(() => {
             this.log.d('subscribe called');
             this.rectangles = this.dataService.rectangles;
-            // this.defect = Object.keys(DefectName)[0];
-            // console.log('defect:', this.defect);
             this.intervalX = this.canvas.nativeElement.width
                 * this.magnification / this.dataService.form.value.columns;
             this.intervalY = this.canvas.nativeElement.height
@@ -133,14 +129,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 this.log.i(`url:${url}`);
                 this.dataService.form.controls['fileUrlField'].setValue(
                     url, {emitEvent: false});
-                // this.dataService.form.controls['brightnessLevel'].setValue(100);
-                // setTimeout(() => {
-                //     console.log('img.offsetHeight:',
-                //                 this.img.nativeElement.offsetHeight);
-                //     if (this.img.nativeElement.offsetHeight > 0) {
-                //         this.loading = false;
-                //     }
-                // }, 500);
             });
         this.dataService.form.get('columns').valueChanges
             .debounceTime(500)
@@ -164,14 +152,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         this.dataService.form.get('pending').valueChanges
             .debounceTime(500)
             .subscribe((pending) => this.setPending(pending));
-        // this.dataService.form.get('defect').valueChanges
-        //     .debounceTime(500)
-        //     .subscribe(
-        //         (defect) => {
-        //             this.defect = defect;
-        //             // console.log('defect:', this.defect);
-        //             this.drawCanvas();
-        //         });
         this.dataService.form.get('brightnessLevel').valueChanges
             .debounceTime(500)
             .subscribe(
@@ -181,8 +161,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                     this.drawCanvas();
                     this.log.d('brightness:', this.brightness);
                 });
-        // this.defect = this.dataService.form.value.defect;
-        // console.log('defect:', this.defect);
         this.sharedStorageService.observe('cropX').subscribe(
             (x) => this.drawCanvas());
         this.sharedStorageService.observe('cropY').subscribe(
@@ -196,28 +174,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             this.img.nativeElement, 'click', (event) => this.loading = false);
     }
 
-    // ngAfterViewInit() {
-    //     this.mouseMoveSubscription =
-    //         Observable.fromEvent(this.canvas.nativeElement, 'mousemove')
-    //         .sampleTime(3).subscribe((event: MouseEvent) => {
-    //             // console.log('event:', event);
-    //             if (event.ctrlKey && !event.shiftKey) {
-    //                 this.onclick(event, false);
-    //             } else if (!event.ctrlKey && event.shiftKey) {
-    //                 this.onclick(event, true);
-    //             }
-    //             // if (this.isMouseDown) {
-    //             //     this.drag(event.layerX, event.layerY,
-    //             //               event.movementX, event.movementY);
-    //             // }
-    //         });
-    // }
-
     ngOnDestroy() {
-        // if (this.mouseMoveSubscription) {
-        //     this.mouseMoveSubscription.unsubscribe();
-        // }
-
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
@@ -243,8 +200,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         this.rightEnd = 0;
         this.bottomEnd = 0;
         this.context = this.canvas.nativeElement.getContext('2d');
-        // this.context.font = '38px "Courier"';
-        // this.context.fillText('Now loading...', 10, 40);
         this.loading = false;
         this.intervalX = this.canvas.nativeElement.width
             / this.dataService.form.value.columns;
@@ -398,7 +353,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     drag(x, y, movementX, movementY) {
-        // const currentX = this.cropX + this.previousX - x;
         const currentX = this.cropX - movementX;
         this.log.d('currentX:', currentX,
                    'rightEnd', this.rightEnd,
@@ -406,13 +360,10 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                    this.magnification);
         if (currentX >= 0 && currentX <= this.rightEnd) {
             this.cropX = currentX;
-            // this.previousX = x;
         }
-        // const currentY = this.cropY + this.previousY - y;
         const currentY = this.cropY - movementY;
         if (currentY >= 0 && currentY <= this.bottomEnd) {
             this.cropY = currentY;
-            // this.previousY = y;
         }
         this.drawCanvas();
         this.hasMouseMoved = true;
@@ -464,18 +415,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             }
             this.log.d('rectangles[', this.coordinate, ']:',
                        this.rectangles[this.coordinate]);
-            // this.saveRectangle(true);
         } else if (!isSingleClick && this.rectangles[this.coordinate]) {
-            // if (this.defects[this.coordinate]
-            //     && this.defects[this.coordinate][this.defect]) {
-            //     this.deleteDefect();
-            //     delete(this.defects[this.coordinate][this.defect]);
-            // }
-            // if (this.rectangles[this.coordinate]
-            //     && !this.rectangles[this.coordinate].comment) {
-            //     this.deleteRectangle(this.rectangles[this.coordinate].id);
             delete(this.rectangles[this.coordinate]);
-            // }
             this.dirty = true;
         }
         this.drawCanvas();
@@ -522,7 +463,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         } else {
             this.rectangles[this.coordinate].comment = comment;
         }
-        // this.saveRectangle(false);
         this.log.d('setComment:', comment, this.dataService.form.value.comment,
                    'coordinate:', this.coordinate);
         this.dirty = true;
@@ -538,7 +478,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         this.log.d('createRectangleXY().x:',
                    rectangleX * this.intervalX * this.rate);
         this.rectangles[`${rectangleX},${rectangleY}`] = <Rectangle>{
-            // annotation: this.dataService.annotation,
             x: rectangleX * this.intervalX * this.rate,
             y: rectangleY * this.intervalY * this.rate,
             width: this.intervalX * this.rate,
@@ -549,112 +488,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             comment
         };
     }
-
-    // saveRectangle(shouldDefectSave) {
-    //     if (this.coordinate === undefined
-    //         || this.rectangles[this.coordinate] === undefined
-    //         || isNaN(this.rectangles[this.coordinate].x)
-    //         || isNaN(this.rectangles[this.coordinate].y)) {
-    //         return;
-    //     }
-    //     console.log('rectangle:', this.coordinate,
-    //                 this.rectangles[this.coordinate]);
-    //     let observable;
-    //     let message;
-    //     this.rectangles[this.coordinate].annotation =
-    //         this.dataService.annotation;
-    //     if (!this.rectangles[this.coordinate].id) {
-    //         observable =
-    //             this.rectangleService.create(this.rectangles[this.coordinate]);
-    //         message = 'new Rectangle saved at ' + this.coordinate;
-    //     } else {
-    //         observable =
-    //             this.rectangleService.update(this.rectangles[this.coordinate]);
-    //         message = 'Rectangle updated at ' + this.coordinate;
-    //     }
-    //     observable.subscribe(
-    //         (res: HttpResponse<Rectangle>) => {
-    //             this.rectangles[this.coordinate] = res.body;
-    //             console.log(`${message}:`, res.body);
-    //             if (shouldDefectSave) {
-    //                 this.saveDefect(this.dataService.form.value.pending);
-    //             }
-    //         },
-    //         (res: HttpErrorResponse) => {
-    //             console.error(this.coordinate, res.message);
-    //             this.onError(res.message);
-    //             delete(this.rectangles[this.coordinate]);
-    //         });
-    // }
-
-    // private saveDefect(pending) {
-    //     console.log('defects:', this.defects);
-    //     if (!this.defects[this.coordinate]) {
-    //         this.defects[this.coordinate] = new Map<string, Defect>();
-    //     }
-    //     this.defects[this.coordinate][this.defect] =
-    //         this.defects[this.coordinate][this.defect] || <Defect>{
-    //             rectangle: this.rectangles[this.coordinate],
-    //             name: this.defect,
-    //             pending
-    //         };
-    //     this.defects[this.coordinate][this.defect].pending = pending;
-    //     let observable;
-    //     let message;
-    //     if (this.defects[this.coordinate][this.defect].id) {
-    //         observable = this.defectService.update(
-    //             this.defects[this.coordinate][this.defect]);
-    //         message =
-    //             'update defect[' + this.coordinate + '][' + this.defect + ']';
-    //     } else {
-    //         observable = this.defectService.create(
-    //             this.defects[this.coordinate][this.defect]);
-    //         message =
-    //             'create defect[' + this.coordinate + '][' + this.defect + ']';
-    //     }
-    //     observable.subscribe(
-    //         (res: HttpResponse<Defect>) => {
-    //             console.log(message, res.body);
-    //             this.defects[this.coordinate][this.defect] = res.body;
-    //             this.drawCanvas();
-    //         },
-    //         (res: HttpErrorResponse) => {
-    //             console.error(res.message);
-    //             this.onError(res.message);
-    //             delete(this.defects[this.coordinate][this.defect]);
-    //             this.drawCanvas();
-    //         });
-    // }
-
-    // deleteDefect() {
-    //     this.defectService
-    //         .delete(this.defects[this.coordinate][this.defect].id)
-    //         .subscribe(
-    //             (res) => {
-    //                 delete(this.defects[this.coordinate][this.defect]);
-    //                 console.log('deleteDefect:',
-    //                             this.defects[this.coordinate].size);
-    //                 if (this.defects[this.coordinate].size === 0) {
-    //                     this.deleteRectangle();
-    //                 }
-    //             },
-    //             (res: HttpErrorResponse) => {
-    //                 console.error(res.message);
-    //                 this.onError(res.message);
-    //             });
-    // }
-
-    // deleteRectangle() {
-    //     this.rectangleService.delete(this.rectangles[this.coordinate].id)
-    //         .subscribe(
-    //             (res) => {
-    //                 delete(this.rectangles[this.coordinate]);
-    //             },
-    //             (res: HttpErrorResponse) => {
-    //                 console.error(res.message);
-    //                 this.onError(res.message);
-    //             });
-    // }
 
     saveRectangles(x) {
         this.log.d(`Next: ${x}, rectangles: `

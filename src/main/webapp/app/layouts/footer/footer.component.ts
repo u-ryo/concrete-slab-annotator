@@ -92,8 +92,6 @@ export class FooterComponent implements OnInit {
             = `${this.img.nativeElement.offsetHeight}px`;
         this.canvas.nativeElement.height = this.img.nativeElement.offsetHeight;
         this.context = this.canvas.nativeElement.getContext('2d');
-        // this.context.font = '24px "Courier"';
-        // this.context.fillText('Now loading...', 10, 40);
         this.context.fillStyle = 'rgba(192, 80, 77, 0.5)';
         this.ratio = this.img.nativeElement.offsetWidth
             / this.img.nativeElement.naturalWidth;
