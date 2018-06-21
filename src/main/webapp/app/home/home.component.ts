@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 import { JhiLanguageService } from 'ng-jhipster';
+import { Level, Log } from 'ng2-logger/client';
 import { LoginService } from '../shared';
 import { SharedStorage } from 'ngx-store';
 import { Router } from '@angular/router';
@@ -23,6 +24,7 @@ export class HomeComponent implements OnInit {
     language = 'en';
     @SharedStorage() filename: string;
     @SharedStorage() annotation: Annotation;
+    private log = Log.create('home', Level.ERROR, Level.WARN, Level.INFO);
 
     constructor(
         private downloadFileService: DownloadFileService,
@@ -74,7 +76,7 @@ export class HomeComponent implements OnInit {
     }
 
     downloadXml() {
-        console.log(`filename:${this.filename}`);
+        this.log.i(`filename:${this.filename}`);
         const f = this.filename.substring(this.filename.lastIndexOf('/') + 1);
         this.downloadFileService.results(
             `api/rectangles/xml/annotation/${this.annotation.id}`,

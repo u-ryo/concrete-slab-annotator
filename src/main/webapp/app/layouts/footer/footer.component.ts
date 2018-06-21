@@ -1,4 +1,5 @@
 import { Component, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Level, Log } from 'ng2-logger/client';
 import { NavigationEnd, Router } from '@angular/router';
 import { Principal } from '../../shared';
 import { SharedStorage, SharedStorageService } from 'ngx-store';
@@ -26,6 +27,7 @@ export class FooterComponent implements OnInit {
     ratio = 1;
     private isMouseDown = false;
     cursor = 'pointer';
+    private log = Log.create('footer', Level.ERROR, Level.WARN, Level.INFO);
 
     constructor(private sharedStorageService: SharedStorageService,
                 private principal: Principal,
@@ -61,8 +63,8 @@ export class FooterComponent implements OnInit {
             });
         this.router.events.filter((event) => event instanceof NavigationEnd)
             .subscribe((event: NavigationEnd) => {
-                // console.log(`router:`, this.router, `event:`, event);
-                // console.log(`event.url:${event.url}`);
+                this.log.d(`router:`, this.router, `event:`, event);
+                this.log.d(`event.url:${event.url}`);
                 if (event.url === '/' || event.url.lastIndexOf('/?', 0) === 0) {
                     this.maximize();
                 } else {
@@ -95,27 +97,21 @@ export class FooterComponent implements OnInit {
         this.context.fillStyle = 'rgba(192, 80, 77, 0.5)';
         this.ratio = this.img.nativeElement.offsetWidth
             / this.img.nativeElement.naturalWidth;
-        // console.log(
-        //     `img.offsetWidth:${this.img.nativeElement.offsetWidth},`
-        //         // + `naturalWidth:${this.img.nativeElement.naturalWidth},`
-        //         + `ratio:${this.ratio},`
-        //         + `canvas.width:${this.canvas.nativeElement.width}`
-        // );
+        this.log.d(`img.offsetWidth:${this.img.nativeElement.offsetWidth},`
+                   + `naturalWidth:${this.img.nativeElement.naturalWidth},`
+                   + `ratio:${this.ratio},`
+                   + `canvas.width:${this.canvas.nativeElement.width}`
+                  );
         this.drawRectangle(0);
     }
 
     drawRectangle(x) {
-        // console.log('x:', x, 'cropX:', this.cropX);
+        this.log.d('x:', x, 'cropX:', this.cropX);
         this.context.clearRect(0, 0, this.canvas.nativeElement.width,
                                this.canvas.nativeElement.height);
-        // console.log(
-        //     // `cropX:${this.cropX}, `
-        //     //     + `cropX*ratio:${this.cropX * this.ratio}, `
-        //     //     + `cropX*rate:${this.cropX * this.rate}, `
-        //     //     + `cropX*ratio*rate:${this.cropX * this.ratio * this.rate}`
-        //     `virtualImageWidth:${this.virtualImageWidth},`
-        //         + `ratio:${this.ratio},`
-        // );
+        this.log.d(`virtualImageWidth:${this.virtualImageWidth},`
+                   + `ratio:${this.ratio},`
+                  );
         this.context.fillRect(this.cropX * this.ratio * this.rate,
                               this.cropY * this.ratio * this.rate,
                               this.virtualImageWidth * this.ratio,
@@ -123,11 +119,12 @@ export class FooterComponent implements OnInit {
     }
 
     drag(x, y, movementX, movementY) {
-        // console.log(`cropX:${this.cropX},x:${x},movementX:${movementX},`
-        //             + `x/ratio:${x / this.ratio},`
-        //             + `movementX/ratio:${movementX / this.ratio}`
-        //             + `movementX/ratio/rate:${movementX / this.ratio / this.rate}`
-        //            );
+        this.log.d(
+            `cropX:${this.cropX},x:${x},movementX:${movementX},`
+                + `x/ratio:${x / this.ratio},`
+                + `movementX/ratio:${movementX / this.ratio}`
+                + `movementX/ratio/rate:${movementX / this.ratio / this.rate}`
+        );
         const currentX = this.cropX + (movementX / this.ratio / this.rate);
         if (currentX >= 0 && currentX <= this.rightEnd) {
             this.cropX = currentX;

@@ -4,6 +4,7 @@ import { DefectName } from '../../entities/annotation/annotation.model';
 import { DomSanitizer } from '@angular/platform-browser';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { JhiAlertService } from 'ng-jhipster';
+import { Level, Log } from 'ng2-logger/client';
 import { Observable } from 'rxjs/Observable';
 import { Rectangle } from '../../entities/rectangle/rectangle.model';
 import { RectangleService } from '../../entities/rectangle/rectangle.service';
@@ -48,6 +49,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     private dirty = false;
     private timerObservable = Observable.interval(this.CHECK_INTERVAL);
     cursor = 'auto';
+    private log = Log.create('view-panel', Level.ERROR, Level.WARN, Level.INFO);
 
     constructor(private dataService: DataService,
                 private sanitizer: DomSanitizer,
@@ -58,7 +60,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
 
     ngOnInit() {
         this.subscription = this.dataService.redrawData$.subscribe(() => {
-            // console.log('subscribe:', 'a');
+            this.log.d('subscribe called');
             this.rectangles = this.dataService.rectangles;
             // this.defect = Object.keys(DefectName)[0];
             // console.log('defect:', this.defect);
@@ -66,7 +68,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 * this.magnification / this.dataService.form.value.columns;
             this.intervalY = this.canvas.nativeElement.height
                 * this.magnification / this.dataService.form.value.rows;
-            // console.log('redraw intervalX:', this.intervalX);
+            this.log.d('redraw intervalX:', this.intervalX);
             this.drawCanvas();
         });
         this.renderer.listen(this.canvas.nativeElement, 'mouseup', (event) => {
@@ -80,7 +82,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             });
         this.renderer.listen(
             this.canvas.nativeElement, 'mousemove', (event) => {
-                // console.log('event:', event);
+                this.log.d('event:', event);
                 if (event.ctrlKey && event.shiftKey) {
                     if (this.magnification > this.MAGNIFICATION_START) {
                         this.cursor = 'brush';
@@ -128,7 +130,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 this.cropY = 0;
                 this.isMouseDown = false;
                 this.hasMouseMoved = false;
-                console.log(`url:${url}`);
+                this.log.i(`url:${url}`);
                 this.dataService.form.controls['fileUrlField'].setValue(
                     url, {emitEvent: false});
                 // this.dataService.form.controls['brightnessLevel'].setValue(100);
@@ -147,8 +149,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                     this.intervalX = this.canvas.nativeElement.width
                         * this.magnification / columns;
                     this.drawCanvas();
-                    // console.log('columns:', columns,
-                    //             this.dataService.form.value.columns);
+                    this.log.d('columns:', columns,
+                               this.dataService.form.value.columns);
                 });
         this.dataService.form.get('rows').valueChanges
             .debounceTime(500)
@@ -157,7 +159,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                     this.intervalY = this.canvas.nativeElement.height
                         * this.magnification / rows;
                     this.drawCanvas();
-                    // console.log('rows:', rows, this.dataService.form.value.rows);
+                    this.log.d('rows:', rows, this.dataService.form.value.rows);
                 });
         this.dataService.form.get('pending').valueChanges
             .debounceTime(500)
@@ -177,7 +179,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                     this.brightness = this.sanitizer.bypassSecurityTrustStyle(
                         `brightness(${brightnessLevel}%)`);
                     this.drawCanvas();
-                    // console.log('brightness:', this.brightness);
+                    this.log.d('brightness:', this.brightness);
                 });
         // this.defect = this.dataService.form.value.defect;
         // console.log('defect:', this.defect);
@@ -222,7 +224,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     afterLoading() {
-        // console.log(`img.offsetHeight:${this.img.nativeElement.offsetHeight},loading:${this.loading}`);
+        this.log.d(`img.offsetHeight:${this.img.nativeElement.offsetHeight},`
+                   + `loading:${this.loading}`);
         if (this.img.nativeElement.offsetHeight === 0) {
             this.loading = false;
             this.drawCanvas();
@@ -251,20 +254,16 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             this.img.nativeElement.naturalWidth / this.magnification;
         this.virtualImageHeight =
             this.img.nativeElement.naturalHeight / this.magnification;
-        // console.log(`canvas height:${this.canvas.nativeElement.height}`,
-        //             `img offsetHeight:${this.img.nativeElement.offsetHeight}`,
-        //             `loading:${this.loading}`,
-        // //             'naturalWidth:', this.img.nativeElement.naturalWidth,
-        // //             'magnification:', this.magnification,
-        // //             'rightEnd:', this.rightEnd,
-        //             `intervalX:${this.intervalX}`);
+        this.log.d(`canvas height:${this.canvas.nativeElement.height}`,
+                   `img offsetHeight:${this.img.nativeElement.offsetHeight}`,
+                   `loading:${this.loading}`,
+                   `intervalX:${this.intervalX}`);
         this.rectangles = this.dataService.rectangles;
-        // console.log('defects from dataService:', this.dataService.defects);
         this.drawCanvas();
     }
 
     drawCanvas() {
-        // console.log('drawCanvas context:', this.context);
+        this.log.d('drawCanvas context:', this.context);
         if (this.magnification < 1) {
             this.context.clearRect(0, 0, this.canvas.nativeElement.width,
                                    this.canvas.nativeElement.height);
@@ -272,8 +271,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         if (!this.context) {
             return;
         }
-        // console.log('img:', this.img.nativeElement.src,
-        //             this.img.nativeElement.src.endsWith('.jpg'));
+        this.log.d('img:', this.img.nativeElement.src,
+                   this.img.nativeElement.src.endsWith('.jpg'));
         try {
             this.context.drawImage(
                 this.img.nativeElement,
@@ -294,7 +293,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     drawLattices() {
         let delta = this.cropX % this.intervalX;
         let max = (this.canvas.nativeElement.width / this.intervalX) + 1;
-        // console.log('delta:', delta, 'max:', max);
+        this.log.d('delta:', delta, 'max:', max);
         this.context.beginPath();
         for (let i = 0; i < max; i++) {
             this.context.moveTo(i * this.intervalX - delta, 0);
@@ -312,7 +311,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     drawRectangles() {
-        // console.log('defect:', this.defect);
         const rectangleMinX = Math.floor(this.cropX / this.intervalX);
         const rectangleMinY = Math.floor(this.cropY / this.intervalY);
         const rectangleMaxX = Math.ceil(
@@ -354,7 +352,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     mouseWheel(event) {
-        // console.log('mouse wheel', event, event.wheelDelta, -event.detail);
+        this.log.d('mouse wheel', event, event.wheelDelta, -event.detail);
         this.magnification
             += (event.wheelDelta * 0.001) || (-event.detail * 0.01);
         this.magnify(event.layerX, event.layerY);
@@ -390,22 +388,22 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             / this.dataService.form.value.rows;
         this.cropX = Math.max(0, Math.min(this.cropX, this.rightEnd));
         this.cropY = Math.max(0, Math.min(this.cropY, this.bottomEnd));
-        // console.log('magnification:', this.magnification,
-        //             'cropX:', this.cropX,
-        //             'rate:', this.rate,
-        //             'virtualImageWidth', this.virtualImageWidth,
-        //             'rightEnd:', this.rightEnd,
-        //             'intervalX:', this.intervalX);
+        this.log.d('magnification:', this.magnification,
+                   'cropX:', this.cropX,
+                   'rate:', this.rate,
+                   'virtualImageWidth', this.virtualImageWidth,
+                   'rightEnd:', this.rightEnd,
+                   'intervalX:', this.intervalX);
         this.drawCanvas();
     }
 
     drag(x, y, movementX, movementY) {
         // const currentX = this.cropX + this.previousX - x;
         const currentX = this.cropX - movementX;
-        // console.log('currentX:', currentX,
-        //             'rightEnd', this.rightEnd,
-        //             'virtualImageWidth:', this.virtualImageWidth,
-        //             this.magnification);
+        this.log.d('currentX:', currentX,
+                   'rightEnd', this.rightEnd,
+                   'virtualImageWidth:', this.virtualImageWidth,
+                   this.magnification);
         if (currentX >= 0 && currentX <= this.rightEnd) {
             this.cropX = currentX;
             // this.previousX = x;
@@ -423,8 +421,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     onclick(event, isSingleClick) {
         this.clickCounter++;
         setTimeout(() => {
-            // console.log('onclick event:', event, 'isSingleClick:',
-            //             isSingleClick, this.clickCounter);
+            this.log.d('onclick event:', event, 'isSingleClick:',
+                       isSingleClick, this.clickCounter);
             if (isSingleClick && this.clickCounter === 1) {
                 this.click(event, true, false);
             } else if (!isSingleClick) {
@@ -435,8 +433,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     click(event, isSingleClick, isThick) {
-        // console.log('click event:', event, 'isSingleClick:', isSingleClick,
-        //             this.clickCounter);
+        this.log.d('click event:', event, 'isSingleClick:', isSingleClick,
+                   this.clickCounter);
         if (this.magnification <= this.MAGNIFICATION_START) {
             return;
         }
@@ -464,8 +462,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                         (j) => this.drawCreateRectangle(
                             rectangleX + i, rectangleY + j)));
             }
-            // console.log('rectangles[', this.coordinate, ']:',
-            //             this.rectangles[this.coordinate]);
+            this.log.d('rectangles[', this.coordinate, ']:',
+                       this.rectangles[this.coordinate]);
             // this.saveRectangle(true);
         } else if (!isSingleClick && this.rectangles[this.coordinate]) {
             // if (this.defects[this.coordinate]
@@ -484,7 +482,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     drawCreateRectangle(x, y) {
-        // console.log(`drawCreateRectangle(${x},${y})`);
+        this.log.d(`drawCreateRectangle(${x},${y})`);
         if (x < 0 || y < 0 || x > this.dataService.form.value.columns
             || y > this.dataService.form.value.rows) {
             return;
@@ -504,13 +502,14 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
 
     setPending(pending) {
         if (this.magnification > this.MAGNIFICATION_START && this.coordinate) {
-            // console.log(`rectangles: ${this.rectangles[this.coordinate]}`);
+            this.log.d(`rectangles: ${this.rectangles[this.coordinate]}`);
             if (!this.rectangles[this.coordinate]) {
-                // console.log(`pending: ${pending}, rectangles: ${this.rectangles[this.coordinate]}`);
+                this.log.d(`pending:${pending}, `
+                           + `rectangles:${this.rectangles[this.coordinate]}`);
                 this.createRectangle(pending,
                                      this.dataService.form.value.comment);
             } else {
-                // console.log(`pending: ${pending}`);
+                this.log.d(`pending:${pending}`);
                 this.rectangles[this.coordinate].pending = pending;
             }
             this.drawCanvas();
@@ -524,8 +523,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             this.rectangles[this.coordinate].comment = comment;
         }
         // this.saveRectangle(false);
-        // console.log('setComment:', comment, this.dataService.form.value.comment,
-        //             'coordinate:', this.coordinate);
+        this.log.d('setComment:', comment, this.dataService.form.value.comment,
+                   'coordinate:', this.coordinate);
         this.dirty = true;
     }
 
@@ -536,7 +535,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     private createRectangleXY(pending, comment, rectangleX, rectangleY) {
-        // console.log(`createRectangleXY().x:${rectangleX * this.intervalX * this.rate}`);
+        this.log.d('createRectangleXY().x:',
+                   rectangleX * this.intervalX * this.rate);
         this.rectangles[`${rectangleX},${rectangleY}`] = <Rectangle>{
             // annotation: this.dataService.annotation,
             x: rectangleX * this.intervalX * this.rate,
@@ -657,12 +657,14 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     // }
 
     saveRectangles(x) {
-        // console.log(`Next: ${x}, rectangles: ${JSON.stringify(Object.keys(this.rectangles))}`);
+        this.log.d(`Next: ${x}, rectangles: `
+                   + `${JSON.stringify(Object.keys(this.rectangles))}`);
         this.rectangleService.saveRectangles(
-            this.dataService.annotation.id, Object.keys(this.rectangles).map((k) => this.rectangles[k]))
+            this.dataService.annotation.id,
+            Object.keys(this.rectangles).map((k) => this.rectangles[k]))
             .subscribe(
                 (res) => {
-                    // console.log(`res:${res}`);
+                    this.log.d(`res:${res}`);
                     this.dirty = false;
                 },
                 (res: HttpErrorResponse) => {
@@ -682,7 +684,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 comment: this.rectangles[localCoordinate].comment,
                 showOnly: true
             });
-            // console.log(`comment: ${this.rectangles[localCoordinate].comment}`);
+            this.log.d(`comment: ${this.rectangles[localCoordinate].comment}`);
         }
     }
 
