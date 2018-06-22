@@ -189,7 +189,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             this.drawCanvas();
             return;
         }
-        this.dataService.image = this.img.nativeElement;
         this.canvas.nativeElement.style.width =
             `${this.img.nativeElement.offsetWidth}px`;
         this.canvas.nativeElement.width = this.img.nativeElement.offsetWidth;

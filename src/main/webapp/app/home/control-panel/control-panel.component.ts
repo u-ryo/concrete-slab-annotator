@@ -33,6 +33,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     private squareSize = 2;
     @LocalStorage() annotation: Annotation;
     @LocalStorage() brightness: number;
+    @SharedStorage() img;
     auto;
     comment;
     private log =
@@ -174,8 +175,8 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     changeSize() {
         if (this.inputForm.value.focalLength === 0
             || this.inputForm.value.squareSize === 0
-            || !this.dataService.image
-            || this.dataService.image.naturalWidth === 0) {
+            || !this.img
+            || this.img.naturalWidth === 0) {
             return;
         }
         this.log.d('squareSize:', this.squareSize,
@@ -186,14 +187,14 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         const baseValue = this.distance * 0.46 / this.focalLength
             / this.squareSize;
         this.log.d('squareSize:', this.inputForm.value.squareSize,
-                   'image.naturalWidth:', this.dataService.image.naturalWidth,
+                   'image.naturalWidth:', this.img.naturalWidth,
                    'columns:', Math.round(
-                       baseValue * this.dataService.image.naturalWidth));
+                       baseValue * this.img.naturalWidth));
         this.inputForm.controls['columns'].setValue(
-            Math.round(baseValue * this.dataService.image.naturalWidth),
+            Math.round(baseValue * this.img.naturalWidth),
             {emitEvent: false});
         this.inputForm.controls['rows'].setValue(
-            Math.round(baseValue * this.dataService.image.naturalHeight),
+            Math.round(baseValue * this.img.naturalHeight),
             {emitEvent: false});
         this.log.d('focalLength:', this.focalLength,
                    'distance:', this.distance,
