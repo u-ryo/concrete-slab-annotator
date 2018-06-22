@@ -20,7 +20,7 @@ import 'rxjs/Rx';
 })
 export class ViewPanelComponent implements OnDestroy, OnInit {
     context: CanvasRenderingContext2D;
-    @SharedStorage() @ViewChild('img') img;
+    @ViewChild('img') img;
     @ViewChild('canvas') canvas;
     private CHECK_INTERVAL = 5000;
     @SharedStorage() cropX = 0;
@@ -189,6 +189,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             this.drawCanvas();
             return;
         }
+        this.dataService.image = this.img.nativeElement;
         this.canvas.nativeElement.style.width =
             `${this.img.nativeElement.offsetWidth}px`;
         this.canvas.nativeElement.width = this.img.nativeElement.offsetWidth;

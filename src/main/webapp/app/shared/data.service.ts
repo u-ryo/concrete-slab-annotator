@@ -7,6 +7,7 @@ import { Subject } from 'rxjs/Subject';
 @Injectable()
 export class DataService {
     form: FormGroup;
+    image: any;
     annotation: Annotation;
     private commentDataSource = new Subject<string>();
     private redrawDataSource = new Subject<Map<string, Rectangle>>();
