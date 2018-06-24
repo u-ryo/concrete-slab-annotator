@@ -169,7 +169,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             (y) => this.drawCanvas());
         this.timerObservable.filter((x) => this.dirty).subscribe(
             (x) => this.saveRectangles(x),
-            (error) => console.error(`Error: ${error}`),
+            (error) => this.log.er(`Error: ${error}`),
             () => console.log('Completed')
         );
         this.renderer.listen(
@@ -239,7 +239,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 0, 0, this.canvas.nativeElement.width,
                 this.canvas.nativeElement.height);
         } catch (error) {
-            console.error(error);
+            this.log.er(error);
             return;
         }
         if (this.magnification > this.MAGNIFICATION_START) {
@@ -500,11 +500,11 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             Object.keys(this.rectangles).map((k) => this.rectangles[k]))
             .subscribe(
                 (res) => {
-                    this.log.d(`res:${res}`);
+                    this.log.i('res:', res);
                     this.dirty = false;
                 },
                 (res: HttpErrorResponse) => {
-                    console.error(res.message);
+                    this.log.er(res.message);
                     this.onError(res.message);
                 });
     }

@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.*;
@@ -178,11 +179,22 @@ s in body
      */
     @PostMapping("/rectangles/annotation/{annotationId}")
     @Timed
-    public Map<String, Rectangle> saveRectanglesWithAnnotationId
+    public ResponseEntity<Void> saveRectanglesWithAnnotationId
         (@PathVariable Long annotationId,
          @Valid @RequestBody Set<Rectangle> rectangles) {
         log.debug("REST request to save Rectangles with annotationId:{}, {}",
                   annotationId, rectangles);
+        CompletableFuture.runAsync(() ->
+                                   saveRectangles(annotationId, rectangles));
+        return ResponseEntity.ok().build();
+        // return rectangles.stream()
+        //     .collect(Collectors.toMap
+        //              (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
+        //               r -> r,
+        //               (r1, r2) -> r2));
+    }
+
+    private void saveRectangles(Long annotationId, Set<Rectangle> rectangles) {
         Map<String, Rectangle> rectangleMap =
             rectangleRepository.findByAnnotationId(annotationId).stream()
             .collect(Collectors.toMap
@@ -220,13 +232,7 @@ s in body
         } else {
             accessLogRepository.save(accessLogs.get(0).to(now));
         }
-        return rectangles.stream()
-            .collect(Collectors.toMap
-                     (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
-                      r -> r,
-                      (r1, r2) -> r2));
     }
-
     
     /**
      * GET  /rectangles/xml/annotation/{annotationId} : get the rectangles XML which belong to the annotation with the specified annotationId.

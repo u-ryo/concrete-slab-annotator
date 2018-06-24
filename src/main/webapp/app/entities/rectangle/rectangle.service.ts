@@ -51,7 +51,8 @@ export class RectangleService {
         const copy = Observable.from(rectangles).map((rectangle) => this.convert(rectangle));
         // console.dir(`rectangles:${JSON.stringify(rectangles)}, copy: ${JSON.stringify(copy)}`);
         return this.http.post<Map<string, Rectangle>>(`${this.resourceUrl}/annotation/${annotationId}`, rectangles, { observe: 'response' })
-            .map((res: HttpResponse<Map<string, Rectangle>>) => this.convertMapResponse(res));
+            // .map((res: HttpResponse<Map<string, Rectangle>>) => this.convertMapResponse(res))
+        ;
     }
 
     private convertResponse(res: EntityResponseType): EntityResponseType {
