@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { DataService } from '../../shared/data.service';
-import { DefectName } from '../../entities/annotation/annotation.model';
 import { DomSanitizer } from '@angular/platform-browser';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { JhiAlertService } from 'ng-jhipster';

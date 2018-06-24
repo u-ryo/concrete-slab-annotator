@@ -4,7 +4,7 @@ import { JhiEventManager } from 'ng-jhipster';
 import { JhiLanguageService } from 'ng-jhipster';
 import { Level, Log } from 'ng2-logger/client';
 import { LoginService } from '../shared';
-import { SharedStorage } from 'ngx-store';
+import { LocalStorage, SharedStorage } from 'ngx-store';
 import { Router } from '@angular/router';
 import { Annotation } from '../entities/annotation/annotation.model';
 
@@ -23,7 +23,7 @@ export class HomeComponent implements OnInit {
     modalRef: NgbModalRef;
     language = 'en';
     @SharedStorage() filename: string;
-    @SharedStorage() annotation: Annotation;
+    @LocalStorage() annotation: Annotation;
     private log = Log.create('home', Level.ERROR, Level.WARN, Level.INFO);
 
     constructor(

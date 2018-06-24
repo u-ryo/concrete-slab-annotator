@@ -54,7 +54,8 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         this.imageService.query().subscribe(
             (res: HttpResponse<Image[]>) => {
                 this.images = res.body;
-                this.log.d(`filename:${this.filename}, images:`, this.images);
+                this.log.d(`filename:${this.filename}, images:`, this.images,
+                           'image:', this.image, 'annotation:', this.annotation);
                 if (this.filename) {
                     const imgs = this.images.filter(
                         (i) => i.filename === this.filename);
