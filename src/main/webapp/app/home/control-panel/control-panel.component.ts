@@ -265,6 +265,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             this.image.id, this.squareSize, defect).subscribe(
                 (res: HttpResponse<Annotation>) => {
                     this.annotation = res.body;
+                    this.annotation = res.body;
                     this.log.d('annotation:', this.annotation);
                     this.changeAnnotation();
                 },
