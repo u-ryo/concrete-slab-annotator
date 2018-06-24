@@ -1,3 +1,4 @@
+import { ActivatedRoute, Router } from '@angular/router';
 import { Annotation, DefectName } from '../../entities/annotation/annotation.model';
 import { AnnotationService } from '../../entities/annotation/annotation.service';
 import { Camera, Image } from '../../entities/image/image.model';
@@ -38,12 +39,14 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     private log =
         Log.create('control-panel', Level.WARN, Level.INFO, Level.ERROR);
 
-    constructor(private annotationService: AnnotationService,
+    constructor(private activatedRoute: ActivatedRoute,
+                private annotationService: AnnotationService,
                 private dataService: DataService,
                 private formBuilder: FormBuilder,
                 private imageService: ImageService,
                 private jhiAlertService: JhiAlertService,
-                private rectangleService: RectangleService) {
+                private rectangleService: RectangleService,
+                private router: Router) {
         if (!DEBUG_INFO_ENABLED) {
             Log.setProductionMode();
         }
@@ -59,15 +62,17 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                 if (this.filename) {
                     const imgs = this.images.filter(
                         (i) => i.filename === this.filename);
-                    this.log.d('imgs:', imgs);
+                    this.log.d('imgs:', imgs, `imgs.length:${imgs.length}`);
                     if (imgs.length > 0) {
                         this.image = imgs[0];
-                        this.log.d('image00.filename:', this.image,
-                                   'imgs[0].filename:', imgs[0].filename);
+                        this.image = imgs[0];
+                        this.log.d('this.image:', this.image,
+                                   'imgs[0]:', imgs[0],
+                                   `this.filename:${this.filename}`);
                     }
                 }
                 this.log.d('image0:', this.image,
-                           'image.filename:', this.image.filename);
+                           `image.filename:${this.image.filename}`);
                 if (!this.image) {
                     this.image = this.images[0];
                 }
@@ -90,6 +95,11 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     }
 
     ngOnInit() {
+        const filenameParam = this.activatedRoute.snapshot.queryParams.filename;
+        this.log.d(`filename param:`, filenameParam);
+        if (filenameParam) {
+            this.filename = filenameParam;
+        }
         this.loadAll();
         this.subscription = this.dataService.commentData$
             .subscribe((comment) => this.setComment(comment));
