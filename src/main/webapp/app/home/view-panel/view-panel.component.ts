@@ -7,6 +7,7 @@ import { Level, Log } from 'ng2-logger/client';
 import { Observable } from 'rxjs/Observable';
 import { Rectangle } from '../../entities/rectangle/rectangle.model';
 import { RectangleService } from '../../entities/rectangle/rectangle.service';
+import { Router } from '@angular/router';
 import { SharedStorage, SharedStorageService } from 'ngx-store';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/observable/fromEvent';
@@ -53,6 +54,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 private jhiAlertService: JhiAlertService,
                 private rectangleService: RectangleService,
                 private renderer: Renderer2,
+                private router: Router,
                 private sharedStorageService: SharedStorageService) {}
 
     ngOnInit() {
@@ -181,6 +183,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     afterLoading() {
+        this.router.navigate([''], {
+            queryParams: { filename: this.dataService.form.value.fileUrlField }});
         this.log.d(`img.offsetHeight:${this.img.nativeElement.offsetHeight},`
                    + `loading:${this.loading}`);
         if (this.img.nativeElement.offsetHeight === 0) {
