@@ -427,8 +427,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
 
     drawCreateRectangle(x, y) {
         this.log.d(`drawCreateRectangle(${x},${y})`);
-        if (x < 0 || y < 0 || x > this.dataService.form.value.columns
-            || y > this.dataService.form.value.rows) {
+        if (x < 0 || y < 0 || x >= this.dataService.form.value.columns
+            || y >= this.dataService.form.value.rows) {
             return;
         }
         const coordinate = `${x},${y}`;
