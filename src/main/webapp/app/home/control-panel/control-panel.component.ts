@@ -23,6 +23,7 @@ import { Subscription } from 'rxjs/Subscription';
 export class ControlPanelComponent implements OnDestroy, OnInit {
     inputForm: FormGroup;
     private subscription: Subscription;
+    private imageLoadedSubscription: Subscription;
     cameras = Object.keys(Camera);
     defects = Object.keys(DefectName);
     images;
@@ -38,6 +39,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     comment;
     private log =
         Log.create('control-panel', Level.WARN, Level.INFO, Level.ERROR);
+    private rate = 0.46;
 
     constructor(private activatedRoute: ActivatedRoute,
                 private annotationService: AnnotationService,
@@ -103,6 +105,8 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         this.loadAll();
         this.subscription = this.dataService.commentData$
             .subscribe((comment) => this.setComment(comment));
+        this.imageLoadedSubscription = this.dataService.imageLoadedData$
+            .subscribe(() => this.changeSize());
         this.createForm();
         this.log.d('defects:', this.defects);
     }
@@ -112,7 +116,12 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     }
 
     ngOnDestroy() {
-        this.subscription.unsubscribe();
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
+        if (this.imageLoadedSubscription) {
+            this.imageLoadedSubscription.unsubscribe();
+        }
     }
 
     createForm() {
@@ -160,6 +169,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     }
 
     rebuildForm() {
+        this.log.i('dataService.image:', this.dataService.image);
         this.inputForm.reset({
             fileUrlField: this.image
                 ? this.image.filename : this.images[0].filename,
@@ -168,8 +178,12 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             squareSize: (this.annotation && this.annotation.squareSize)
                 ? this.annotation.squareSize : this.squareSize,
             camera: this.image ? this.image.camera : this.images[0].camera,
-            columns: 153,
-            rows: 115,
+            columns: this.dataService.image ? Math.round(
+                this.distance * this.rate / this.focalLength / this.squareSize
+                    * this.dataService.image.naturalWidth) : 153,
+            rows: this.dataService.image ? Math.round(
+                this.distance * this.rate / this.focalLength / this.squareSize
+                    * this.dataService.image.naturalHeight) : 115,
             defect: (this.annotation && this.annotation.defect)
                 ? this.annotation.defect : this.defects[0],
             pending: false,
@@ -194,7 +208,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         if (this.squareSize !== this.annotation.squareSize) {
             this.loadAnnotation(this.inputForm.value.defect);
         }
-        const baseValue = this.distance * 0.46 / this.focalLength
+        const baseValue = this.distance * this.rate / this.focalLength
             / this.squareSize;
         this.log.d('squareSize:', this.inputForm.value.squareSize,
                    'image.naturalWidth:', this.dataService.image.naturalWidth,

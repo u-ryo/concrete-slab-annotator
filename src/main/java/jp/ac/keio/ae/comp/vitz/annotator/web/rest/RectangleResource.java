@@ -288,6 +288,10 @@ s in body
                                  .ymin(r.getCoordinateY() * interval)
                                  .xmax((r.getCoordinateX() + 1) * interval)
                                  .ymax((r.getCoordinateY() + 1) * interval)))
+                                 // .xmin(r.getX())
+                                 // .ymin(r.getY())
+                                 // .xmax(r.getX() + r.getWidth())
+                                 // .ymax(r.getY() + r.getHeight())))
                     .collect(Collectors.toList()));
         return annotationXml;
     }

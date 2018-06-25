@@ -11,8 +11,10 @@ export class DataService {
     annotation: Annotation;
     private commentDataSource = new Subject<string>();
     private redrawDataSource = new Subject<Map<string, Rectangle>>();
+    private imageLoadedDataSource = new Subject<void>();
     public commentData$ = this.commentDataSource.asObservable();
     public redrawData$ = this.redrawDataSource.asObservable();
+    public imageLoadedData$ = this.imageLoadedDataSource.asObservable();
 
     constructor() {}
 
@@ -22,5 +24,9 @@ export class DataService {
 
     notifyRedraw(r: Map<string, Rectangle>) {
         this.redrawDataSource.next(r);
+    }
+
+    notifyImageLoaded() {
+        this.imageLoadedDataSource.next();
     }
 }
