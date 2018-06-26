@@ -217,7 +217,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                    `img offsetHeight:${this.img.nativeElement.offsetHeight}`,
                    `loading:${this.loading}`,
                    `intervalX:${this.intervalX}`);
-        this.dataService.notifyImageLoaded();
+        // this.dataService.notifyImageLoaded();
         this.drawCanvas();
     }
 
