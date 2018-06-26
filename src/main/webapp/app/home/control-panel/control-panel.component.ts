@@ -276,6 +276,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                    + `brightnessLevel:${this.inputForm.value.brightnessLevel}`);
         this.squareSize = this.annotation ? this.annotation.squareSize : 2;
         this.loadAnnotation(this.inputForm.value.defect);
+        this.filename = this.image.filename;
     }
 
     loadAnnotation(defect) {
