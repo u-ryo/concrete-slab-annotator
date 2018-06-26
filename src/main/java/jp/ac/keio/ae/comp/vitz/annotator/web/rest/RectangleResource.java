@@ -263,7 +263,7 @@ s in body
         double rate = distance * RATE / focalLength / squareSize;
         // int columns = (int) Math.round(rate * width);
         int columns = 153;
-        int interval = width / columns;
+        double interval = width / columns;
         log.debug("squareSize:{},width:{},distance:{},focalLength:{},rate:{},"
                   + "columns:{},interval:{}", squareSize, width, distance,
                   focalLength, rate, columns, interval);
@@ -285,10 +285,10 @@ s in body
                          .truncated(0)
                          .difficult(0)
                          .bndbox(new AnnotationXml.Bndbox()
-                                 .xmin(r.getCoordinateX() * interval)
-                                 .ymin(r.getCoordinateY() * interval)
-                                 .xmax((r.getCoordinateX() + 1) * interval)
-                                 .ymax((r.getCoordinateY() + 1) * interval)))
+                                 .xmin((int) (r.getCoordinateX() * interval))
+                                 .ymin((int) (r.getCoordinateY() * interval))
+                                 .xmax((int) ((r.getCoordinateX() + 1) * interval))
+                                 .ymax((int) ((r.getCoordinateY() + 1) * interval))))
                                  // .xmin(r.getX())
                                  // .ymin(r.getY())
                                  // .xmax(r.getX() + r.getWidth())
