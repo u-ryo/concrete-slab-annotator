@@ -73,8 +73,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                                    `this.filename:${this.filename}`);
                     }
                 }
-                this.log.d('image0:', this.image,
-                           `image.filename:${this.image.filename}`);
+                this.log.d('image0:', this.image);
                 if (!this.image) {
                     this.image = this.images[0];
                 }
@@ -83,6 +82,8 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                 this.distance = this.image.distance;
                 this.focalLength = this.image.focalLength;
                 this.filename = this.image.filename;
+                this.loadAnnotation((this.annotation && this.annotation.defect)
+                                    ? this.annotation.defect : this.defects[0]);
                 this.rebuildForm();
                 this.log.d('image:', this.image,
                            'image.filename:', this.image.filename);
@@ -169,7 +170,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     }
 
     rebuildForm() {
-        this.log.i('dataService.image:', this.dataService.image);
+        this.log.d('dataService.image:', this.dataService.image);
         this.inputForm.reset({
             fileUrlField: this.image
                 ? this.image.filename : this.images[0].filename,

@@ -501,7 +501,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             Object.keys(this.rectangles).map((k) => this.rectangles[k]))
             .subscribe(
                 (res) => {
-                    this.log.i('res:', res);
+                    this.log.d('res:', res);
                     this.dirty = false;
                 },
                 (res: HttpErrorResponse) => {

@@ -258,15 +258,18 @@ s in body
 
         int squareSize = annotation.getSquareSize();
         int width = annotation.getImage().getWidth();
+        int height = annotation.getImage().getHeight();
         double distance = annotation.getImage().getDistance();
         int focalLength = annotation.getImage().getFocalLength();
         double rate = distance * RATE / focalLength / squareSize;
         // int columns = (int) Math.round(rate * width);
         int columns = 153;
-        double interval = width / columns;
+        int rows = 115;
+        double intervalX = width / (double) columns;
+        double intervalY = height / (double) rows;
         log.debug("squareSize:{},width:{},distance:{},focalLength:{},rate:{},"
-                  + "columns:{},interval:{}", squareSize, width, distance,
-                  focalLength, rate, columns, interval);
+                  + "columns:{},intervalX:{}", squareSize, width, distance,
+                  focalLength, rate, columns, intervalX);
 
         AnnotationXml annotationXml = new AnnotationXml()
             .folder(folder)
@@ -285,10 +288,10 @@ s in body
                          .truncated(0)
                          .difficult(0)
                          .bndbox(new AnnotationXml.Bndbox()
-                                 .xmin((int) (r.getCoordinateX() * interval))
-                                 .ymin((int) (r.getCoordinateY() * interval))
-                                 .xmax((int) ((r.getCoordinateX() + 1) * interval))
-                                 .ymax((int) ((r.getCoordinateY() + 1) * interval))))
+                                 .xmin((int) (r.getCoordinateX() * intervalX))
+                                 .ymin((int) (r.getCoordinateY() * intervalY))
+                                 .xmax((int) ((r.getCoordinateX() + 1) * intervalX))
+                                 .ymax((int) ((r.getCoordinateY() + 1) * intervalY))))
                                  // .xmin(r.getX())
                                  // .ymin(r.getY())
                                  // .xmax(r.getX() + r.getWidth())
