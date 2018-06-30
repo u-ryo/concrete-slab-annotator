@@ -179,14 +179,14 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             squareSize: (this.annotation && this.annotation.squareSize)
                 ? this.annotation.squareSize : this.squareSize,
             camera: this.image ? this.image.camera : this.images[0].camera,
-            // columns: this.dataService.image ? Math.round(
-            //     this.distance * this.rate / this.focalLength / this.squareSize
-            //         * this.dataService.image.naturalWidth) : 153,
-            // rows: this.dataService.image ? Math.round(
-            //     this.distance * this.rate / this.focalLength / this.squareSize
-            //         * this.dataService.image.naturalHeight) : 115,
-            columns: 153,
-            rows: 115,
+            columns: this.dataService.image ? Math.round(
+                this.distance * this.rate / this.focalLength / this.squareSize
+                    * this.dataService.image.naturalWidth) : 153,
+            rows: this.dataService.image ? Math.round(
+                this.distance * this.rate / this.focalLength / this.squareSize
+                    * this.dataService.image.naturalHeight) : 115,
+            // columns: 153,
+            // rows: 115,
             defect: (this.annotation && this.annotation.defect)
                 ? this.annotation.defect : this.defects[0],
             pending: false,
@@ -218,12 +218,12 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                    'columns:', Math.round(
                        baseValue * this.dataService.image.naturalWidth));
         this.inputForm.controls['columns'].setValue(
-            // Math.round(baseValue * this.dataService.image.naturalWidth),
-            153,
+            Math.round(baseValue * this.dataService.image.naturalWidth),
+            // 153,
             {emitEvent: false});
         this.inputForm.controls['rows'].setValue(
-            // Math.round(baseValue * this.dataService.image.naturalHeight),
-            115,
+            Math.round(baseValue * this.dataService.image.naturalHeight),
+            // 115,
             {emitEvent: false});
         this.log.d('focalLength:', this.focalLength,
                    'distance:', this.distance,
