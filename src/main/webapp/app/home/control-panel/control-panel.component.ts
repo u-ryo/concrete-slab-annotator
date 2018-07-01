@@ -82,8 +82,6 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                 this.distance = this.image.distance;
                 this.focalLength = this.image.focalLength;
                 this.filename = this.image.filename;
-                this.loadAnnotation((this.annotation && this.annotation.defect)
-                                    ? this.annotation.defect : this.defects[0]);
                 this.rebuildForm();
                 this.log.d('image:', this.image,
                            'image.filename:', this.image.filename);

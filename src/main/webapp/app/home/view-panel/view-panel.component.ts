@@ -173,7 +173,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             () => console.log('Completed')
         );
         this.renderer.listen(
-            this.img.nativeElement, 'click', (event) => this.loading = false);
+            this.img.nativeElement, 'mousemove',
+            (event) => this.loading = false);
     }
 
     ngOnDestroy() {
@@ -285,10 +286,9 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                     } else {
                         this.context.fillStyle = 'rgba(192, 80, 77, 0.5)';
                     }
-                    this.context.fillRect(
-                        i * this.intervalX - this.cropX,
-                        j * this.intervalY - this.cropY,
-                        this.intervalX, this.intervalY);
+                    this.context.fillRect(i * this.intervalX - this.cropX,
+                                          j * this.intervalY - this.cropY,
+                                          this.intervalX, this.intervalY);
                     if (this.rectangles[coordinate].comment) {
                         this.drawFrame(i, j, 'rgba(180, 192, 77, 0.8)');
                     }
