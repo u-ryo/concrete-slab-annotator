@@ -173,8 +173,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             () => console.log('Completed')
         );
         this.renderer.listen(
-            this.img.nativeElement, 'mousemove',
-            (event) => this.loading = false);
+            this.img.nativeElement, 'click', (event) => this.loading = false);
     }
 
     ngOnDestroy() {
