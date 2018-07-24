@@ -262,9 +262,10 @@ s in body
         double distance = annotation.getImage().getDistance();
         int focalLength = annotation.getImage().getFocalLength();
         double rate = distance * RATE / focalLength / squareSize;
-        // int columns = (int) Math.round(rate * width);
-        int columns = 153;
-        int rows = 115;
+        int columns = (int) Math.round(rate * width);
+        int rows = (int) Math.round(rate * height);
+        // int columns = 153;
+        // int rows = 115;
         double intervalX = width / (double) columns;
         double intervalY = height / (double) rows;
         log.debug("squareSize:{},width:{},distance:{},focalLength:{},rate:{},"

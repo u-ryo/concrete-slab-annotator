@@ -1,6 +1,6 @@
 {
     "global": {
-        "title": "Concrete Slab Annotator2",
+        "title": "Concrete Slab Annotator",
         "browsehappy": "<strong>古い</strong>ブラウザーが使われています。まずは<a href=\"http://browsehappy.com/?locale=en\">ブラウザをアップデート</a>してください。",
         "menu": {
             "home": "ホーム",
@@ -55,7 +55,7 @@
         "messages": {
             "info": {
                 "authenticated": {
-                    "prefix": "Concrete Slab Annotator2へようこそ。<br/>アノテーションを開始するには",
+                    "prefix": "Concrete Slab Annotatorへようこそ。<br/>アノテーションを開始するには",
                     "link": "ログイン",
                     "suffix": "して下さい。"
                 },
