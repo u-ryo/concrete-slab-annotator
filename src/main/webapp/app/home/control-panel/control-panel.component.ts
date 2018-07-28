@@ -71,6 +71,9 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                         this.log.d('this.image:', this.image,
                                    'imgs[0]:', imgs[0],
                                    `this.filename:${this.filename}`);
+                    } else {
+                        this.image = null;
+                        this.image = null;
                     }
                 }
                 this.log.d('image0:', this.image);
