@@ -15,6 +15,7 @@ export class FooterComponent implements OnInit {
     @ViewChild('minimizer') minimizer;
     @ViewChild('maximizer') maximizer;
     @ViewChild('canvas') canvas;
+    @ViewChild('statusDiv') statusDiv;
     @SharedStorage() fileUrl;
     @SharedStorage() cropX = 0;
     @SharedStorage() cropY = 0;
@@ -28,6 +29,9 @@ export class FooterComponent implements OnInit {
     private isMouseDown = false;
     cursor = 'pointer';
     private log = Log.create('footer', Level.ERROR, Level.WARN, Level.INFO);
+    @SharedStorage() dirty;
+    status = undefined;
+    statusClass = '';
 
     constructor(private sharedStorageService: SharedStorageService,
                 private principal: Principal,
@@ -39,10 +43,14 @@ export class FooterComponent implements OnInit {
                              (event) => this.minimize());
         this.renderer.listen(this.maximizer.nativeElement, 'click',
                              (event) => this.maximize());
+        this.renderer.listen(this.statusDiv.nativeElement, 'click',
+                             (event) => this.status = undefined);
         this.sharedStorageService.observe('cropX').subscribe(
             (x) => this.drawRectangle(x));
         this.sharedStorageService.observe('cropY').subscribe(
             (y) => this.drawRectangle(y));
+        this.sharedStorageService.observe('dirty').subscribe(
+            (dirty) => this.setStatus(dirty));
         this.renderer.listen(this.canvas.nativeElement, 'mousedown',
                              (event) => {
                                  this.isMouseDown = true;
@@ -131,6 +139,12 @@ export class FooterComponent implements OnInit {
         if (currentY >= 0 && currentY <= this.bottomEnd) {
             this.cropY = currentY;
         }
+    }
+
+    setStatus(dirty) {
+        this.log.i(`${dirty.key}:${dirty.oldValue}->${dirty.newValue}`);
+        this.status = this.dirty ? 'CHANGED' : 'SAVED';
+        this.statusClass = 'alert alert-' + (this.dirty ? 'warning' : 'success');
     }
 
     isAuthenticated() {

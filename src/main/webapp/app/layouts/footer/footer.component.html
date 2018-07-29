@@ -1,3 +1,8 @@
+<div #statusDiv class="left-footer">
+  <div *ngIf="status" [class]="statusClass" style="position:relative;">
+    {{status}}
+  </div>
+</div>
 <div [class]="footerClass">
   <!-- <p jhiTranslate="footer">This is your footer</p> -->
   <div style="position:relative" [hidden]="!isAuthenticated()">

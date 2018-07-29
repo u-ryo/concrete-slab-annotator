@@ -288,3 +288,9 @@ Social Buttons
     right: 5px;
     width: 0.1%;
 }
+.left-footer {
+    position: fixed;
+    bottom: 10px;
+    left: 85px;
+    opacity: 0.7;
+}

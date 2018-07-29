@@ -44,7 +44,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     brightness = this.sanitizer.bypassSecurityTrustStyle(`brightness(100%)`);
     private clickCounter = 0;
     private subscription: Subscription;
-    private dirty = false;
+    @SharedStorage() dirty = false;
     private timerObservable = Observable.interval(this.CHECK_INTERVAL);
     cursor = 'auto';
     private log = Log.create('view-panel', Level.ERROR, Level.WARN, Level.INFO);
