@@ -109,6 +109,7 @@ export class FooterComponent implements OnInit {
                    + `canvas.width:${this.canvas.nativeElement.width}`
                   );
         this.drawRectangle(0);
+        this.status = undefined;
     }
 
     drawRectangle(x) {
@@ -142,7 +143,7 @@ export class FooterComponent implements OnInit {
     }
 
     setStatus(dirty) {
-        this.log.i(`${dirty.key}:${dirty.oldValue}->${dirty.newValue}`);
+        this.log.d(`${dirty.key}:${dirty.oldValue}->${dirty.newValue}`);
         this.status = this.dirty ? 'CHANGED' : 'SAVED';
         this.statusClass = 'alert alert-' + (this.dirty ? 'warning' : 'success');
     }
