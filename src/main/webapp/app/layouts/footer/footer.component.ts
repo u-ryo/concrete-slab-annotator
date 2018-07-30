@@ -79,6 +79,7 @@ export class FooterComponent implements OnInit {
                     this.maximize();
                 } else {
                     this.minimize();
+                    this.statusClass = 'd-none';
                 }
             });
     }
