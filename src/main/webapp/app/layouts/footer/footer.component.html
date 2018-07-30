@@ -1,6 +1,6 @@
-<div #statusDiv class="left-footer">
-  <div *ngIf="status" [class]="statusClass" style="position:relative;">
-    {{status}}
+<div class="left-footer">
+  <div [class]="statusClass" style="position:relative;">
+    {{status}} <a><i #statusCloser class="fa fa-window-close pull-right" style="margin-top:-7px;"></i></a>
   </div>
 </div>
 <div [class]="footerClass">

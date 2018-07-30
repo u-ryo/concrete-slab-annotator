@@ -15,7 +15,7 @@ export class FooterComponent implements OnInit {
     @ViewChild('minimizer') minimizer;
     @ViewChild('maximizer') maximizer;
     @ViewChild('canvas') canvas;
-    @ViewChild('statusDiv') statusDiv;
+    @ViewChild('statusCloser') statusCloser;
     @SharedStorage() fileUrl;
     @SharedStorage() cropX = 0;
     @SharedStorage() cropY = 0;
@@ -31,7 +31,7 @@ export class FooterComponent implements OnInit {
     private log = Log.create('footer', Level.ERROR, Level.WARN, Level.INFO);
     @SharedStorage() dirty;
     status = undefined;
-    statusClass = '';
+    statusClass = 'd-none';
 
     constructor(private sharedStorageService: SharedStorageService,
                 private principal: Principal,
@@ -43,8 +43,10 @@ export class FooterComponent implements OnInit {
                              (event) => this.minimize());
         this.renderer.listen(this.maximizer.nativeElement, 'click',
                              (event) => this.maximize());
-        this.renderer.listen(this.statusDiv.nativeElement, 'click',
-                             (event) => this.status = undefined);
+        this.renderer.listen(this.statusCloser.nativeElement, 'click',
+                             (event) => {
+                                 this.statusClass = 'd-none';
+                             });
         this.sharedStorageService.observe('cropX').subscribe(
             (x) => this.drawRectangle(x));
         this.sharedStorageService.observe('cropY').subscribe(
@@ -109,7 +111,7 @@ export class FooterComponent implements OnInit {
                    + `canvas.width:${this.canvas.nativeElement.width}`
                   );
         this.drawRectangle(0);
-        this.status = undefined;
+        this.statusClass = 'd-none';
     }
 
     drawRectangle(x) {
