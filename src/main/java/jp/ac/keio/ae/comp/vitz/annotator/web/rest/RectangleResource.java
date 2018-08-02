@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.AccessLog;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Annotation;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.AnnotationXml;
+import jp.ac.keio.ae.comp.vitz.annotator.domain.Image;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Rectangle;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.User;
 
@@ -239,8 +240,7 @@ s in body
      * ref. http://blog.rakugakibox.net/entry/2014/11/23/java_spring_boot_rest
      *
      * @param annotationId annotationId of rectangles belong to
-     * @return the ResponseEntity with status 200 (OK)
-s in body
+     * @return the AnnotationXml with status 200 (OK)
      */
     @GetMapping("/rectangles/xml/annotation/{annotationId}")
     @Timed
@@ -248,7 +248,39 @@ s in body
         log.debug("REST request to get AnnotationXml with annotationId:{}",
                   annotationId);
         Annotation annotation = annotationRepository.findOne(annotationId);
-        String filename = annotation.getImage().getFilename();
+        int squareSize = annotation.getSquareSize();
+        return getAnnotationXml(annotation.getImage(), squareSize,
+                                rectangleRepository
+                                .findByAnnotationId(annotationId));
+    }
+
+    /**
+     * GET  /rectangles/xml/image/{imageId} : get the rectangles XML which belong to the annotations with the specified imageId.
+     *
+     * @param imageId imageId of rectangles belong to
+     * @return the AnnotationXml with status 200 (OK)
+     */
+    @GetMapping("/rectangles/xml/image/{imageId}/{squareSize}")
+    @Timed
+    public AnnotationXml getImageAnnotationXml(@PathVariable Long imageId,
+                                               @PathVariable Integer squareSize) {
+        log.debug("REST request to get AnnotationXml with imageId:{} "
+                  + "squareSize:{}", imageId, squareSize);
+        Set<Annotation> annotations =
+            annotationRepository.findByImageIdAndSquareSize(imageId, squareSize);
+        log.debug("annotations:{}", annotations);
+        if (annotations.isEmpty()) {
+            return null;
+        }
+        Annotation annotation = annotations.iterator().next();
+        return getAnnotationXml(annotation.getImage(), squareSize,
+                                rectangleRepository.findByImageIdAndSquareSize
+                                (imageId, squareSize));
+    }
+
+    private AnnotationXml getAnnotationXml(Image image, int squareSize,
+                                           Set<Rectangle> rectangles) {
+        String filename = image.getFilename();
         int index = filename.indexOf("/", 8);
         int lastIndex = filename.lastIndexOf("/");
         String folder = filename;
@@ -256,11 +288,10 @@ s in body
             folder = filename.substring(index, lastIndex);
         }
 
-        int squareSize = annotation.getSquareSize();
-        int width = annotation.getImage().getWidth();
-        int height = annotation.getImage().getHeight();
-        double distance = annotation.getImage().getDistance();
-        int focalLength = annotation.getImage().getFocalLength();
+        int width = image.getWidth();
+        int height = image.getHeight();
+        double distance = image.getDistance();
+        int focalLength = image.getFocalLength();
         double rate = distance * RATE / focalLength / squareSize;
         int columns = (int) Math.round(rate * width);
         int rows = (int) Math.round(rate * height);
@@ -276,15 +307,15 @@ s in body
             .folder(folder)
             .filename(filename.substring(lastIndex + 1))
             .size(new AnnotationXml.Size()
-                  .width(annotation.getImage().getWidth())
-                  .height(annotation.getImage().getHeight())
+                  .width(width)
+                  .height(height)
                   .depth(3))
-            .object(rectangleRepository.findByAnnotationId(annotationId)
+            .object(rectangles
                     .stream()
                     .parallel()
                     .filter(r -> !r.isPending())
                     .map(r -> new AnnotationXml.Obj()
-                         .name(annotation.getDefect().name())
+                         .name(r.getAnnotation().getDefect().name())
                          .pose("Unspecified")
                          .truncated(0)
                          .difficult(0)

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -28,4 +29,9 @@ public interface RectangleRepository extends JpaRepository<Rectangle, Long> {
     Set<Rectangle> findByCoordinate(@Param("annotationId") Long annotationId,
                                     @Param("coordinateX") Integer coordinateX,
                                     @Param("coordinateY") Integer coordinateY);
+
+    @Query("SELECT r FROM Rectangle r, Annotation a WHERE r.annotation.id = a.id AND a.image.id = :imageId AND a.squareSize = :squareSize")
+    Set<Rectangle> findByImageIdAndSquareSize
+        (@Param("imageId") Long imageId,
+         @Param("squareSize") Integer squareSize);
 }
