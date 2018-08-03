@@ -1,6 +1,8 @@
 package jp.ac.keio.ae.comp.vitz.annotator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.AccessLog;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Annotation;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.AnnotationXml;
@@ -10,6 +12,7 @@ import jp.ac.keio.ae.comp.vitz.annotator.domain.User;
 
 import jp.ac.keio.ae.comp.vitz.annotator.repository.AccessLogRepository;
 import jp.ac.keio.ae.comp.vitz.annotator.repository.AnnotationRepository;
+import jp.ac.keio.ae.comp.vitz.annotator.repository.ImageRepository;
 import jp.ac.keio.ae.comp.vitz.annotator.repository.RectangleRepository;
 import jp.ac.keio.ae.comp.vitz.annotator.service.UserService;
 import jp.ac.keio.ae.comp.vitz.annotator.web.rest.errors.BadRequestAlertException;
@@ -17,15 +20,17 @@ import jp.ac.keio.ae.comp.vitz.annotator.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+// import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.time.ZonedDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -34,6 +39,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import static org.springframework.data.domain.Sort.Direction.*;
 
@@ -57,15 +66,18 @@ public class RectangleResource {
 
     private final AccessLogRepository accessLogRepository;
     private final AnnotationRepository annotationRepository;
+    private final ImageRepository imageRepository;
     private final RectangleRepository rectangleRepository;
     private final UserService userService;
 
     public RectangleResource(AccessLogRepository accessLogRepository,
                              AnnotationRepository annotationRepository,
+                             ImageRepository imageRepository,
                              RectangleRepository rectangleRepository,
                              UserService userService) {
         this.accessLogRepository = accessLogRepository;
         this.annotationRepository = annotationRepository;
+        this.imageRepository = imageRepository;
         this.rectangleRepository = rectangleRepository;
         this.userService = userService;
     }
@@ -278,8 +290,58 @@ s in body
                                 (imageId, squareSize));
     }
 
+    /**
+     * GET  /rectangles/xml/{squareSize}/all : get all the rectangles XML with specified squareSize
+     *
+     * @param squareSize squareSize
+     * @return the AnnotationXml Zip with status 200 (OK)
+     */
+    @GetMapping(value="/rectangles/xml/{squareSize}/all", produces="application/zip")
+    @Timed
+    // public ResponseEntity<ByteArrayResource> getAllAnnotationXml
+    public void getAllAnnotationXml(HttpServletResponse resonse,
+                                    @PathVariable Integer squareSize)
+        throws IOException {
+        log.debug("REST request to get all AnnotationXml with squareSize:{}",
+                  squareSize);
+        resonse.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                          "attachment;filename=annotations.zip");
+        resonse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        // resonse.setContentLength(data.length);
+        ZipOutputStream zos = new ZipOutputStream(resonse.getOutputStream());
+        ObjectMapper xmlMapper = new XmlMapper();
+        imageRepository.findAll()
+            .parallelStream()
+            .map(image -> getImageAnnotationXml(image.getId(), squareSize))
+            .filter(xml -> xml != null)
+            .sequential()
+            .forEach(xml -> {
+                    try {
+                        zos.putNextEntry
+                            (new ZipEntry(xml.filename()
+                                          .replace(".jpg", ".xml")));
+                        zos.write(xmlMapper.writeValueAsString(xml).getBytes());
+                    } catch (IOException e) {
+                        log.error("IOException occurred. filename:{}",
+                                  xml.filename(), e);
+                    }
+                });
+        zos.flush();
+        zos.close();
+        // byte[] data;
+        // ByteArrayResource resource = new ByteArrayResource(data);
+        // return ResponseEntity.ok()
+        //     .contentType(MediaType.APPLICATION_OCTET_STREAM)
+        //     .contentLength(data.length)
+        //     .body(resource)
+        //     .build();
+    }
+
     private AnnotationXml getAnnotationXml(Image image, int squareSize,
                                            Set<Rectangle> rectangles) {
+        if (rectangles.isEmpty()) {
+            return null;
+        }
         String filename = image.getFilename();
         int index = filename.indexOf("/", 8);
         int lastIndex = filename.lastIndexOf("/");
@@ -311,8 +373,7 @@ s in body
                   .height(height)
                   .depth(3))
             .object(rectangles
-                    .stream()
-                    .parallel()
+                    .parallelStream()
                     .filter(r -> !r.isPending())
                     .map(r -> new AnnotationXml.Obj()
                          .name(r.getAnnotation().getDefect().name())

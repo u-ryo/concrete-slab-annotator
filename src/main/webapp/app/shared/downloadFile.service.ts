@@ -7,8 +7,8 @@ import 'rxjs/Rx';
 export class DownloadFileService {
     constructor(public http: HttpClient) {}
 
-    downloadFile(data: any, filename: string) {
-        const blob = new Blob([data], { type: 'text/csv' });
+    downloadFile(data: any, filename: string, typeString: string) {
+        const blob = new Blob([data], { type: typeString });
         const url = window.URL.createObjectURL(blob);
         // http://takasdev.hatenablog.com/entry/2017/06/15/211725
         const link = document.createElement('a');
@@ -23,20 +23,26 @@ export class DownloadFileService {
     results(url: string, filename: string) {
         // https://angular.io/guide/http#adding-headers
         let headers = new HttpHeaders();
+        let resType;
         if (url.indexOf('xml') > 0) {
-            headers = new HttpHeaders({
-                'Accept': 'application/xml'
-            });
+            if (url.indexOf('all') > 0) {
+                resType = ['arraybuffer', 'application/zip'];
+            } else {
+                resType = ['text', 'application/xml'];
+            }
+        } else if (url.indexOf('csv') > 0) {
+            resType = ['text', 'text/csv'];
         }
+        headers = new HttpHeaders({ 'Accept': resType[1] });
         // https://angular.io/guide/http#requesting-non-json-data
         this.http.get(
             url,
             {
-                responseType: 'text',
+                responseType: resType[0],
                 headers
             })
             .subscribe(
-                (data: string) => this.downloadFile(data, filename),
+                (data: any) => this.downloadFile(data, filename, resType[1]),
                 (error) => console.log('Error downloading the file.', error),
                 () => console.log('OK'));
     }

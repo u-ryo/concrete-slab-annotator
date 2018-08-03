@@ -37,7 +37,8 @@
                 "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)",
                 "downloads": {
                     "accesslog": "Access Log",
-                    "annotationxml": "Annotation XML"
+                    "annotationxml": "Annotation XML",
+                    "allannotationxml": "All Annotation XML"
                 }
             },
             "language": "Language"

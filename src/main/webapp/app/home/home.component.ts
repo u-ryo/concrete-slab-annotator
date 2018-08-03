@@ -90,4 +90,11 @@ export class HomeComponent implements OnInit {
             `api/rectangles/xml/image/${this.annotation.image.id}/${this.annotation.squareSize}`,
             `${f}.${this.annotation.squareSize}.xml`);
     }
+
+    downloadAllXml() {
+        const f = 'annotations.zip';
+        this.log.i(`filename:${f}`);
+        this.downloadFileService.results(
+            `api/rectangles/xml/${this.annotation.squareSize}/all`, f);
+    }
 }
