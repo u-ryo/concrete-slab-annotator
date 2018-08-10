@@ -176,7 +176,6 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind"
     compile "com.fasterxml.jackson.module:jackson-module-afterburner"
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-csv"
-    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
     compile "com.ryantenney.metrics:metrics-spring"
     compile "javax.cache:cache-api"
     compile "org.hibernate:hibernate-core"

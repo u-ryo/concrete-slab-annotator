@@ -2,7 +2,6 @@ package jp.ac.keio.ae.comp.vitz.annotator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.AccessLog;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Annotation;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.AnnotationXml;
@@ -20,7 +19,6 @@ import jp.ac.keio.ae.comp.vitz.annotator.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-// import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
@@ -33,16 +31,22 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.time.ZoneId;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 import static org.springframework.data.domain.Sort.Direction.*;
 
@@ -261,9 +265,9 @@ s in body
                   annotationId);
         Annotation annotation = annotationRepository.findOne(annotationId);
         int squareSize = annotation.getSquareSize();
-        return getAnnotationXml(annotation.getImage(), squareSize,
-                                rectangleRepository
-                                .findByAnnotationId(annotationId));
+        return getAnnotationXml
+            (annotation.getImage(), squareSize,
+             rectangleRepository.findByAnnotationId(annotationId), true);
     }
 
     /**
@@ -287,7 +291,7 @@ s in body
         Annotation annotation = annotations.iterator().next();
         return getAnnotationXml(annotation.getImage(), squareSize,
                                 rectangleRepository.findByImageIdAndSquareSize
-                                (imageId, squareSize));
+                                (imageId, squareSize), true);
     }
 
     /**
@@ -298,18 +302,18 @@ s in body
      */
     @GetMapping(value="/rectangles/xml/{squareSize}/all", produces="application/zip")
     @Timed
-    // public ResponseEntity<ByteArrayResource> getAllAnnotationXml
     public void getAllAnnotationXml(HttpServletResponse resonse,
                                     @PathVariable Integer squareSize)
-        throws IOException {
+        throws IOException, JAXBException {
         log.debug("REST request to get all AnnotationXml with squareSize:{}",
                   squareSize);
         resonse.setHeader(HttpHeaders.CONTENT_DISPOSITION,
                           "attachment;filename=annotations.zip");
         resonse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        // resonse.setContentLength(data.length);
         ZipOutputStream zos = new ZipOutputStream(resonse.getOutputStream());
-        ObjectMapper xmlMapper = new XmlMapper();
+        JAXBContext context = JAXBContext.newInstance(AnnotationXml.class);
+        Marshaller marshaller = context.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         imageRepository.findAll()
             .parallelStream()
             .map(image -> getImageAnnotationXml(image.getId(), squareSize))
@@ -320,25 +324,19 @@ s in body
                         zos.putNextEntry
                             (new ZipEntry(xml.filename()
                                           .replace(".jpg", ".xml")));
-                        zos.write(xmlMapper.writeValueAsString(xml).getBytes());
-                    } catch (IOException e) {
-                        log.error("IOException occurred. filename:{}",
+                        marshaller.marshal(xml, zos);
+                    } catch (IOException | JAXBException e) {
+                        log.error("IO/JAXB Exception occurred. filename:{}",
                                   xml.filename(), e);
                     }
                 });
         zos.flush();
         zos.close();
-        // byte[] data;
-        // ByteArrayResource resource = new ByteArrayResource(data);
-        // return ResponseEntity.ok()
-        //     .contentType(MediaType.APPLICATION_OCTET_STREAM)
-        //     .contentLength(data.length)
-        //     .body(resource)
-        //     .build();
     }
 
     private AnnotationXml getAnnotationXml(Image image, int squareSize,
-                                           Set<Rectangle> rectangles) {
+                                           Set<Rectangle> rectangles,
+                                           boolean withNoAnnotation) {
         if (rectangles.isEmpty()) {
             return null;
         }
@@ -365,31 +363,90 @@ s in body
                   + "columns:{},intervalX:{}", squareSize, width, distance,
                   focalLength, rate, columns, intervalX);
 
-        AnnotationXml annotationXml = new AnnotationXml()
+        if (withNoAnnotation) {
+            Map<String, List<Rectangle>> rectanglesMap =
+                rectangles.stream()
+                .filter(r -> !r.isPending())
+                .collect(Collectors.groupingBy
+                         (r -> r.getCoordinateX() + "," + r.getCoordinateY()));
+            return createAnnotationXml(folder,
+                                       filename.substring(lastIndex + 1),
+                                       width, height,
+                                       createObjects(rectanglesMap,
+                                                     columns, rows,
+                                                     intervalX, intervalY));
+        }
+        return createAnnotationXml(folder, filename.substring(lastIndex + 1),
+                                   width, height,
+                                   createObjects(rectangles, intervalX,
+                                                 intervalY));
+    }
+
+    private List<AnnotationXml.Obj> createObjects(Set<Rectangle> rectangles,
+                                                  double intervalX,
+                                                  double intervalY) {
+        return rectangles
+            .parallelStream()
+            .filter(r -> !r.isPending())
+            .map(r -> createAnnotationXmlObj(r, intervalX, intervalY))
+            .collect(Collectors.toList());
+    }
+
+    private List<AnnotationXml.Obj> createObjects
+        (Map<String, List<Rectangle>> rectanglesMap, int columns, int rows,
+         double intervalX, double intervalY) {
+        return IntStream.range(0, columns)
+            .parallel()
+            .mapToObj(col -> IntStream.range(0, rows)
+                      .mapToObj(row -> Optional.ofNullable
+                                (rectanglesMap.get(col + "," + row))
+                                .map(l -> l.stream()
+                                     .map(r -> createAnnotationXmlObj
+                                          (r, intervalX, intervalY))
+                                     .collect(Collectors.toList()))
+                                .orElse(Collections.singletonList
+                                        (createAnnotationXmlObj
+                                         ("Unannotated", col, row, intervalX,
+                                          intervalY))))
+                      .flatMap(Collection::stream)
+                      .collect(Collectors.toList()))
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+    }
+
+    private AnnotationXml.Obj
+        createAnnotationXmlObj(String name, int coordinateX, int coordinateY,
+                               double intervalX, double intervalY) {
+        return new AnnotationXml.Obj()
+            .name(name)
+            .pose("Unspecified")
+            .truncated(0)
+            .difficult(0)
+            .bndbox(new AnnotationXml.Bndbox()
+                    .xmin((int) (coordinateX * intervalX))
+                    .ymin((int) (coordinateY * intervalY))
+                    .xmax((int) ((coordinateX + 1) * intervalX))
+                    .ymax((int) ((coordinateY + 1) * intervalY)));
+    }
+
+    private AnnotationXml.Obj createAnnotationXmlObj(Rectangle r,
+                                                     double intervalX,
+                                                     double intervalY) {
+        return createAnnotationXmlObj(r.getAnnotation().getDefect().name(),
+                                      r.getCoordinateX(), r.getCoordinateY(),
+                                      intervalX, intervalY);
+    }
+
+    private AnnotationXml createAnnotationXml(String folder, String filename,
+                                              int width, int height,
+                                              List<AnnotationXml.Obj> objects) {
+        return new AnnotationXml()
             .folder(folder)
-            .filename(filename.substring(lastIndex + 1))
+            .filename(filename)
             .size(new AnnotationXml.Size()
                   .width(width)
                   .height(height)
                   .depth(3))
-            .object(rectangles
-                    .parallelStream()
-                    .filter(r -> !r.isPending())
-                    .map(r -> new AnnotationXml.Obj()
-                         .name(r.getAnnotation().getDefect().name())
-                         .pose("Unspecified")
-                         .truncated(0)
-                         .difficult(0)
-                         .bndbox(new AnnotationXml.Bndbox()
-                                 .xmin((int) (r.getCoordinateX() * intervalX))
-                                 .ymin((int) (r.getCoordinateY() * intervalY))
-                                 .xmax((int) ((r.getCoordinateX() + 1) * intervalX))
-                                 .ymax((int) ((r.getCoordinateY() + 1) * intervalY))))
-                                 // .xmin(r.getX())
-                                 // .ymin(r.getY())
-                                 // .xmax(r.getX() + r.getWidth())
-                                 // .ymax(r.getY() + r.getHeight())))
-                    .collect(Collectors.toList()));
-        return annotationXml;
+            .object(objects);
     }
 }
