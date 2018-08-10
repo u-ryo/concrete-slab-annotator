@@ -21,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.ZoneId;
 import java.util.Collection;
@@ -201,53 +204,58 @@ s in body
          @Valid @RequestBody Set<Rectangle> rectangles) {
         log.debug("REST request to save Rectangles with annotationId:{}, {}",
                   annotationId, rectangles);
-        CompletableFuture.runAsync(() ->
-                                   saveRectangles(annotationId, rectangles));
+        // user should be gotten before another thread
+        User user = userService.getUserWithAuthorities().orElse(null);
+        log.debug("user:{}", user);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        CompletableFuture
+            .runAsync(() -> saveRectangles(annotationId, rectangles, user));
         return ResponseEntity.ok().build();
-        // return rectangles.stream()
-        //     .collect(Collectors.toMap
-        //              (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
-        //               r -> r,
-        //               (r1, r2) -> r2));
     }
 
-    private void saveRectangles(Long annotationId, Set<Rectangle> rectangles) {
-        Map<String, Rectangle> rectangleMap =
-            rectangleRepository.findByAnnotationId(annotationId).stream()
-            .collect(Collectors.toMap
-                     (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
-                      r -> r, (r1, r2) -> r2));
-        Annotation annotation = annotationRepository.findOne(annotationId);
-        log.debug("annotation:{}", annotation);
-        rectangles =
-            rectangles.stream()
-            .map(r -> rectangleRepository.save
-                 (r.id(Optional.ofNullable
-                       (rectangleMap.get(r.getCoordinateX() + ","
-                                         + r.getCoordinateY()))
-                       .orElse(new Rectangle()).getId())
-                  .annotation(annotation)))
-            .collect(Collectors.toSet());
-        rectangleMap.values().removeAll(rectangles);
-        rectangleMap.values().stream()
-            .forEach(r -> rectangleRepository.delete(r.getId()));
+    private void saveRectangles(Long annotationId, Set<Rectangle> rectangles,
+                                User user) {
+        try {
+            Map<String, Rectangle> rectangleMap =
+                rectangleRepository.findByAnnotationId(annotationId).stream()
+                .collect(Collectors.toMap
+                         (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
+                          r -> r, (r1, r2) -> r2));
+            Annotation annotation = annotationRepository.findOne(annotationId);
+            log.debug("annotation:{}", annotation);
+            rectangles =
+                rectangles.stream()
+                .map(r -> rectangleRepository.save
+                     (r.id(Optional.ofNullable
+                           (rectangleMap.get(r.getCoordinateX() + ","
+                                             + r.getCoordinateY()))
+                           .orElse(new Rectangle()).getId())
+                      .annotation(annotation)))
+                .collect(Collectors.toSet());
+            rectangleMap.values().removeAll(rectangles);
+            rectangleMap.values().stream()
+                .forEach(r -> rectangleRepository.delete(r.getId()));
 
-        List<AccessLog> accessLogs =
-            accessLogRepository
-            .findByUserIsCurrentUserAndAnnotationId(annotationId, TOP_TO);
-        ZonedDateTime now = ZonedDateTime.now(TOKYO);
-        // https://qiita.com/kurukurupapa@github/items/f55395758eba03d749c9
-        // http://www.atmarkit.co.jp/ait/articles/1501/29/news016_2.html
-        log.debug("accessLogs:{}, isAfter?{}", accessLogs,
-                  accessLogs.isEmpty() ? "EMPTY"
-                  : accessLogs.get(0).getTo().plusMinutes(INTERVAL).isBefore(now));
-        if (accessLogs.isEmpty()
-            || accessLogs.get(0).getTo().plusMinutes(INTERVAL).isBefore(now)) {
-            User user = userService.getUserWithAuthorities().orElse(null);
-            accessLogRepository.save(new AccessLog().from(now).to(now)
-                                     .user(user).annotation(annotation));
-        } else {
-            accessLogRepository.save(accessLogs.get(0).to(now));
+            List<AccessLog> accessLogs = accessLogRepository
+                .findByUserIdAndAnnotationId(user.getId(), annotationId, TOP_TO);
+            ZonedDateTime now = ZonedDateTime.now(TOKYO);
+            // https://qiita.com/kurukurupapa@github/items/f55395758eba03d749c9
+            // http://www.atmarkit.co.jp/ait/articles/1501/29/news016_2.html
+            log.debug("accessLogs:{}, isAfter?{}", accessLogs,
+                      accessLogs.isEmpty() ? "EMPTY"
+                      : accessLogs.get(0).getTo().plusMinutes(INTERVAL)
+                      .isBefore(now));
+            if (accessLogs.isEmpty()
+                || accessLogs.get(0).getTo().plusMinutes(INTERVAL).isBefore(now)) {
+                accessLogRepository.save(new AccessLog().from(now).to(now)
+                                         .user(user).annotation(annotation));
+            } else {
+                accessLogRepository.save(accessLogs.get(0).to(now));
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
     }
     
@@ -271,9 +279,10 @@ s in body
     }
 
     /**
-     * GET  /rectangles/xml/image/{imageId} : get the rectangles XML which belong to the annotations with the specified imageId.
+     * GET  /rectangles/xml/image/{imageId}/{squareSize} : get the rectangles XML which belong to the annotations with the specified imageId.
      *
      * @param imageId imageId of rectangles belong to
+     * @param squareSize squareSize
      * @return the AnnotationXml with status 200 (OK)
      */
     @GetMapping("/rectangles/xml/image/{imageId}/{squareSize}")
@@ -448,5 +457,48 @@ s in body
                   .height(height)
                   .depth(3))
             .object(objects);
+    }
+
+    /**
+     * GET  /rectangles/xml/{squareSize}/{since} : get the rectangles XML with specified squareSize since specified date
+     *
+     * @param squareSize squareSize
+     * @param since Year Month Date
+     * @return the AnnotationXml Zip with status 200 (OK)
+     */
+    @GetMapping(value="/rectangles/xml/{squareSize}/{since}", produces="application/zip")
+    @Timed
+    public void getAnnotationXmlSince(HttpServletResponse resonse,
+                                      @PathVariable Integer squareSize,
+                                      @DateTimeFormat(pattern="yyyyMMdd")
+                                      @PathVariable LocalDate since)
+        throws IOException, JAXBException {
+        log.debug("REST request to get all AnnotationXml with squareSize:{} "
+                  + "since {}", squareSize, since);
+        resonse.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                          "attachment;filename=annotations_" + since + ".zip");
+        resonse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        ZipOutputStream zos = new ZipOutputStream(resonse.getOutputStream());
+        JAXBContext context = JAXBContext.newInstance(AnnotationXml.class);
+        Marshaller marshaller = context.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        imageRepository.findSince(since.atStartOfDay(TOKYO))
+            .parallelStream()
+            .map(image -> getImageAnnotationXml(image.getId(), squareSize))
+            .filter(xml -> xml != null)
+            .sequential()
+            .forEach(xml -> {
+                    try {
+                        zos.putNextEntry
+                            (new ZipEntry(xml.filename()
+                                          .replace(".jpg", ".xml")));
+                        marshaller.marshal(xml, zos);
+                    } catch (IOException | JAXBException e) {
+                        log.error("IO/JAXB Exception occurred. filename:{}",
+                                  xml.filename(), e);
+                    }
+                });
+        zos.flush();
+        zos.close();
     }
 }
