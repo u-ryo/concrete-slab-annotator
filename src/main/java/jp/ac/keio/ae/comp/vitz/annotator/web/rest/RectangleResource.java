@@ -28,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -306,41 +307,20 @@ s in body
     /**
      * GET  /rectangles/xml/{squareSize}/all : get all the rectangles XML with specified squareSize
      *
+     * @param response injected HttpServletResponse
      * @param squareSize squareSize
      * @return the AnnotationXml Zip with status 200 (OK)
      */
     @GetMapping(value="/rectangles/xml/{squareSize}/all", produces="application/zip")
     @Timed
-    public void getAllAnnotationXml(HttpServletResponse resonse,
+    public void getAllAnnotationXml(HttpServletResponse response,
                                     @PathVariable Integer squareSize)
         throws IOException, JAXBException {
         log.debug("REST request to get all AnnotationXml with squareSize:{}",
                   squareSize);
-        resonse.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
                           "attachment;filename=annotations.zip");
-        resonse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        ZipOutputStream zos = new ZipOutputStream(resonse.getOutputStream());
-        JAXBContext context = JAXBContext.newInstance(AnnotationXml.class);
-        Marshaller marshaller = context.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        imageRepository.findAll()
-            .parallelStream()
-            .map(image -> getImageAnnotationXml(image.getId(), squareSize))
-            .filter(xml -> xml != null)
-            .sequential()
-            .forEach(xml -> {
-                    try {
-                        zos.putNextEntry
-                            (new ZipEntry(xml.filename()
-                                          .replace(".jpg", ".xml")));
-                        marshaller.marshal(xml, zos);
-                    } catch (IOException | JAXBException e) {
-                        log.error("IO/JAXB Exception occurred. filename:{}",
-                                  xml.filename(), e);
-                    }
-                });
-        zos.flush();
-        zos.close();
+        getAnnotationXmls(response, imageRepository.findAll(), squareSize);
     }
 
     private AnnotationXml getAnnotationXml(Image image, int squareSize,
@@ -462,28 +442,37 @@ s in body
     /**
      * GET  /rectangles/xml/{squareSize}/{since} : get the rectangles XML with specified squareSize since specified date
      *
+     * @param response injected HttpServletResponse
      * @param squareSize squareSize
      * @param since Year Month Date
      * @return the AnnotationXml Zip with status 200 (OK)
      */
     @GetMapping(value="/rectangles/xml/{squareSize}/{since}", produces="application/zip")
     @Timed
-    public void getAnnotationXmlSince(HttpServletResponse resonse,
+    public void getAnnotationXmlSince(HttpServletResponse response,
                                       @PathVariable Integer squareSize,
                                       @DateTimeFormat(pattern="yyyyMMdd")
                                       @PathVariable LocalDate since)
         throws IOException, JAXBException {
         log.debug("REST request to get all AnnotationXml with squareSize:{} "
                   + "since {}", squareSize, since);
-        resonse.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
                           "attachment;filename=annotations_" + since + ".zip");
-        resonse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        ZipOutputStream zos = new ZipOutputStream(resonse.getOutputStream());
+        getAnnotationXmls(response,
+                          imageRepository.findSince(since.atStartOfDay(TOKYO)),
+                          squareSize);
+    }
+
+    private void getAnnotationXmls(HttpServletResponse response,
+                                   List<Image> images, int squareSize)
+        throws IOException, JAXBException {
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        ZipOutputStream zos = new ZipOutputStream
+            (new BufferedOutputStream(response.getOutputStream()));
         JAXBContext context = JAXBContext.newInstance(AnnotationXml.class);
         Marshaller marshaller = context.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        imageRepository.findSince(since.atStartOfDay(TOKYO))
-            .parallelStream()
+        images.parallelStream()
             .map(image -> getImageAnnotationXml(image.getId(), squareSize))
             .filter(xml -> xml != null)
             .sequential()
