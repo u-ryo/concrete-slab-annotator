@@ -65,9 +65,6 @@ public class RectangleResource {
 
     private static final String ENTITY_NAME = "rectangle";
     private static final ZoneId TOKYO = ZoneId.of("Asia/Tokyo");
-    // https://github.com/yamkazu/springdata-jpa-example/blob/pageable/src/test/java/org/yamkazu/springdata/EmpRepositoryTest.java
-    // https://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-part-seven-pagination/
-    // https://stackoverflow.com/questions/9314078/setmaxresults-for-spring-data-jpa-annotation?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
     private static final Pageable TOP_TO = new PageRequest(0, 1, DESC, "to");
     private static final int INTERVAL = 5;
     private static final double RATE = 0.46;
@@ -242,8 +239,6 @@ s in body
             List<AccessLog> accessLogs = accessLogRepository
                 .findByUserIdAndAnnotationId(user.getId(), annotationId, TOP_TO);
             ZonedDateTime now = ZonedDateTime.now(TOKYO);
-            // https://qiita.com/kurukurupapa@github/items/f55395758eba03d749c9
-            // http://www.atmarkit.co.jp/ait/articles/1501/29/news016_2.html
             log.debug("accessLogs:{}, isAfter?{}", accessLogs,
                       accessLogs.isEmpty() ? "EMPTY"
                       : accessLogs.get(0).getTo().plusMinutes(INTERVAL)
@@ -262,7 +257,6 @@ s in body
     
     /**
      * GET  /rectangles/xml/annotation/{annotationId} : get the rectangles XML which belong to the annotation with the specified annotationId.
-     * ref. http://blog.rakugakibox.net/entry/2014/11/23/java_spring_boot_rest
      *
      * @param annotationId annotationId of rectangles belong to
      * @return the AnnotationXml with status 200 (OK)

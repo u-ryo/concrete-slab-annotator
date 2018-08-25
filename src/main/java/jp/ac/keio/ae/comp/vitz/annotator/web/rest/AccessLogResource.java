@@ -4,7 +4,6 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jp.ac.keio.ae.comp.vitz.annotator.domain.AccessLog;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.AccessLogBean;
@@ -130,7 +129,6 @@ public class AccessLogResource {
 
     /**
      * GET  /access-logs/csv : get all the accessLogs with CSV.
-     * ref. https://qiita.com/yo1000/items/050c5c47daabf7a10e10
      *
      * @return the CSV File
      */
@@ -152,8 +150,6 @@ public class AccessLogResource {
             .collect(Collectors.toList());
         CsvMapper mapper = new CsvMapper();
         CsvSchema schema = mapper.schemaFor(AccessLogBean.class).withHeader();
-        // https://stackoverflow.com/questions/39086472/jackson-serializes-a-zoneddatetime-wrongly-in-spring-boot?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-        mapper.registerModule(new JavaTimeModule());
         return mapper.writer(schema).writeValueAsString(accessLogs);
     }
 }

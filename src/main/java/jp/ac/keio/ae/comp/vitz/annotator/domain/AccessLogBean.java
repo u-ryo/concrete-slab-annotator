@@ -6,7 +6,6 @@ import java.time.ZonedDateTime;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-// https://projectlombok.org/features/experimental/Accessors
 @Data
 @Accessors(fluent = true)
 @JsonPropertyOrder({"login", "filename", "defect", "squareSize", "from", "to"})
