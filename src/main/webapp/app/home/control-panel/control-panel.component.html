@@ -19,10 +19,13 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <div class="form-inline col-md-2">
+    <div class="form-inline col-md-1">
       <mat-slide-toggle formControlName="pending" color="primary" class="w-100"><span class="w-25 h6" jhiTranslate="home.pending">Pending</span></mat-slide-toggle>
     </div>
-    <div class="form-inline col-md-5">
+    <div class="form-inline col-md-2">
+      <mat-slide-toggle formControlName="lock" color="danger" class="w-100"><span class="w-25 h6" jhiTranslate="home.lock">lock</span></mat-slide-toggle>
+    </div>
+    <div class="form-inline col-md-4">
       <label class="w-100"><span class="w-25 text-right" jhiTranslate="home.brightness">Brightness:</span>
         <mat-slider [thumb-label]="true" [tick-interval]="auto" formControlName="brightnessLevel" class="w-100" placeholder="Brightness" max="200"></mat-slider>
       </label>

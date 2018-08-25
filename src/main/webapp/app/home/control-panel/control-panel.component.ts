@@ -40,6 +40,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     private log =
         Log.create('control-panel', Level.WARN, Level.INFO, Level.ERROR);
     private rate = 0.46;
+    private lock = true;
 
     constructor(private activatedRoute: ActivatedRoute,
                 private annotationService: AnnotationService,
@@ -137,6 +138,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             camera: this.cameras[0],
             defect: this.defects[0],
             pending: false,
+            lock: true,
             brightnessLevel: this.brightness,
             comment: { value: '', disabled: true }
         });
@@ -191,6 +193,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             defect: (this.annotation && this.annotation.defect)
                 ? this.annotation.defect : this.defects[0],
             pending: false,
+            lock: true,
             brightnessLevel: this.brightness,
             comment: { value: '', disabled: true }
         },

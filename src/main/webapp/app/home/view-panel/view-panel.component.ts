@@ -397,10 +397,11 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     click(event, isSingleClick, isThick) {
         this.log.d('click event:', event, 'isSingleClick:', isSingleClick,
                    this.clickCounter);
-        if (this.magnification <= this.MAGNIFICATION_START) {
+        if (this.dataService.form.value.lock) {
             return;
-        }
-        if (this.hasMouseMoved && !event.shiftKey && !event.ctrlKey) {
+        } else if (this.magnification <= this.MAGNIFICATION_START) {
+            return;
+        } if (this.hasMouseMoved && !event.shiftKey && !event.ctrlKey) {
             return;
         }
         this.isMouseDown = false;

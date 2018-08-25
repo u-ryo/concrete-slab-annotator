@@ -6,6 +6,7 @@
         },
         "imageFileUrl": "画像ファイルURL",
         "pending": "保留",
+        "lock": "ロック",
         "brightness": "明るさ",
         "attributes": "属性",
         "settings": "設定",
