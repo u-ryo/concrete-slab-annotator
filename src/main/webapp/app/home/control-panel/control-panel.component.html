@@ -42,33 +42,33 @@
         </mat-expansion-panel-header>
         <div class="form-group">
           <mat-form-field class="w-100">
-            <input matInput type="number" formControlName="squareSize" min="1" [placeholder]="'home.squareSize'|translate"/>
+            <input matInput readonly type="number" formControlName="squareSize" min="1" [placeholder]="'home.squareSize'|translate"/>
           </mat-form-field>
         </div>
         <div class="form-group">
           <mat-form-field class="w-100">
-            <input matInput type="number" formControlName="focalLength" min="1" step="10" [placeholder]="'home.focalLength'|translate"/>
+            <input matInput readonly type="number" formControlName="focalLength" min="1" step="10" [placeholder]="'home.focalLength'|translate"/>
           </mat-form-field>
         </div>
         <div class="form-group">
           <mat-form-field class="w-100">
-            <input matInput type="number" formControlName="distance" min="0.1" step="0.1" [placeholder]="'home.distance'|translate"/>
+            <input matInput readonly type="number" formControlName="distance" min="0.1" step="0.1" [placeholder]="'home.distance'|translate"/>
           </mat-form-field>
         </div>
         <div class="form-group">
           <mat-form-field class="w-100">
-            <mat-select id="camera" formControlName="camera" [placeholder]="'home.camera'|translate">
+            <mat-select readonly id="camera" formControlName="camera" [placeholder]="'home.camera'|translate">
               <mat-option *ngFor="let camera of cameras" [value]="camera">{{('concreteSlabAnnotatorApp.Camera.' + camera) | translate}}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
         <div class="form-group">
           <mat-form-field style="width:43%">
-            <input matInput type="number" [placeholder]="'home.columns'|translate" min="10" step="1" formControlName="columns"/>
+            <input matInput readonly type="number" [placeholder]="'home.columns'|translate" min="10" step="1" formControlName="columns"/>
           </mat-form-field>
           <span class="p-1">x</span>
           <mat-form-field style="width:43%">
-            <input matInput type="number" [placeholder]="'home.rows'|translate" min="10" step="1" formControlName="rows"/>
+            <input matInput readonly type="number" [placeholder]="'home.rows'|translate" min="10" step="1" formControlName="rows"/>
           </mat-form-field>
         </div>
       </mat-expansion-panel>
