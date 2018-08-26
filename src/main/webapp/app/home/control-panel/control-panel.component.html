@@ -57,7 +57,7 @@
         </div>
         <div class="form-group">
           <mat-form-field class="w-100">
-            <mat-select readonly id="camera" formControlName="camera" [placeholder]="'home.camera'|translate">
+            <mat-select disabled id="camera" formControlName="camera" [placeholder]="'home.camera'|translate">
               <mat-option *ngFor="let camera of cameras" [value]="camera">{{('concreteSlabAnnotatorApp.Camera.' + camera) | translate}}</mat-option>
             </mat-select>
           </mat-form-field>
