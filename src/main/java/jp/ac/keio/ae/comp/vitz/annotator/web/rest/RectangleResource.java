@@ -184,8 +184,7 @@ public class RectangleResource {
         return rectangleRepository.findByAnnotationId(annotationId).stream()
             .collect(Collectors.toMap
                      (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
-                      r -> r,
-                      (r1, r2) -> r2));
+                      r -> r, this::delete1Return2));
     }
 
     /**
@@ -220,7 +219,7 @@ s in body
                 rectangleRepository.findByAnnotationId(annotationId).stream()
                 .collect(Collectors.toMap
                          (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
-                          r -> r, (r1, r2) -> r2));
+                          r -> r, this::delete1Return2));
             Annotation annotation = annotationRepository.findOne(annotationId);
             log.debug("annotation:{}", annotation);
             rectangles =
@@ -293,9 +292,18 @@ s in body
             return null;
         }
         Annotation annotation = annotations.iterator().next();
-        return getAnnotationXml(annotation.getImage(), squareSize,
-                                rectangleRepository.findByImageIdAndSquareSize
-                                (imageId, squareSize), true);
+        return getAnnotationXml
+            (annotation.getImage(), squareSize,
+             rectangleRepository
+             .findByImageIdAndSquareSize(imageId, squareSize)
+             .stream()
+             .collect(Collectors.toMap
+                      (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
+                       r -> r, this::delete1Return2))
+             .values()
+             .stream()
+             .collect(Collectors.toSet()),
+             true);
     }
 
     /**
@@ -363,6 +371,11 @@ s in body
                                    width, height,
                                    createObjects(rectangles, intervalX,
                                                  intervalY));
+    }
+
+    private Rectangle delete1Return2(Rectangle r1, Rectangle r2) {
+        rectangleRepository.delete(r1.getId());
+        return r2;
     }
 
     private List<AnnotationXml.Obj> createObjects(Set<Rectangle> rectangles,
