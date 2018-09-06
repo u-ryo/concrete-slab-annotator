@@ -184,7 +184,7 @@ public class RectangleResource {
         return rectangleRepository.findByAnnotationId(annotationId).stream()
             .collect(Collectors.toMap
                      (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
-                      r -> r, this::delete1Return2));
+                      r -> r, (r1, r2) -> r2));
     }
 
     /**
@@ -219,7 +219,7 @@ s in body
                 rectangleRepository.findByAnnotationId(annotationId).stream()
                 .collect(Collectors.toMap
                          (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
-                          r -> r, this::delete1Return2));
+                          r -> r, (r1, r2) -> r2));
             Annotation annotation = annotationRepository.findOne(annotationId);
             log.debug("annotation:{}", annotation);
             rectangles =
@@ -299,7 +299,8 @@ s in body
              .stream()
              .collect(Collectors.toMap
                       (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
-                       r -> r, this::delete1Return2))
+                       r -> r,
+                       (r1, r2) -> r2))
              .values()
              .stream()
              .collect(Collectors.toSet()),
@@ -371,11 +372,6 @@ s in body
                                    width, height,
                                    createObjects(rectangles, intervalX,
                                                  intervalY));
-    }
-
-    private Rectangle delete1Return2(Rectangle r1, Rectangle r2) {
-        rectangleRepository.delete(r1.getId());
-        return r2;
     }
 
     private List<AnnotationXml.Obj> createObjects(Set<Rectangle> rectangles,
