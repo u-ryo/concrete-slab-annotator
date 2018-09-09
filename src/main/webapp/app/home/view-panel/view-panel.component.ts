@@ -282,9 +282,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 if (this.rectangles[coordinate]) {
                     if (this.rectangles[coordinate].pending) {
                         this.context.fillStyle = 'rgba(80, 77, 192, 0.5)';
-                        // this.context.fillRect(i * this.intervalX - this.cropX,
-                        //                       j * this.intervalY - this.cropY,
-                        //                       this.intervalX, this.intervalY);
                     } else {
                         this.context.fillStyle = 'rgba(192, 80, 77, 0.5)';
                     }
@@ -294,11 +291,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                     if (this.rectangles[coordinate].comment) {
                         this.drawFrame(i, j, 'rgba(180, 192, 77, 0.8)');
                     }
-                // } else {
-                //     this.context.fillStyle = 'rgba(192, 80, 77, 0.5)';
-                //     this.context.fillRect(i * this.intervalX - this.cropX,
-                //                           j * this.intervalY - this.cropY,
-                //                           this.intervalX, this.intervalY);
                 }
                 if (this.coordinate === coordinate) {
                     this.drawFrame(i, j, 'rgba(77, 192, 80, 0.8)');
@@ -397,9 +389,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     click(event, isSingleClick, isThick) {
         this.log.d('click event:', event, 'isSingleClick:', isSingleClick,
                    this.clickCounter);
-        if (this.dataService.form.value.lock) {
-            return;
-        } else if (this.magnification <= this.MAGNIFICATION_START) {
+        if (this.magnification <= this.MAGNIFICATION_START) {
             return;
         } if (this.hasMouseMoved && !event.shiftKey && !event.ctrlKey) {
             return;
@@ -416,6 +406,10 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                       ? this.rectangles[this.coordinate].comment : ''),
             showOnly: false
         });
+        if (this.dataService.form.value.lock) {
+            this.drawCanvas();
+            return;
+        }
         if (isSingleClick) {
             if (!isThick) {
                 this.drawCreateRectangle(rectangleX, rectangleY);
