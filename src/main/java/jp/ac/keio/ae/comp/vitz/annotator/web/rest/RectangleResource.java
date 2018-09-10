@@ -300,7 +300,10 @@ s in body
              .collect(Collectors.toMap
                       (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
                        r -> r,
-                       (r1, r2) -> r2))
+                       (r1, r2) -> {
+                          // rectangleRepository.delete(r1.getId());
+                          return r2;
+                      }))
              .values()
              .stream()
              .collect(Collectors.toSet()),
@@ -358,7 +361,7 @@ s in body
         if (withNoAnnotation) {
             Map<String, List<Rectangle>> rectanglesMap =
                 rectangles.stream()
-                .filter(r -> !r.isPending())
+                // .filter(r -> !r.isPending())
                 .collect(Collectors.groupingBy
                          (r -> r.getCoordinateX() + "," + r.getCoordinateY()));
             return createAnnotationXml(folder,
@@ -379,7 +382,7 @@ s in body
                                                   double intervalY) {
         return rectangles
             .parallelStream()
-            .filter(r -> !r.isPending())
+            // .filter(r -> !r.isPending())
             .map(r -> createAnnotationXmlObj(r, intervalX, intervalY))
             .collect(Collectors.toList());
     }
@@ -399,7 +402,7 @@ s in body
                                 .orElse(Collections.singletonList
                                         (createAnnotationXmlObj
                                          ("Unannotated", col, row, intervalX,
-                                          intervalY))))
+                                          intervalY, false))))
                       .flatMap(Collection::stream)
                       .collect(Collectors.toList()))
             .flatMap(Collection::stream)
@@ -408,12 +411,13 @@ s in body
 
     private AnnotationXml.Obj
         createAnnotationXmlObj(String name, int coordinateX, int coordinateY,
-                               double intervalX, double intervalY) {
+                               double intervalX, double intervalY,
+                               boolean isPending) {
         return new AnnotationXml.Obj()
             .name(name)
             .pose("Unspecified")
             .truncated(0)
-            .difficult(0)
+            .difficult(isPending ? 100 : 0)
             .bndbox(new AnnotationXml.Bndbox()
                     .xmin((int) (coordinateX * intervalX))
                     .ymin((int) (coordinateY * intervalY))
@@ -426,7 +430,7 @@ s in body
                                                      double intervalY) {
         return createAnnotationXmlObj(r.getAnnotation().getDefect().name(),
                                       r.getCoordinateX(), r.getCoordinateY(),
-                                      intervalX, intervalY);
+                                      intervalX, intervalY, r.isPending());
     }
 
     private AnnotationXml createAnnotationXml(String folder, String filename,
