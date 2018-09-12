@@ -14,6 +14,8 @@ This application was generated using JHipster 4.14.4, you can find documentation
 |---|---|---|
 |![downloads](https://raw.githubusercontent.com/wiki/u-ryo/concrete-slab-annotator/images/downloads.png)|![settings](https://raw.githubusercontent.com/wiki/u-ryo/concrete-slab-annotator/images/settings.png)|![help chat](https://raw.githubusercontent.com/wiki/u-ryo/concrete-slab-annotator/images/helpchat.png)|
 
+![operation](https://raw.githubusercontent.com/wiki/u-ryo/concrete-slab-annotator/images/concrete-slab-annotator.gif)
+
 ## Functionalities
 
 1. Selecting to annotate crack, efflorescence, don't care, spalling, popout, scaling, chalk, wetting, rust fluid, reinforcement exposure, honey comb, air void and stain/discoloration.
