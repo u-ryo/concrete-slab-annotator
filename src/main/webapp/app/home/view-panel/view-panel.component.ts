@@ -254,6 +254,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         let max = (this.canvas.nativeElement.width / this.intervalX) + 1;
         this.log.d('delta:', delta, 'max:', max);
         this.context.beginPath();
+        this.context.strokeStyle = 'rgba(0, 0, 0, 0.3)';
         for (let i = 0; i < max; i++) {
             this.context.moveTo(i * this.intervalX - delta, 0);
             this.context.lineTo(i * this.intervalX - delta,
@@ -267,6 +268,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                                 j * this.intervalY - delta);
         }
         this.context.stroke();
+        this.context.strokeStyle = 'rgba(0, 0, 0, 1)';
     }
 
     drawRectangles() {
