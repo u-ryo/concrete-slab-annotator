@@ -474,27 +474,26 @@ s in body
                                    List<Image> images, int squareSize)
         throws IOException, JAXBException {
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        ZipOutputStream zos = new ZipOutputStream
-            (new BufferedOutputStream(response.getOutputStream()));
-        JAXBContext context = JAXBContext.newInstance(AnnotationXml.class);
-        Marshaller marshaller = context.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        images.parallelStream()
-            .map(image -> getImageAnnotationXml(image.getId(), squareSize))
-            .filter(xml -> xml != null)
-            .sequential()
-            .forEach(xml -> {
-                    try {
-                        zos.putNextEntry
-                            (new ZipEntry(xml.filename()
-                                          .replace(".jpg", ".xml")));
-                        marshaller.marshal(xml, zos);
-                    } catch (IOException | JAXBException e) {
-                        log.error("IO/JAXB Exception occurred. filename:{}",
-                                  xml.filename(), e);
-                    }
-                });
-        zos.flush();
-        zos.close();
+        try (ZipOutputStream zos = new ZipOutputStream
+             (new BufferedOutputStream(response.getOutputStream()))) {
+            JAXBContext context = JAXBContext.newInstance(AnnotationXml.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            images.parallelStream()
+                .map(image -> getImageAnnotationXml(image.getId(), squareSize))
+                .filter(xml -> xml != null)
+                .sequential()
+                .forEach(xml -> {
+                        try {
+                            zos.putNextEntry
+                                (new ZipEntry(xml.filename()
+                                              .replace(".jpg", ".xml")));
+                            marshaller.marshal(xml, zos);
+                        } catch (IOException | JAXBException e) {
+                            log.error("IO/JAXB Exception occurred. filename:{}",
+                                      xml.filename(), e);
+                        }
+                    });
+        }
     }
 }
