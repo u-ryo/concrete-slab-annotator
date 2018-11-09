@@ -1,5 +1,5 @@
 <form [formGroup]="inputForm" class="form-inline w-100">
-  <div class="col-md-9 form-inline">
+  <div class="col-md-10 form-inline">
     <div class="form-group w-100">
       <mat-form-field class="col-md-12">
         <input matInput type="text" name="filename" [placeholder]="'home.imageFileUrl'|translate" formControlName="fileUrlField" list="fileUrls"/>
@@ -19,11 +19,13 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <div class="form-inline col-md-1">
-      <mat-slide-toggle formControlName="pending" color="primary" class="w-100"><span class="w-25 h6" jhiTranslate="home.pending">Pending</span></mat-slide-toggle>
-    </div>
-    <div class="form-inline col-md-2">
-      <mat-slide-toggle formControlName="lock" color="danger" class="w-100"><span class="w-25 h6" jhiTranslate="home.lock">lock</span></mat-slide-toggle>
+    <div class="form-inline col-md-3">
+      <span class="col-sm-6" style="padding-right:0px">
+        <mat-slide-toggle formControlName="pending" color="primary"><span jhiTranslate="home.pending">Pending</span></mat-slide-toggle>
+      </span>
+      <span class="col-sm-6" style="padding-right:0px">
+        <mat-slide-toggle formControlName="lock" color="danger"><span jhiTranslate="home.lock">lock</span></mat-slide-toggle>
+      </span>
     </div>
     <div class="form-inline col-md-4">
       <label class="w-100"><span class="w-25 text-right" jhiTranslate="home.brightness">Brightness:</span>
@@ -74,7 +76,7 @@
       </mat-expansion-panel>
     </div>
   </div>
-  <div class="col-md-3">
+  <div class="col-md-2">
     <mat-form-field class="w-100">
       <textarea matInput [placeholder]="'home.comment'|translate:coordinate" formControlName="comment" matTextareaAutosize matAutosizeMaxRows="5" matAutosizeMinRows="5">{{comment}}</textarea>
     </mat-form-field>
