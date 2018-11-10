@@ -163,6 +163,14 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                     this.drawCanvas();
                     this.log.d('brightness:', this.brightness);
                 });
+        this.dataService.form.get('coordinateXField').valueChanges
+            .debounceTime(500)
+            .subscribe((x) => this.specifyCoordinate(
+                x, this.dataService.form.value.coordinateYField));
+        this.dataService.form.get('coordinateYField').valueChanges
+            .debounceTime(500)
+            .subscribe((y) => this.specifyCoordinate(
+                this.dataService.form.value.coordinateXField, y));
         this.sharedStorageService.observe('cropX').subscribe(
             (x) => this.drawCanvas());
         this.sharedStorageService.observe('cropY').subscribe(
@@ -386,6 +394,24 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             }
             this.clickCounter = 0;
         }, 200);
+    }
+
+    specifyCoordinate(rectangleX, rectangleY) {
+        if (this.magnification <= this.MAGNIFICATION_START
+            || rectangleX < 0
+            || rectangleX > this.dataService.form.value.columns
+            || rectangleY < 0
+            || rectangleY > this.dataService.form.value.rows) {
+            return;
+        }
+        this.coordinate = rectangleX + ',' + rectangleY;
+        this.dataService.notifyComment({
+            coordinate: this.coordinate,
+            comment: (this.rectangles[this.coordinate]
+                      ? this.rectangles[this.coordinate].comment : ''),
+            showOnly: false
+        });
+        this.drawCanvas();
     }
 
     click(event, isSingleClick, isThick) {

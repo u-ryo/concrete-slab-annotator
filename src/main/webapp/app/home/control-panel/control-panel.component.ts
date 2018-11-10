@@ -140,7 +140,9 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             pending: false,
             lock: true,
             brightnessLevel: this.brightness,
-            comment: { value: '', disabled: true }
+            comment: { value: '', disabled: true },
+            coordinateXField: 0,
+            coordinateYField: 0
         });
         this.inputForm.get('squareSize').valueChanges
             .debounceTime(500)
@@ -195,7 +197,9 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             pending: false,
             lock: true,
             brightnessLevel: this.brightness,
-            comment: { value: '', disabled: true }
+            comment: { value: '', disabled: true },
+            coordinateXField: 0,
+            coordinateYField: 0
         },
                              {
             emitEvent: false,
@@ -240,6 +244,9 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         this.inputForm.controls['comment'].setValue(comment.comment,
                                                     {emitEvent: false});
         this.coordinate = { coordinate: comment.coordinate };
+        const coordinates = this.coordinate.coordinate.split(',');
+        this.inputForm.controls['coordinateXField'].setValue(coordinates[0], {emitEvent: false});
+        this.inputForm.controls['coordinateYField'].setValue(coordinates[1], {emitEvent: false});
         if (comment.showOnly) {
             this.inputForm.controls['comment'].disable({emitEvent: false});
         } else {

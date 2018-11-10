@@ -77,8 +77,19 @@
     </div>
   </div>
   <div class="col-md-2">
+    <div>
+      <mat-form-field class="col-6" style="padding-right:0">
+        <span matPrefix>(</span>
+        <span matSuffix><b>,</b></span>
+        <input matInput placeholder="x" type="number" min="0" max={{this.dataService.form.value.columns}} formControlName="coordinateXField"/>
+      </mat-form-field>
+      <mat-form-field class="col-5" style="padding-left:0">
+        <input matInput placeholder="y" type="number" min="0" max={{this.dataService.form.value.rows}} formControlName="coordinateYField"/>
+        <span matSuffix>)</span>
+      </mat-form-field>
+    </div>
     <mat-form-field class="w-100">
-      <textarea matInput [placeholder]="'home.comment'|translate:coordinate" formControlName="comment" matTextareaAutosize matAutosizeMaxRows="5" matAutosizeMinRows="5">{{comment}}</textarea>
+      <textarea matInput [placeholder]="'home.comment'|translate:coordinate" formControlName="comment" matTextareaAutosize matAutosizeMaxRows="3" matAutosizeMinRows="3">{{comment}}</textarea>
     </mat-form-field>
   </div>
 </form>
