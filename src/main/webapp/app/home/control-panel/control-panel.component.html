@@ -81,10 +81,10 @@
       <mat-form-field class="col-6" style="padding-right:0">
         <span matPrefix>(</span>
         <span matSuffix><b>,</b></span>
-        <input matInput placeholder="x" type="number" min="0" max={{this.dataService.form.value.columns}} formControlName="coordinateXField"/>
+        <input matInput placeholder="x" type="number" min="0" max={{this.inputForm.value.columns}} formControlName="coordinateXField"/>
       </mat-form-field>
       <mat-form-field class="col-5" style="padding-left:0">
-        <input matInput placeholder="y" type="number" min="0" max={{this.dataService.form.value.rows}} formControlName="coordinateYField"/>
+        <input matInput placeholder="y" type="number" min="0" max={{this.inputForm.value.rows}} formControlName="coordinateYField"/>
         <span matSuffix>)</span>
       </mat-form-field>
     </div>
