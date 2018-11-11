@@ -144,24 +144,24 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             coordinateXField: 0,
             coordinateYField: 0
         });
-        this.inputForm.get('squareSize').valueChanges
-            .debounceTime(500)
-            .subscribe((squareSize) => {
-                this.squareSize = squareSize;
-                this.changeSize();
-            });
-        this.inputForm.get('distance').valueChanges
-            .debounceTime(500)
-            .subscribe((distance) => {
-                this.distance = distance;
-                this.changeSize();
-            });
-        this.inputForm.get('focalLength').valueChanges
-            .debounceTime(500)
-            .subscribe((focalLength) => {
-                this.focalLength = focalLength;
-                this.changeSize();
-            });
+        // this.inputForm.get('squareSize').valueChanges
+        //     .debounceTime(500)
+        //     .subscribe((squareSize) => {
+        //         this.squareSize = squareSize;
+        //         this.changeSize();
+        //     });
+        // this.inputForm.get('distance').valueChanges
+        //     .debounceTime(500)
+        //     .subscribe((distance) => {
+        //         this.distance = distance;
+        //         this.changeSize();
+        //     });
+        // this.inputForm.get('focalLength').valueChanges
+        //     .debounceTime(500)
+        //     .subscribe((focalLength) => {
+        //         this.focalLength = focalLength;
+        //         this.changeSize();
+        //     });
         this.inputForm.get('defect').valueChanges
             .debounceTime(500)
             .subscribe((defect) => this.loadAnnotation(defect));

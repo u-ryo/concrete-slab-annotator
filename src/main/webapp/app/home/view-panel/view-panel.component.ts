@@ -132,25 +132,25 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 this.dataService.form.controls['fileUrlField'].setValue(
                     url, {emitEvent: false});
             });
-        this.dataService.form.get('columns').valueChanges
-            .debounceTime(500)
-            .subscribe(
-                (columns) => {
-                    this.intervalX = this.canvas.nativeElement.width
-                        * this.magnification / columns;
-                    this.drawCanvas();
-                    this.log.d('columns:', columns,
-                               this.dataService.form.value.columns);
-                });
-        this.dataService.form.get('rows').valueChanges
-            .debounceTime(500)
-            .subscribe(
-                (rows) => {
-                    this.intervalY = this.canvas.nativeElement.height
-                        * this.magnification / rows;
-                    this.drawCanvas();
-                    this.log.d('rows:', rows, this.dataService.form.value.rows);
-                });
+        // this.dataService.form.get('columns').valueChanges
+        //     .debounceTime(500)
+        //     .subscribe(
+        //         (columns) => {
+        //             this.intervalX = this.canvas.nativeElement.width
+        //                 * this.magnification / columns;
+        //             this.drawCanvas();
+        //             this.log.d('columns:', columns,
+        //                        this.dataService.form.value.columns);
+        //         });
+        // this.dataService.form.get('rows').valueChanges
+        //     .debounceTime(500)
+        //     .subscribe(
+        //         (rows) => {
+        //             this.intervalY = this.canvas.nativeElement.height
+        //                 * this.magnification / rows;
+        //             this.drawCanvas();
+        //             this.log.d('rows:', rows, this.dataService.form.value.rows);
+        //         });
         this.dataService.form.get('pending').valueChanges
             .debounceTime(500)
             .subscribe((pending) => this.setPending(pending));
@@ -399,11 +399,28 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     specifyCoordinate(rectangleX, rectangleY) {
         if (this.magnification <= this.MAGNIFICATION_START
             || rectangleX < 0
-            || rectangleX > this.dataService.form.value.columns
+            || rectangleX >= this.dataService.form.value.columns
             || rectangleY < 0
-            || rectangleY > this.dataService.form.value.rows) {
+            || rectangleY >= this.dataService.form.value.rows) {
             return;
         }
+        this.log.d(`img:${this.img.nativeElement.naturalWidth},`
+                   + `canvas:${this.canvas.nativeElement.width},`
+                   + `real:${this.canvas.nativeElement.width * this.magnification},`
+                   + `interval:${this.intervalX},`
+                   + `${rectangleX * this.intervalX},cropX:${this.cropX}`);
+        this.cropX = (rectangleX * this.intervalX) + (this.intervalX / 2.0)
+            - (this.canvas.nativeElement.width / 2.0);
+        this.cropX = Math.min(
+            Math.max(this.cropX, 0),
+            this.canvas.nativeElement.width * this.magnification
+                - this.canvas.nativeElement.width);
+        this.cropY = (rectangleY * this.intervalY) + (this.intervalY / 2.0)
+            - (this.canvas.nativeElement.width / 10.0);
+        this.cropY = Math.min(
+            Math.max(this.cropY, 0),
+            this.canvas.nativeElement.height * this.magnification
+                - this.canvas.nativeElement.height);
         this.coordinate = rectangleX + ',' + rectangleY;
         this.dataService.notifyComment({
             coordinate: this.coordinate,
