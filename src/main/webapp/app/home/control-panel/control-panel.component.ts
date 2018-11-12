@@ -41,6 +41,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         Log.create('control-panel', Level.WARN, Level.INFO, Level.ERROR);
     private rate = 0.46;
     private lock = true;
+    @SharedStorage() rectangles2 = null;
 
     constructor(private activatedRoute: ActivatedRoute,
                 private annotationService: AnnotationService,
@@ -292,6 +293,12 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     }
 
     loadAnnotation(defect) {
+        this.rectangles2 = null;
+        if (defect === DefectName.POPOUT || defect === DefectName.SCALING) {
+            this.loadScaleOrPopout(defect === DefectName.POPOUT
+                                   ? DefectName.SCALING : DefectName.POPOUT);
+        }
+
         this.annotationService.queryWithImageIdDefectAndSquareSize(
             this.image.id, this.squareSize, defect).subscribe(
                 (res: HttpResponse<Annotation>) => {
@@ -324,6 +331,28 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                     this.onError(res.message);
                     this.log.er(res.message);
                     this.dataService.notifyRedraw(new Map<string, Rectangle>());
+                });
+    }
+
+    loadScaleOrPopout(defect) {
+        this.annotationService.queryWithImageIdDefectAndSquareSize(
+            this.image.id, this.squareSize, defect).subscribe(
+                (res: HttpResponse<Annotation>) => {
+                    const a = res.body;
+                    this.log.d('annotation:', a);
+                    this.rectangleService.queryWithAnnotationId(a.id).subscribe(
+                        (response: HttpResponse<Map<string, Rectangle>>) => {
+                            this.rectangles2 = response.body;
+                            this.log.d('rectangles for a:', response.body);
+                        },
+                        (response: HttpErrorResponse) => {
+                            this.onError(response.message);
+                            this.log.er(response.message);
+                        });
+                },
+                (res: HttpErrorResponse) => {
+                    this.log.er(res.message);
+                    this.onError(res.message);
                 });
     }
 }

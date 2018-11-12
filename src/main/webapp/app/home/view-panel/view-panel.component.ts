@@ -31,6 +31,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     private isMouseDown = false;
     private hasMouseMoved = false;
     private rectangles = new Map<string, Rectangle>();
+    @SharedStorage() rectangles2 = null;
     @SharedStorage() rightEnd = 1;
     @SharedStorage() bottomEnd = 1;
     @SharedStorage() fileUrl;
@@ -175,6 +176,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             (x) => this.drawCanvas());
         this.sharedStorageService.observe('cropY').subscribe(
             (y) => this.drawCanvas());
+        this.sharedStorageService.observe('rectangles2').subscribe(
+            (r) => this.drawCanvas());
         this.timerObservable.filter((x) => this.dirty).subscribe(
             (x) => this.saveRectangles(x),
             (error) => this.log.er(`Error: ${error}`),
@@ -289,6 +292,12 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         for (let i = rectangleMinX; i <= rectangleMaxX; i++) {
             for (let j = rectangleMinY; j <= rectangleMaxY; j++) {
                 const coordinate = i + ',' + j;
+                if (this.rectangles2 && this.rectangles2[coordinate]) {
+                    this.context.fillStyle = 'rgba(80, 192, 77, 0.5)';
+                    this.context.fillRect(i * this.intervalX - this.cropX,
+                                          j * this.intervalY - this.cropY,
+                                          this.intervalX, this.intervalY);
+                }
                 if (this.rectangles[coordinate]) {
                     if (this.rectangles[coordinate].pending) {
                         this.context.fillStyle = 'rgba(80, 77, 192, 0.5)';
