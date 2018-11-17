@@ -1,0 +1,15 @@
+<h1 mat-dialog-title jhiTranslate="global.menu.admin.downloads.comparation">Compare Annotations</h1>
+<mat-dialog-content>
+  <p jhiTranslate="global.menu.admin.downloads.whatCompareTo">What will you compare to?</p>
+  <mat-form-field class="w-100">
+    <mat-select placeholder="Select Image URL" required [(ngModel)]="data.to">
+      <mat-option *ngFor="let image of data.images" [value]="image" [disabled]="image.filename === data.from">
+        {{image.filename}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button [attr.disabled]="data.to ? null : true" [mat-dialog-close]="data.to" cdkFocusInitial>OK</button>
+</mat-dialog-actions>
