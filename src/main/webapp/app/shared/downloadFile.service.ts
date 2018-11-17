@@ -32,6 +32,8 @@ export class DownloadFileService {
             }
         } else if (url.indexOf('csv') > 0) {
             resType = ['text', 'text/csv'];
+        } else if (filename.indexOf('.jpg') > 0) {
+            resType = ['blob', 'image/jpeg'];
         }
         headers = new HttpHeaders({ 'Accept': resType[1] });
         // https://angular.io/guide/http#requesting-non-json-data

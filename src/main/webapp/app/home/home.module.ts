@@ -3,13 +3,13 @@ import { RouterModule } from '@angular/router';
 
 import { ConcreteSlabAnnotatorSharedModule } from '../shared';
 
-import { HOME_ROUTE, HomeComponent } from './';
+import { HOME_ROUTE, CompareDialogComponent, HomeComponent } from './';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatExpansionModule, MatInputModule, MatFormFieldModule,
-         MatMenuModule, MatSelectModule, MatSliderModule, MatSlideToggleModule
-       } from '@angular/material';
+import { MatDialogModule, MatExpansionModule, MatInputModule,
+         MatFormFieldModule, MatMenuModule, MatSelectModule, MatSliderModule,
+         MatSlideToggleModule } from '@angular/material';
 import { WebStorageModule } from 'ngx-store';
 import { MouseWheelDirective } from '../shared/mousewheel.directive';
 
@@ -22,6 +22,7 @@ import { ViewPanelComponent } from './view-panel/view-panel.component';
         FormsModule,
         ReactiveFormsModule,
         BrowserAnimationsModule,
+        MatDialogModule,
         MatExpansionModule,
         MatInputModule,
         MatFormFieldModule,
@@ -36,9 +37,11 @@ import { ViewPanelComponent } from './view-panel/view-panel.component';
         HomeComponent,
         ControlPanelComponent,
         ViewPanelComponent,
-        MouseWheelDirective
+        MouseWheelDirective,
+        CompareDialogComponent
     ],
     entryComponents: [
+        CompareDialogComponent
     ],
     providers: [
     ],

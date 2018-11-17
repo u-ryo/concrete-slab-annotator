@@ -2,12 +2,14 @@ package jp.ac.keio.ae.comp.vitz.annotator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jp.ac.keio.ae.comp.vitz.annotator.config.ApplicationProperties;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.AccessLog;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Annotation;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.AnnotationXml;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Image;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Rectangle;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.User;
+import jp.ac.keio.ae.comp.vitz.annotator.domain.enumeration.DefectName;
 
 import jp.ac.keio.ae.comp.vitz.annotator.repository.AccessLogRepository;
 import jp.ac.keio.ae.comp.vitz.annotator.repository.AnnotationRepository;
@@ -17,8 +19,15 @@ import jp.ac.keio.ae.comp.vitz.annotator.service.UserService;
 import jp.ac.keio.ae.comp.vitz.annotator.web.rest.errors.BadRequestAlertException;
 import jp.ac.keio.ae.comp.vitz.annotator.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import org.im4java.core.ConvertCmd;
+import org.im4java.core.IM4JavaException;
+import org.im4java.core.IMOperation;
+import org.im4java.core.IMOps;
+import org.im4java.core.Operation;
+import org.im4java.process.Pipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -63,7 +72,9 @@ public class RectangleResource {
 
     private final Logger log = LoggerFactory.getLogger(RectangleResource.class);
 
-    private static final String ENTITY_NAME = "rectangle";
+    private static final String ENTITY_NAME = "rectangle",
+        RED = "rgba(178, 76, 77, 0.6)", GREEN = "rgba(76, 178, 77, 0.6)",
+        JPG = "jpg:-";
     private static final ZoneId TOKYO = ZoneId.of("Asia/Tokyo");
     private static final Pageable TOP_TO = new PageRequest(0, 1, DESC, "to");
     private static final int INTERVAL = 5;
@@ -74,6 +85,9 @@ public class RectangleResource {
     private final ImageRepository imageRepository;
     private final RectangleRepository rectangleRepository;
     private final UserService userService;
+
+    @Autowired
+    private ApplicationProperties properties;
 
     public RectangleResource(AccessLogRepository accessLogRepository,
                              AnnotationRepository annotationRepository,
@@ -495,5 +509,83 @@ s in body
                         }
                     });
         }
+    }
+
+    /**
+     * GET /rectangles/compare/{annotationId}/{imageId}/{defect} : 
+     * get compared annotation image with specified squareSize, annotationId
+     * and imageId with defect
+     *
+     * @param response injected HttpServletResponse
+     * @param annotationId annotationId to be compared
+     * @param imageId imageId for specifying annotation id
+     * @param defect defect for specifying annotation id
+     * @return the AnnotationXml Zip with status 200 (OK)
+     */
+    @GetMapping(value="/rectangles/compare/{annotationId}/{imageId}/{defect}", produces="image/jpeg")
+    @Timed
+    public void getComparedJpg(HttpServletResponse response,
+                               @PathVariable Long annotationId,
+                               @PathVariable Long imageId,
+                               @PathVariable DefectName defect)
+        throws IOException, JAXBException {
+        log.debug("REST request to get a compared image with annotationId:{}, "
+                  + "imageId:{}, defect:{}", annotationId, imageId, defect);
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                          "attachment;filename=compare_" + annotationId + "_"
+                           + imageId + "_" + defect + ".jpg");
+        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+        Annotation annotation = annotationRepository.findOne(annotationId);
+        Image image = annotation.getImage();
+        int squareSize = annotation.getSquareSize(),
+            width = image.getWidth(),
+            height = image.getHeight(),
+            focalLength = image.getFocalLength();
+        double distance = image.getDistance(),
+            rate = distance * RATE / focalLength / squareSize;
+        int columns = (int) Math.round(rate * width),
+            rows = (int) Math.round(rate * height);
+        double intervalX = width / columns,
+            intervalY = height / rows;
+
+        IMOps op =
+            ((IMOperation) new IMOperation()
+             .addImage(image.getFilename()
+                       .replace(properties.getImageURLOrig(),
+                                properties.getImageURLReplace())));
+        drawRectanglesIM4Java
+            (rectangleRepository.findByAnnotationId(annotationId), RED, op,
+             intervalX, intervalY);
+
+        drawRectanglesIM4Java
+            (rectangleRepository.findByImageIdAndSquareSizeAndDefectName
+             (imageId, annotation.getSquareSize(), defect), GREEN, op,
+             intervalX, intervalY);
+
+        BufferedOutputStream stream =
+            new BufferedOutputStream (response.getOutputStream());
+        ConvertCmd cmd = new ConvertCmd();
+        cmd.setOutputConsumer(new Pipe(null, stream));
+        try {
+            cmd.run(op.addImage(JPG));
+        } catch (InterruptedException | IM4JavaException e) {
+            log.error("op({}) was interrupted.", op, e);
+        }
+        // cmd.createScript("/tmp/im4java.sh", op);
+        stream.flush();
+    }
+
+    private void drawRectanglesIM4Java(Set<Rectangle> rectangles, String color,
+                                       IMOps op,
+                                       double intervalX, double intervalY) {
+        op.fill(color).stroke(color);
+        rectangles.stream()
+            .forEach(r -> op.draw
+                     (String.format
+                      ("rectangle %d, %d, %d, %d",
+                       (int) (r.getCoordinateX() * intervalX),
+                       (int) (r.getCoordinateY() * intervalY),
+                       (int) (r.getCoordinateX() * intervalX + intervalX),
+                       (int) (r.getCoordinateY() * intervalY + intervalY))));
     }
 }

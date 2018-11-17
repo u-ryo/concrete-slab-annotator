@@ -26,7 +26,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     private imageLoadedSubscription: Subscription;
     cameras = Object.keys(Camera);
     defects = Object.keys(DefectName);
-    images;
+    @SharedStorage() images: Image[];
     @LocalStorage() image: Image;
     @SharedStorage() filename: string;
     coordinate = { coordinate: 'this image' };

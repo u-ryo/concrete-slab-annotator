@@ -38,7 +38,9 @@
                 "downloads": {
                     "accesslog": "Access Log",
                     "annotationxml": "Annotation XML",
-                    "allannotationxml": "All Annotation XML"
+                    "allannotationxml": "All Annotation XML",
+                    "comparation": "Compare Annotations",
+                    "whatCompareTo": "To which image do you compare?"
                 }
             },
             "language": "Language"

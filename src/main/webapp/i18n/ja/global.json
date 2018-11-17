@@ -38,7 +38,9 @@
                 "downloads": {
                     "accesslog": "アクセスログ",
                     "annotationxml": "アノテーションXML",
-                    "allannotationxml": "全アノテーションXML"
+                    "allannotationxml": "全アノテーションXML",
+                    "comparation": "アノテーション比較",
+                    "whatCompareTo": "どの画像と比較しますか?"
                 }
             },
             "language": "言語"

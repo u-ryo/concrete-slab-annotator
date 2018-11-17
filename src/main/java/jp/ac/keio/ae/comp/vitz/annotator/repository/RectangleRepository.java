@@ -1,6 +1,7 @@
 package jp.ac.keio.ae.comp.vitz.annotator.repository;
 
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Rectangle;
+import jp.ac.keio.ae.comp.vitz.annotator.domain.enumeration.DefectName;
 import org.springframework.stereotype.Repository;
 
 import org.springframework.data.jpa.repository.*;
@@ -34,4 +35,10 @@ public interface RectangleRepository extends JpaRepository<Rectangle, Long> {
     Set<Rectangle> findByImageIdAndSquareSize
         (@Param("imageId") Long imageId,
          @Param("squareSize") Integer squareSize);
+
+    @Query("SELECT r FROM Rectangle r, Annotation a WHERE r.annotation.id = a.id AND a.image.id = :imageId AND a.squareSize = :squareSize AND a.defect = :defect")
+    Set<Rectangle> findByImageIdAndSquareSizeAndDefectName
+        (@Param("imageId") Long imageId,
+         @Param("squareSize") Integer squareSize,
+         @Param("defect") DefectName defect);
 }

@@ -125,3 +125,5 @@ jhipster:
 # ===================================================================
 
 application:
+  imageURLOrig: https://vitz.comp.ae.keio.ac.jp/SIP
+  imageURLReplace: /home/u-ryo/SIP
