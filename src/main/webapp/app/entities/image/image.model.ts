@@ -13,6 +13,7 @@ export class Image implements BaseEntity {
         public focalLength?: number,
         public distance?: number,
         public camera?: Camera,
+        public role?: string,
         public annotations?: BaseEntity[],
     ) {
     }

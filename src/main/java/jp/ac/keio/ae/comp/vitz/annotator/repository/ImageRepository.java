@@ -17,4 +17,7 @@ import java.util.List;
 public interface ImageRepository extends JpaRepository<Image, Long> {
     @Query("SELECT i FROM Image i, AccessLog l WHERE i.id = l.annotation.image.id AND l.from >= :since")
     List<Image> findSince(@Param("since") ZonedDateTime since);
+
+    @Query("SELECT i FROM Image i WHERE i.role IN :roles")
+    List<Image> findByRoles(@Param("roles") List<String> roles);
 }

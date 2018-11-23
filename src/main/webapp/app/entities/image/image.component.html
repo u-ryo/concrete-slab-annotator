@@ -23,6 +23,7 @@
             <th><span jhiTranslate="concreteSlabAnnotatorApp.image.focalLength">Focal Length</span></th>
             <th><span jhiTranslate="concreteSlabAnnotatorApp.image.distance">Distance</span></th>
             <th><span jhiTranslate="concreteSlabAnnotatorApp.image.camera">Camera</span></th>
+            <th><span jhiTranslate="concreteSlabAnnotatorApp.image.role">Role</span></th>
             <th></th>
             </tr>
             </thead>
@@ -35,6 +36,7 @@
                 <td>{{image.focalLength}}</td>
                 <td>{{image.distance}}</td>
                 <td jhiTranslate="{{'concreteSlabAnnotatorApp.Camera.' + image.camera}}">{{image.camera}}</td>
+                <td>{{image.role}}</td>
                 <td class="text-right">
                     <div class="btn-group flex-btn-group-container">
                         <button type="submit"

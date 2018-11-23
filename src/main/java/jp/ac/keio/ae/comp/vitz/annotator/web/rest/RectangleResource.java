@@ -520,7 +520,7 @@ s in body
      * @param annotationId annotationId to be compared
      * @param imageId imageId for specifying annotation id
      * @param defect defect for specifying annotation id
-     * @return the AnnotationXml Zip with status 200 (OK)
+     * @return jpg image with annotations by annotationId(red) and by imageId/defect(green)
      */
     @GetMapping(value="/rectangles/compare/{annotationId}/{imageId}/{defect}", produces="image/jpeg")
     @Timed

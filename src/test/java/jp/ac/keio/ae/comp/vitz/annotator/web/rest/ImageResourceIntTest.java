@@ -57,6 +57,9 @@ public class ImageResourceIntTest {
     private static final Camera DEFAULT_CAMERA = Camera.IXU1000;
     private static final Camera UPDATED_CAMERA = Camera.IXU1000;
 
+    private static final String DEFAULT_ROLE = "AAAAAAAAAA";
+    private static final String UPDATED_ROLE = "BBBBBBBBBB";
+
     @Autowired
     private ImageRepository imageRepository;
 
@@ -100,7 +103,8 @@ public class ImageResourceIntTest {
             .height(DEFAULT_HEIGHT)
             .focalLength(DEFAULT_FOCAL_LENGTH)
             .distance(DEFAULT_DISTANCE)
-            .camera(DEFAULT_CAMERA);
+            .camera(DEFAULT_CAMERA)
+            .role(DEFAULT_ROLE);
         return image;
     }
 
@@ -130,6 +134,7 @@ public class ImageResourceIntTest {
         assertThat(testImage.getFocalLength()).isEqualTo(DEFAULT_FOCAL_LENGTH);
         assertThat(testImage.getDistance()).isEqualTo(DEFAULT_DISTANCE);
         assertThat(testImage.getCamera()).isEqualTo(DEFAULT_CAMERA);
+        assertThat(testImage.getRole()).isEqualTo(DEFAULT_ROLE);
     }
 
     @Test
@@ -185,7 +190,8 @@ public class ImageResourceIntTest {
             .andExpect(jsonPath("$.[*].height").value(hasItem(DEFAULT_HEIGHT)))
             .andExpect(jsonPath("$.[*].focalLength").value(hasItem(DEFAULT_FOCAL_LENGTH)))
             .andExpect(jsonPath("$.[*].distance").value(hasItem(DEFAULT_DISTANCE.doubleValue())))
-            .andExpect(jsonPath("$.[*].camera").value(hasItem(DEFAULT_CAMERA.toString())));
+            .andExpect(jsonPath("$.[*].camera").value(hasItem(DEFAULT_CAMERA.toString())))
+            .andExpect(jsonPath("$.[*].role").value(hasItem(DEFAULT_ROLE.toString())));
     }
 
     @Test
@@ -204,7 +210,8 @@ public class ImageResourceIntTest {
             .andExpect(jsonPath("$.height").value(DEFAULT_HEIGHT))
             .andExpect(jsonPath("$.focalLength").value(DEFAULT_FOCAL_LENGTH))
             .andExpect(jsonPath("$.distance").value(DEFAULT_DISTANCE.doubleValue()))
-            .andExpect(jsonPath("$.camera").value(DEFAULT_CAMERA.toString()));
+            .andExpect(jsonPath("$.camera").value(DEFAULT_CAMERA.toString()))
+            .andExpect(jsonPath("$.role").value(DEFAULT_ROLE.toString()));
     }
 
     @Test
@@ -232,7 +239,8 @@ public class ImageResourceIntTest {
             .height(UPDATED_HEIGHT)
             .focalLength(UPDATED_FOCAL_LENGTH)
             .distance(UPDATED_DISTANCE)
-            .camera(UPDATED_CAMERA);
+            .camera(UPDATED_CAMERA)
+            .role(UPDATED_ROLE);
 
         restImageMockMvc.perform(put("/api/images")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -249,6 +257,7 @@ public class ImageResourceIntTest {
         assertThat(testImage.getFocalLength()).isEqualTo(UPDATED_FOCAL_LENGTH);
         assertThat(testImage.getDistance()).isEqualTo(UPDATED_DISTANCE);
         assertThat(testImage.getCamera()).isEqualTo(UPDATED_CAMERA);
+        assertThat(testImage.getRole()).isEqualTo(UPDATED_ROLE);
     }
 
     @Test

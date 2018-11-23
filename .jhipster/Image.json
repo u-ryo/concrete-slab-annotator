@@ -36,12 +36,16 @@
             "fieldName": "camera",
             "fieldType": "Camera",
             "fieldValues": "IXU1000"
+        },
+        {
+            "fieldName": "role",
+            "fieldType": "String"
         }
     ],
     "changelogDate": "20180603181915",
-    "entityTableName": "image",
     "dto": "no",
-    "pagination": "no",
     "service": "no",
-    "jpaMetamodelFiltering": false
+    "entityTableName": "image",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
 }

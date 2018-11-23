@@ -21,6 +21,7 @@
             "focalLength": "焦点距離",
             "distance": "距離",
             "camera": "カメラ",
+            "role": "ロール",
             "annotations": "アノテーション"
         }
     }

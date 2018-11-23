@@ -49,6 +49,11 @@
                 <option value="IXU1000">{{'concreteSlabAnnotatorApp.Camera.IXU1000' | translate}}</option>
             </select>
         </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="concreteSlabAnnotatorApp.image.role" for="field_role">Role</label>
+            <input type="text" class="form-control" name="role" id="field_role"
+                [(ngModel)]="image.role" />
+        </div>
 
     </div>
     <div class="modal-footer">

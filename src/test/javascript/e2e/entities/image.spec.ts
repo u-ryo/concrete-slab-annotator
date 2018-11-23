@@ -44,6 +44,8 @@ describe('Image e2e test', () => {
         imageDialogPage.setDistanceInput('5');
         expect(imageDialogPage.getDistanceInput()).toMatch('5');
         imageDialogPage.cameraSelectLastOption();
+        imageDialogPage.setRoleInput('role');
+        expect(imageDialogPage.getRoleInput()).toMatch('role');
         imageDialogPage.save();
         expect(imageDialogPage.getSaveButton().isPresent()).toBeFalsy();
     });
@@ -76,6 +78,7 @@ export class ImageDialogPage {
     focalLengthInput = element(by.css('input#field_focalLength'));
     distanceInput = element(by.css('input#field_distance'));
     cameraSelect = element(by.css('select#field_camera'));
+    roleInput = element(by.css('input#field_role'));
 
     getModalTitle() {
         return this.modalTitle.getAttribute('jhiTranslate');
@@ -132,6 +135,14 @@ export class ImageDialogPage {
     cameraSelectLastOption = function() {
         this.cameraSelect.all(by.tagName('option')).last().click();
     };
+    setRoleInput = function(role) {
+        this.roleInput.sendKeys(role);
+    };
+
+    getRoleInput = function() {
+        return this.roleInput.getAttribute('value');
+    };
+
     save() {
         this.saveButton.click();
     }

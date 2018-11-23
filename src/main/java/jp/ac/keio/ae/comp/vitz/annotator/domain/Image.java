@@ -48,6 +48,9 @@ public class Image implements Serializable {
     @Column(name = "camera")
     private Camera camera;
 
+    @Column(name = "jhi_role")
+    private String role;
+
     @OneToMany(mappedBy = "image")
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
@@ -140,6 +143,19 @@ public class Image implements Serializable {
         this.camera = camera;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public Image role(String role) {
+        this.role = role;
+        return this;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public Set<Annotation> getAnnotations() {
         return annotations;
     }
@@ -196,6 +212,7 @@ public class Image implements Serializable {
             ", focalLength=" + getFocalLength() +
             ", distance=" + getDistance() +
             ", camera='" + getCamera() + "'" +
+            ", role='" + getRole() + "'" +
             "}";
     }
 }

@@ -4,20 +4,25 @@ import com.codahale.metrics.annotation.Timed;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Image;
 
 import jp.ac.keio.ae.comp.vitz.annotator.repository.ImageRepository;
+import jp.ac.keio.ae.comp.vitz.annotator.security.AuthoritiesConstants;
+import jp.ac.keio.ae.comp.vitz.annotator.security.SecurityUtils;
 import jp.ac.keio.ae.comp.vitz.annotator.web.rest.errors.BadRequestAlertException;
 import jp.ac.keio.ae.comp.vitz.annotator.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 
 /**
  * REST controller for managing Image.
@@ -86,9 +91,25 @@ public class ImageResource {
     @GetMapping("/images")
     @Timed
     public List<Image> getAllImages() {
-        log.debug("REST request to get all Images");
-        return imageRepository.findAll();
+        log.debug("REST request to get all Images with Role");
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        log.debug("securityContext:{}, authentication:{}",
+                  securityContext, securityContext.getAuthentication());
+        if (securityContext.getAuthentication() == null) {
+            return new ArrayList<Image>();
         }
+        if (securityContext.getAuthentication().getAuthorities().stream()
+            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority()
+                      .equals(AuthoritiesConstants.USER)
+                      || grantedAuthority.getAuthority()
+                      .equals(AuthoritiesConstants.ADMIN))) {
+            return imageRepository.findAll();
+        }
+        return imageRepository.findByRoles
+            (securityContext.getAuthentication().getAuthorities().stream()
+             .map(grantedAuthority -> grantedAuthority.getAuthority())
+             .collect(Collectors.toList()));
+    }
 
     /**
      * GET  /images/:id : get the "id" image.
