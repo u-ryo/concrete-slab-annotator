@@ -561,7 +561,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     saveRectangles(x) {
-        this.log.i('Timer x:' + x);
+        this.log.d('Timer x:' + x);
         this.log.d(`Next: ${x}, rectangles: `
                    + `${JSON.stringify(Object.keys(this.rectangles))}`);
         this.rectangleService.saveRectangles(
