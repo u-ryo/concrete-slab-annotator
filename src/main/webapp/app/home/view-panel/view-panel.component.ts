@@ -48,7 +48,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     private subscription: Subscription;
     @SharedStorage() dirty: boolean;
     @SharedStorage() status = Status.SAVED;
-    statusCounter = 0;
+    lastStatusNumber = 0;
     private timerObservable = Observable.interval(this.CHECK_INTERVAL);
     cursor = 'auto';
     private log = Log.create('view-panel', Level.ERROR, Level.WARN, Level.INFO);
@@ -71,7 +71,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             this.intervalY = this.canvas.nativeElement.height
                 * this.magnification / this.dataService.form.value.rows;
             this.log.d('redraw intervalX:', this.intervalX);
-            this.statusCounter = 0;
             this.status = undefined;
             this.drawCanvas();
         });
@@ -134,7 +133,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 this.cropY = 0;
                 this.isMouseDown = false;
                 this.hasMouseMoved = false;
-                this.statusCounter = 0;
                 this.log.i(`url:${url}`);
                 this.dataService.form.controls['fileUrlField'].setValue(
                     url, {emitEvent: false});
@@ -561,7 +559,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     saveRectangles(x) {
-        this.log.d('Timer x:' + x);
+        this.log.d(`Timer x:${x},lastStatusNumber:${this.lastStatusNumber}`);
+        this.lastStatusNumber = x;
         this.log.d(`Next: ${x}, rectangles: `
                    + `${JSON.stringify(Object.keys(this.rectangles))}`);
         this.rectangleService.saveRectangles(
@@ -571,14 +570,17 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 (res) => {
                     this.log.d('res:', res);
                     this.dirty = false;
-                    this.status = this.judgeStatus(Status.SAVED);
+                    this.log.d(`x:${x},lastStatusNumber:${this.lastStatusNumber}`);
+                    this.status = this.lastStatusNumber === x
+                        ? Status.SAVED : this.status;
                 },
                 (res: HttpErrorResponse) => {
                     this.log.er(res.message);
                     this.onError(res.message);
-                    this.status = this.judgeStatus(Status.FAILED);
+                    this.status = this.lastStatusNumber === x
+                        ? Status.FAILED : this.status;
                 });
-        this.status = this.judgeStatus(Status.SENT);
+        this.status = Status.SENT;
     }
 
     private checkComment(x, y) {
@@ -598,15 +600,5 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
 
     private onError(error) {
         this.jhiAlertService.error(error.message, null, null);
-    }
-
-    private judgeStatus(status) {
-        if (status === Status.SENT) {
-            this.statusCounter++;
-        }
-        if (status === Status.SAVED || status === Status.FAILED) {
-            this.statusCounter--;
-        }
-        return this.statusCounter > 0 ? Status.SENT : status;
     }
 }
