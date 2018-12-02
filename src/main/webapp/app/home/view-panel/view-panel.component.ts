@@ -9,6 +9,7 @@ import { Rectangle } from '../../entities/rectangle/rectangle.model';
 import { RectangleService } from '../../entities/rectangle/rectangle.service';
 import { Router } from '@angular/router';
 import { SharedStorage, SharedStorageService } from 'ngx-store';
+import { Status } from '../../entities/image/image.model';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/observable/fromEvent';
 import 'rxjs/Rx';
@@ -45,7 +46,9 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     brightness = this.sanitizer.bypassSecurityTrustStyle(`brightness(100%)`);
     private clickCounter = 0;
     private subscription: Subscription;
-    @SharedStorage() dirty = false;
+    @SharedStorage() dirty: boolean;
+    @SharedStorage() status = Status.SAVED;
+    statusCounter = 0;
     private timerObservable = Observable.interval(this.CHECK_INTERVAL);
     cursor = 'auto';
     private log = Log.create('view-panel', Level.ERROR, Level.WARN, Level.INFO);
@@ -68,6 +71,8 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             this.intervalY = this.canvas.nativeElement.height
                 * this.magnification / this.dataService.form.value.rows;
             this.log.d('redraw intervalX:', this.intervalX);
+            this.statusCounter = 0;
+            this.status = undefined;
             this.drawCanvas();
         });
         this.renderer.listen(this.canvas.nativeElement, 'mouseup', (event) => {
@@ -129,6 +134,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 this.cropY = 0;
                 this.isMouseDown = false;
                 this.hasMouseMoved = false;
+                this.statusCounter = 0;
                 this.log.i(`url:${url}`);
                 this.dataService.form.controls['fileUrlField'].setValue(
                     url, {emitEvent: false});
@@ -178,10 +184,11 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             (y) => this.drawCanvas());
         this.sharedStorageService.observe('rectangles2').subscribe(
             (r) => this.drawCanvas());
-        this.timerObservable.filter((x) => this.dirty).subscribe(
-            (x) => this.saveRectangles(x),
-            (error) => this.log.er(`Error: ${error}`),
-            () => console.log('Completed')
+        this.timerObservable.filter((x) => this.status === Status.CHANGED)
+            .subscribe(
+                (x) => this.saveRectangles(x),
+                (error) => this.log.er(`Error: ${error}`),
+                () => this.log.d('Completed')
         );
         this.renderer.listen(
             this.img.nativeElement, 'click', (event) => this.loading = false);
@@ -478,6 +485,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         } else if (!isSingleClick && this.rectangles[this.coordinate]) {
             delete(this.rectangles[this.coordinate]);
             this.dirty = true;
+            this.status = Status.CHANGED;
         }
         this.drawCanvas();
     }
@@ -493,11 +501,13 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             this.createRectangleXY(
                 this.dataService.form.value.pending, '', x, y);
             this.dirty = true;
+            this.status = Status.CHANGED;
         } else if (this.rectangles[coordinate].pending
                    !== this.dataService.form.value.pending) {
             this.rectangles[coordinate].pending =
                 this.dataService.form.value.pending;
             this.dirty = true;
+            this.status = Status.CHANGED;
         }
     }
 
@@ -526,6 +536,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         this.log.d('setComment:', comment, this.dataService.form.value.comment,
                    'coordinate:', this.coordinate);
         this.dirty = true;
+        this.status = Status.CHANGED;
     }
 
     private createRectangle(pending, comment) {
@@ -550,6 +561,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     }
 
     saveRectangles(x) {
+        this.log.i('Timer x:' + x);
         this.log.d(`Next: ${x}, rectangles: `
                    + `${JSON.stringify(Object.keys(this.rectangles))}`);
         this.rectangleService.saveRectangles(
@@ -559,11 +571,14 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 (res) => {
                     this.log.d('res:', res);
                     this.dirty = false;
+                    this.status = this.judgeStatus(Status.SAVED);
                 },
                 (res: HttpErrorResponse) => {
                     this.log.er(res.message);
                     this.onError(res.message);
+                    this.status = this.judgeStatus(Status.FAILED);
                 });
+        this.status = this.judgeStatus(Status.SENT);
     }
 
     private checkComment(x, y) {
@@ -583,5 +598,15 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
 
     private onError(error) {
         this.jhiAlertService.error(error.message, null, null);
+    }
+
+    private judgeStatus(status) {
+        if (status === Status.SENT) {
+            this.statusCounter++;
+        }
+        if (status === Status.SAVED || status === Status.FAILED) {
+            this.statusCounter--;
+        }
+        return this.statusCounter > 0 ? Status.SENT : status;
     }
 }

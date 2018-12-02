@@ -3,6 +3,7 @@ import { Level, Log } from 'ng2-logger/client';
 import { NavigationEnd, Router } from '@angular/router';
 import { Principal } from '../../shared';
 import { SharedStorage, SharedStorageService } from 'ngx-store';
+import { Status } from '../../entities/image/image.model';
 
 @Component({
     selector: 'jhi-footer',
@@ -29,8 +30,9 @@ export class FooterComponent implements OnInit {
     private isMouseDown = false;
     cursor = 'pointer';
     private log = Log.create('footer', Level.ERROR, Level.WARN, Level.INFO);
-    @SharedStorage() dirty;
-    status = undefined;
+    // @SharedStorage() dirty: boolean;
+    @SharedStorage() status;
+    statusString: string;
     statusClass = 'd-none';
 
     constructor(private sharedStorageService: SharedStorageService,
@@ -51,8 +53,10 @@ export class FooterComponent implements OnInit {
             (x) => this.drawRectangle(x));
         this.sharedStorageService.observe('cropY').subscribe(
             (y) => this.drawRectangle(y));
-        this.sharedStorageService.observe('dirty').subscribe(
-            (dirty) => this.setStatus(dirty));
+        // this.sharedStorageService.observe('dirty').subscribe(
+        //     (dirty) => this.setStatus(dirty));
+        this.sharedStorageService.observe('status').subscribe(
+            (status) => this.setStatus(status));
         this.renderer.listen(this.canvas.nativeElement, 'mousedown',
                              (event) => {
                                  this.isMouseDown = true;
@@ -145,10 +149,19 @@ export class FooterComponent implements OnInit {
         }
     }
 
-    setStatus(dirty) {
-        this.log.d(`${dirty.key}:${dirty.oldValue}->${dirty.newValue}`);
-        this.status = this.dirty ? 'CHANGED' : 'SAVED';
-        this.statusClass = 'alert alert-' + (this.dirty ? 'warning' : 'success');
+    // setStatus(dirty) {
+    //     this.log.d(`${dirty.key}:${dirty.oldValue}->${dirty.newValue}`);
+    //     // this.status = this.dirty ? 'CHANGED' : 'SAVED';
+    //     this.statusClass = 'alert alert-' + (this.dirty ? 'warning' : 'success');
+    // }
+    setStatus(status) {
+        this.log.d(`${status.key}:${status.oldValue}->${status.newValue}`);
+        this.statusString = Status[status.newValue];
+        this.statusClass = this.status === undefined ? 'd-none'
+            : ('alert alert-'
+               + (this.status === Status.SAVED ? 'success'
+                  : this.status === Status.FAILED ? 'danger'
+                  : this.status === Status.SENT ? 'info' : 'warning'));
     }
 
     isAuthenticated() {

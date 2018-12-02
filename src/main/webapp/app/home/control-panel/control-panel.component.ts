@@ -11,6 +11,7 @@ import { ImageService } from '../../entities/image/image.service';
 import { JhiAlertService } from 'ng-jhipster';
 import { Level, Log } from 'ng2-logger/client';
 import { LocalStorage, SharedStorage } from 'ngx-store';
+import { MatDialog } from '@angular/material';
 import { Rectangle } from '../../entities/rectangle/rectangle.model';
 import { RectangleService } from '../../entities/rectangle/rectangle.service';
 import { Subscription } from 'rxjs/Subscription';
@@ -40,12 +41,13 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     private log =
         Log.create('control-panel', Level.WARN, Level.INFO, Level.ERROR);
     private rate = 0.46;
-    private lock = true;
     @SharedStorage() rectangles2 = null;
+    private dialogRef;
 
     constructor(private activatedRoute: ActivatedRoute,
                 private annotationService: AnnotationService,
                 private dataService: DataService,
+                public dialog: MatDialog,
                 private formBuilder: FormBuilder,
                 private imageService: ImageService,
                 private jhiAlertService: JhiAlertService,
@@ -294,6 +296,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
 
     loadAnnotation(defect) {
         this.rectangles2 = null;
+        this.openLoadingDialog();
         if (defect === DefectName.POPOUT || defect === DefectName.SCALING) {
             this.loadScaleOrPopout(defect === DefectName.POPOUT
                                    ? DefectName.SCALING : DefectName.POPOUT);
@@ -326,11 +329,13 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                 (res: HttpResponse<Map<string, Rectangle>>) => {
                     this.log.d('rectangles:', res.body);
                     this.dataService.notifyRedraw(res.body);
+                    this.dialogRef.close();
                 },
                 (res: HttpErrorResponse) => {
                     this.onError(res.message);
                     this.log.er(res.message);
                     this.dataService.notifyRedraw(new Map<string, Rectangle>());
+                    this.dialogRef.close();
                 });
     }
 
@@ -355,4 +360,19 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                     this.onError(res.message);
                 });
     }
+
+    openLoadingDialog() {
+        this.dialogRef = this.dialog.open(LoadingDialogComponent, {
+            disableClose: true,
+            width: '50%'
+        });
+    }
+}
+
+@Component({
+    selector: 'jhi-loading-dialog',
+    template: '<h1 style="text-align:center;">NOW LOADING...</h1><mat-spinner style="margin:0 auto;"></mat-spinner>'
+})
+export class LoadingDialogComponent {
+    constructor() {}
 }

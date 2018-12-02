@@ -195,6 +195,7 @@ public class RectangleResource {
         (@PathVariable Long annotationId) {
         log.debug("REST request to get Rectangles with annotationId:{}",
                   annotationId);
+        // try { java.util.concurrent.TimeUnit.SECONDS.sleep(60); } catch (InterruptedException e) {}
         return rectangleRepository.findByAnnotationId(annotationId).stream()
             .collect(Collectors.toMap
                      (r -> r.getCoordinateX() + "," + r.getCoordinateY(),
@@ -221,14 +222,16 @@ s in body
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        CompletableFuture
-            .runAsync(() -> saveRectangles(annotationId, rectangles, user));
-        return ResponseEntity.ok().build();
+        // CompletableFuture
+        //     .runAsync(() -> saveRectangles(annotationId, rectangles, user));
+        saveRectangles(annotationId, rectangles, user);
+        return ResponseEntity.status(201).build();
     }
 
     private void saveRectangles(Long annotationId, Set<Rectangle> rectangles,
                                 User user) {
         try {
+            // java.util.concurrent.TimeUnit.SECONDS.sleep(30);
             Map<String, Rectangle> rectangleMap =
                 rectangleRepository.findByAnnotationId(annotationId).stream()
                 .collect(Collectors.toMap
