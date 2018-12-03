@@ -565,13 +565,15 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 (res) => {
                     this.log.d('res:', res);
                     this.log.d(`x:${x},lastStatusNumber:${this.lastStatusNumber}`);
-                    this.status = this.lastStatusNumber === x
+                    this.status = (this.lastStatusNumber === x
+                                   && this.status === Status.SENT)
                         ? Status.SAVED : this.status;
                 },
                 (res: HttpErrorResponse) => {
                     this.log.er(res.message);
                     this.onError(res.message);
-                    this.status = this.lastStatusNumber === x
+                    this.status = (this.lastStatusNumber === x
+                                   && this.status === Status.SENT)
                         ? Status.FAILED : this.status;
                 });
         this.status = Status.SENT;

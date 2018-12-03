@@ -230,10 +230,11 @@ s in body
         return ResponseEntity.status(201).build();
     }
 
+    // private static final java.util.Random RAND = new java.util.Random();
     private void saveRectangles(Long annotationId, Set<Rectangle> rectangles,
                                 User user) {
         try {
-            // java.util.concurrent.TimeUnit.SECONDS.sleep(30);
+            // java.util.concurrent.TimeUnit.SECONDS.sleep(RAND.nextInt(10));
             Map<String, Rectangle> rectangleMap =
                 rectangleRepository.findByAnnotationId(annotationId).stream()
                 .collect(Collectors.toMap
