@@ -20,6 +20,7 @@ export class Image implements BaseEntity {
 }
 
 export enum Status {
+    NONE,
     CHANGED,
     SENT,
     SAVED,

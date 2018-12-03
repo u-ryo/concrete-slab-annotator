@@ -30,7 +30,6 @@ export class FooterComponent implements OnInit {
     private isMouseDown = false;
     cursor = 'pointer';
     private log = Log.create('footer', Level.ERROR, Level.WARN, Level.INFO);
-    // @SharedStorage() dirty: boolean;
     @SharedStorage() status;
     statusString: string;
     statusClass = 'd-none';
@@ -53,8 +52,6 @@ export class FooterComponent implements OnInit {
             (x) => this.drawRectangle(x));
         this.sharedStorageService.observe('cropY').subscribe(
             (y) => this.drawRectangle(y));
-        // this.sharedStorageService.observe('dirty').subscribe(
-        //     (dirty) => this.setStatus(dirty));
         this.sharedStorageService.observe('status').subscribe(
             (status) => this.setStatus(status));
         this.renderer.listen(this.canvas.nativeElement, 'mousedown',
@@ -149,15 +146,10 @@ export class FooterComponent implements OnInit {
         }
     }
 
-    // setStatus(dirty) {
-    //     this.log.d(`${dirty.key}:${dirty.oldValue}->${dirty.newValue}`);
-    //     // this.status = this.dirty ? 'CHANGED' : 'SAVED';
-    //     this.statusClass = 'alert alert-' + (this.dirty ? 'warning' : 'success');
-    // }
     setStatus(status) {
         this.log.d(`${status.key}:${status.oldValue}->${status.newValue}`);
         this.statusString = Status[status.newValue];
-        this.statusClass = this.status === undefined ? 'd-none'
+        this.statusClass = this.status === Status.NONE ? 'd-none'
             : ('alert alert-'
                + (this.status === Status.SAVED ? 'success'
                   : this.status === Status.FAILED ? 'danger'

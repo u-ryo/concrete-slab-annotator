@@ -46,8 +46,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     brightness = this.sanitizer.bypassSecurityTrustStyle(`brightness(100%)`);
     private clickCounter = 0;
     private subscription: Subscription;
-    @SharedStorage() dirty: boolean;
-    @SharedStorage() status = Status.SAVED;
+    @SharedStorage() status = Status.NONE;
     lastStatusNumber = 0;
     private timerObservable = Observable.interval(this.CHECK_INTERVAL);
     cursor = 'auto';
@@ -71,7 +70,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             this.intervalY = this.canvas.nativeElement.height
                 * this.magnification / this.dataService.form.value.rows;
             this.log.d('redraw intervalX:', this.intervalX);
-            this.status = undefined;
+            this.status = Status.NONE;
             this.drawCanvas();
         });
         this.renderer.listen(this.canvas.nativeElement, 'mouseup', (event) => {
@@ -482,7 +481,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                        this.rectangles[this.coordinate]);
         } else if (!isSingleClick && this.rectangles[this.coordinate]) {
             delete(this.rectangles[this.coordinate]);
-            this.dirty = true;
             this.status = Status.CHANGED;
         }
         this.drawCanvas();
@@ -498,13 +496,11 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         if (!this.rectangles[coordinate]) {
             this.createRectangleXY(
                 this.dataService.form.value.pending, '', x, y);
-            this.dirty = true;
             this.status = Status.CHANGED;
         } else if (this.rectangles[coordinate].pending
                    !== this.dataService.form.value.pending) {
             this.rectangles[coordinate].pending =
                 this.dataService.form.value.pending;
-            this.dirty = true;
             this.status = Status.CHANGED;
         }
     }
@@ -533,7 +529,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         }
         this.log.d('setComment:', comment, this.dataService.form.value.comment,
                    'coordinate:', this.coordinate);
-        this.dirty = true;
         this.status = Status.CHANGED;
     }
 
@@ -569,7 +564,6 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             .subscribe(
                 (res) => {
                     this.log.d('res:', res);
-                    this.dirty = false;
                     this.log.d(`x:${x},lastStatusNumber:${this.lastStatusNumber}`);
                     this.status = this.lastStatusNumber === x
                         ? Status.SAVED : this.status;
