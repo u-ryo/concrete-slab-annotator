@@ -589,9 +589,9 @@ s in body
             .forEach(r -> op.draw
                      (String.format
                       ("rectangle %d, %d, %d, %d",
-                       (int) (r.getCoordinateX() * intervalX),
-                       (int) (r.getCoordinateY() * intervalY),
-                       (int) (r.getCoordinateX() * intervalX + intervalX),
-                       (int) (r.getCoordinateY() * intervalY + intervalY))));
+                       (int) ((r.getCoordinateX() + 1) * intervalX),
+                       (int) ((r.getCoordinateY() + 1) * intervalY),
+                       (int) ((r.getCoordinateX() + 2) * intervalX),
+                       (int) ((r.getCoordinateY() + 2) * intervalY))));
     }
 }
