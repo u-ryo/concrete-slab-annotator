@@ -74,7 +74,7 @@ public class RectangleResource {
     private final Logger log = LoggerFactory.getLogger(RectangleResource.class);
 
     private static final String ENTITY_NAME = "rectangle",
-        RED = "rgba(178, 76, 77, 0.6)", GREEN = "rgba(76, 178, 77, 0.6)",
+        RED = "rgba(178, 76, 77, 0.4)", GREEN = "rgba(76, 178, 77, 0.4)",
         JPG = "jpg:-";
     private static final ZoneId TOKYO = ZoneId.of("Asia/Tokyo");
     private static final Pageable TOP_TO = new PageRequest(0, 1, DESC, "to");
@@ -551,8 +551,10 @@ s in body
             rate = distance * RATE / focalLength / squareSize;
         int columns = (int) Math.round(rate * width),
             rows = (int) Math.round(rate * height);
-        double intervalX = width / columns,
-            intervalY = height / rows;
+        double intervalX = width / (double) columns,
+            intervalY = height / (double) rows;
+        log.debug("columns:{},rows:{},intervalX:{},intervalY:{}",
+                  columns, rows, intervalX, intervalY);
 
         IMOps op =
             ((IMOperation) new IMOperation()
@@ -589,9 +591,9 @@ s in body
             .forEach(r -> op.draw
                      (String.format
                       ("rectangle %d, %d, %d, %d",
-                       (int) ((r.getCoordinateX() + 1) * intervalX),
-                       (int) ((r.getCoordinateY() + 1) * intervalY),
-                       (int) ((r.getCoordinateX() + 2) * intervalX),
-                       (int) ((r.getCoordinateY() + 2) * intervalY))));
+                       (int) (r.getCoordinateX() * intervalX),
+                       (int) (r.getCoordinateY() * intervalY),
+                       (int) (r.getCoordinateX() * intervalX + intervalX),
+                       (int) (r.getCoordinateY() * intervalY + intervalY))));
     }
 }
