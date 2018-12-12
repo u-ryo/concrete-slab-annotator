@@ -277,14 +277,22 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         this.focalLength = this.image.focalLength;
         this.distance = this.image.distance;
         this.inputForm.controls['focalLength'].setValue(this.image.focalLength,
-                                                        {emitEvent: false});
+                                                        { emitEvent: false });
         this.inputForm.controls['distance'].setValue(this.image.distance,
-                                                     {emitEvent: false});
+                                                     { emitEvent: false });
         this.inputForm.controls['camera'].setValue(this.image.camera,
-                                                   {emitEvent: false});
+                                                   { emitEvent: false });
+        this.inputForm.controls['columns'].setValue(
+            Math.round(this.distance * this.rate / this.focalLength
+                       / this.squareSize * this.image.width),
+            { emitEvent: false });
+        this.inputForm.controls['rows'].setValue(
+            Math.round(this.distance * this.rate / this.focalLength
+                       / this.squareSize * this.image.height),
+            { emitEvent: false });
         this.inputForm.controls['defect'].setValue(
             this.annotation ? this.annotation.defect : this.defects[0],
-            {emitEvent: false});
+            { emitEvent: false });
         this.brightness = 100;
         this.inputForm.controls['brightnessLevel'].setValue(this.brightness);
         this.log.d(`brightness:${this.brightness},`

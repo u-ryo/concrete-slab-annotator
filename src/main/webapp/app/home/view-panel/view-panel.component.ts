@@ -121,7 +121,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
             .debounceTime(500)
             .subscribe((comment) => this.setComment(comment));
         this.dataService.form.get('fileUrlField').valueChanges
-            .debounceTime(1000)
+            .debounceTime(200)
             .forEach((url) => {
                 this.loading = true;
                 this.fileUrl = url;

@@ -63,7 +63,9 @@ public class UserService {
                 try {
                     cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).evict(user.getLogin());
                     cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).evict(user.getEmail());
-                } catch (Exception e) { log.error("ERROR", e); }
+                } catch (Exception e) {
+                    log.error("Cache error is ignored.", e);
+                }
                 log.debug("Activated user: {}", user);
                 return user;
             });
@@ -81,7 +83,9 @@ public class UserService {
                 try {
                     cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).evict(user.getLogin());
                     cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).evict(user.getEmail());
-                } catch (Exception e) { log.error("ERROR", e); }
+                } catch (Exception e) {
+                    log.error("Cache error is ignored.", e);
+                }
                 return user;
            });
     }
@@ -95,7 +99,9 @@ public class UserService {
                 try {
                     cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).evict(user.getLogin());
                     cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).evict(user.getEmail());
-                } catch (Exception e) { log.error("ERROR", e); }
+                } catch (Exception e) {
+                    log.error("Cache error is ignored.", e);
+                }
                 return user;
             });
     }
@@ -124,7 +130,9 @@ public class UserService {
         try {
             cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).evict(newUser.getLogin());
             cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).evict(newUser.getEmail());
-        } catch (Exception e) { log.error("ERROR", e); }
+        } catch (Exception e) {
+            log.error("Cache error is ignored.", e);
+        }
         log.debug("Created Information for User: {}", newUser);
         return newUser;
     }
@@ -156,7 +164,9 @@ public class UserService {
         try {
             cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).evict(user.getLogin());
             cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).evict(user.getEmail());
-        } catch (Exception e) { log.error("ERROR", e); }
+        } catch (Exception e) {
+            log.error("Cache error is ignored", e);
+        }
         log.debug("Created Information for User: {}", user);
         return user;
     }
@@ -182,7 +192,9 @@ public class UserService {
                 try {
                     cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).evict(user.getLogin());
                     cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).evict(user.getEmail());
-                } catch (Exception e) { log.error("ERROR", e); }
+                } catch (Exception e) {
+                    log.error("Cache error is ignored.", e);
+                }
                 log.debug("Changed Information for User: {}", user);
             });
     }
@@ -212,7 +224,9 @@ public class UserService {
                 try {
                     cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).evict(user.getLogin());
                     cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).evict(user.getEmail());
-                } catch (Exception e) { log.error("ERROR", e); }
+                } catch (Exception e) {
+                    log.error("Cache error is ignored.", e);
+                }
                 log.debug("Changed Information for User: {}", user);
                 return user;
             })
@@ -226,7 +240,9 @@ public class UserService {
             try {
                 cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).evict(user.getLogin());
                 cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).evict(user.getEmail());
-            } catch (Exception e) { log.error("ERROR", e); }
+            } catch (Exception e) {
+                log.error("Cache error is ignored.", e);
+            }
             log.debug("Deleted User: {}", user);
         });
     }
@@ -240,7 +256,9 @@ public class UserService {
                 try {
                     cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).evict(user.getLogin());
                     cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).evict(user.getEmail());
-                } catch (Exception e) { log.error("ERROR", e); }
+                } catch (Exception e) {
+                    log.error("Cache error is ignored.", e);
+                }
                 log.debug("Changed password for User: {}", user);
             });
     }
@@ -279,7 +297,9 @@ public class UserService {
             try {
                 cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).evict(user.getLogin());
                 cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).evict(user.getEmail());
-            } catch (Exception e) { log.error("ERROR", e); }
+            } catch (Exception e) {
+                log.error("Cache error is ignored.", e);
+            }
         }
     }
 
