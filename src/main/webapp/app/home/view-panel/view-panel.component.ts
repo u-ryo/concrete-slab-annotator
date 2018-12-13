@@ -23,7 +23,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     context: CanvasRenderingContext2D;
     @ViewChild('img') img;
     @ViewChild('canvas') canvas;
-    private CHECK_INTERVAL = 5000;
+    private CHECK_INTERVAL = 5000; // millisecond
     @SharedStorage() cropX = 0;
     @SharedStorage() cropY = 0;
     private intervalX = 0;
@@ -45,10 +45,9 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
     private coordinate = '';
     brightness = this.sanitizer.bypassSecurityTrustStyle(`brightness(100%)`);
     private clickCounter = 0;
-    private subscription: Subscription;
+    private subscriptions: Subscription[] = [];
     @SharedStorage() status = Status.NONE;
     lastStatusNumber = 0;
-    private timerObservable = Observable.interval(this.CHECK_INTERVAL);
     cursor = 'auto';
     private log = Log.create('view-panel', Level.ERROR, Level.WARN, Level.INFO);
 
@@ -61,18 +60,19 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 private sharedStorageService: SharedStorageService) {}
 
     ngOnInit() {
-        this.subscription = this.dataService.redrawData$.subscribe((r) => {
-            this.rectangles = r;
+        this.subscriptions.push(
+            this.dataService.redrawData$.subscribe((r) => {
+                this.rectangles = r;
 
-            this.log.d('subscribe called');
-            this.intervalX = this.canvas.nativeElement.width
-                * this.magnification / this.dataService.form.value.columns;
-            this.intervalY = this.canvas.nativeElement.height
-                * this.magnification / this.dataService.form.value.rows;
-            this.log.d('redraw intervalX:', this.intervalX);
-            this.status = Status.NONE;
-            this.drawCanvas();
-        });
+                this.log.d('subscribe called');
+                this.intervalX = this.canvas.nativeElement.width
+                    * this.magnification / this.dataService.form.value.columns;
+                this.intervalY = this.canvas.nativeElement.height
+                    * this.magnification / this.dataService.form.value.rows;
+                this.log.d('redraw intervalX:', this.intervalX);
+                this.status = Status.NONE;
+                this.drawCanvas();
+            }));
         this.renderer.listen(this.canvas.nativeElement, 'mouseup', (event) => {
             this.isMouseDown = false;
             this.cursor = 'auto';
@@ -117,11 +117,12 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                              (event) => this.onclick(event, false));
         this.renderer.listen(this.canvas.nativeElement, 'pinch',
                              (event) => this.pinch(event));
-        this.dataService.form.get('comment').valueChanges
-            .debounceTime(500)
-            .subscribe((comment) => this.setComment(comment));
+        this.subscriptions.push(
+            this.dataService.form.get('comment').valueChanges
+                .debounceTime(500)
+                .subscribe((comment) => this.setComment(comment)));
         this.dataService.form.get('fileUrlField').valueChanges
-            .debounceTime(200)
+            .debounceTime(20)
             .forEach((url) => {
                 this.loading = true;
                 this.fileUrl = url;
@@ -134,7 +135,7 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
                 this.hasMouseMoved = false;
                 this.log.i(`url:${url}`);
                 this.dataService.form.controls['fileUrlField'].setValue(
-                    url, {emitEvent: false});
+                    url, { emitEvent: false });
             });
         // this.dataService.form.get('columns').valueChanges
         //     .debounceTime(500)
@@ -155,46 +156,52 @@ export class ViewPanelComponent implements OnDestroy, OnInit {
         //             this.drawCanvas();
         //             this.log.d('rows:', rows, this.dataService.form.value.rows);
         //         });
-        this.dataService.form.get('pending').valueChanges
-            .debounceTime(500)
-            .subscribe((pending) => this.setPending(pending));
-        this.dataService.form.get('brightnessLevel').valueChanges
-            .debounceTime(500)
-            .subscribe(
-                (brightnessLevel) => {
-                    this.brightness = this.sanitizer.bypassSecurityTrustStyle(
-                        `brightness(${brightnessLevel}%)`);
-                    this.drawCanvas();
-                    this.log.d('brightness:', this.brightness);
-                });
-        this.dataService.form.get('coordinateXField').valueChanges
-            .debounceTime(500)
-            .subscribe((x) => this.specifyCoordinate(
-                x, this.dataService.form.value.coordinateYField));
-        this.dataService.form.get('coordinateYField').valueChanges
-            .debounceTime(500)
-            .subscribe((y) => this.specifyCoordinate(
-                this.dataService.form.value.coordinateXField, y));
-        this.sharedStorageService.observe('cropX').subscribe(
-            (x) => this.drawCanvas());
-        this.sharedStorageService.observe('cropY').subscribe(
-            (y) => this.drawCanvas());
-        this.sharedStorageService.observe('rectangles2').subscribe(
-            (r) => this.drawCanvas());
-        this.timerObservable.filter((x) => this.status === Status.CHANGED)
-            .subscribe(
-                (x) => this.saveRectangles(x),
-                (error) => this.log.er(`Error: ${error}`),
-                () => this.log.d('Completed')
-        );
+        this.subscriptions.push(
+            this.dataService.form.get('pending').valueChanges
+                .debounceTime(500)
+                .subscribe((pending) => this.setPending(pending)));
+        this.subscriptions.push(
+            this.dataService.form.get('brightnessLevel').valueChanges
+                .debounceTime(500)
+                .subscribe(
+                    (brightnessLevel) => {
+                        this.brightness = this.sanitizer.bypassSecurityTrustStyle(
+                            `brightness(${brightnessLevel}%)`);
+                        this.drawCanvas();
+                        this.log.d('brightness:', this.brightness);
+                    }));
+        this.subscriptions.push(
+            this.dataService.form.get('coordinateXField').valueChanges
+                .debounceTime(500)
+                .subscribe((x) => this.specifyCoordinate(
+                    x, this.dataService.form.value.coordinateYField)));
+        this.subscriptions.push(
+            this.dataService.form.get('coordinateYField').valueChanges
+                .debounceTime(500)
+                .subscribe((y) => this.specifyCoordinate(
+                    this.dataService.form.value.coordinateXField, y)));
+        this.subscriptions.push(
+            this.sharedStorageService.observe('cropX').subscribe(
+                (x) => this.drawCanvas()));
+        this.subscriptions.push(
+            this.sharedStorageService.observe('cropY').subscribe(
+                (y) => this.drawCanvas()));
+        this.subscriptions.push(
+            this.sharedStorageService.observe('rectangles2').subscribe(
+                (r) => this.drawCanvas()));
+        this.subscriptions.push(Observable.interval(this.CHECK_INTERVAL)
+                                .filter((x) => this.status === Status.CHANGED)
+                                .subscribe(
+                                    (x) => this.saveRectangles(x),
+                                    (error) => this.log.er(`Error: ${error}`),
+                                    () => this.log.d('Completed')
+                                ));
         this.renderer.listen(
             this.img.nativeElement, 'click', (event) => this.loading = false);
     }
 
     ngOnDestroy() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-        }
+        this.subscriptions.forEach((subscription) => subscription.unsubscribe());
     }
 
     afterLoading() {

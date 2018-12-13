@@ -23,8 +23,7 @@ import { Subscription } from 'rxjs/Subscription';
 })
 export class ControlPanelComponent implements OnDestroy, OnInit {
     inputForm: FormGroup;
-    private subscription: Subscription;
-    private imageLoadedSubscription: Subscription;
+    private subscriptions: Subscription[] = [];
     cameras = Object.keys(Camera);
     defects = Object.keys(DefectName);
     @SharedStorage() images: Image[];
@@ -60,46 +59,47 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     }
 
     loadAll() {
-        this.imageService.query().subscribe(
-            (res: HttpResponse<Image[]>) => {
-                this.images = res.body;
-                this.log.d(`filename:${this.filename}, images:`, this.images,
-                           'image:', this.image, 'annotation:', this.annotation);
-                if (this.filename) {
-                    const imgs = this.images.filter(
-                        (i) => i.filename === this.filename);
-                    this.log.d('imgs:', imgs, `imgs.length:${imgs.length}`);
-                    if (imgs.length > 0) {
-                        this.image = imgs[0];
-                        this.image = imgs[0];
-                        this.log.d('this.image:', this.image,
-                                   'imgs[0]:', imgs[0],
-                                   `this.filename:${this.filename}`);
-                    } else {
-                        this.image = null;
-                        this.image = null;
+        this.subscriptions.push(
+            this.imageService.query().subscribe(
+                (res: HttpResponse<Image[]>) => {
+                    this.images = res.body;
+                    this.log.d(`filename:${this.filename}, images:`, this.images,
+                               'image:', this.image, 'annotation:', this.annotation);
+                    if (this.filename) {
+                        const imgs = this.images.filter(
+                            (i) => i.filename === this.filename);
+                        this.log.d('imgs:', imgs, `imgs.length:${imgs.length}`);
+                        if (imgs.length > 0) {
+                            this.image = imgs[0];
+                            this.image = imgs[0];
+                            this.log.d('this.image:', this.image,
+                                       'imgs[0]:', imgs[0],
+                                       `this.filename:${this.filename}`);
+                        } else {
+                            this.image = null;
+                            this.image = null;
+                        }
                     }
+                    this.log.d('image0:', this.image);
+                    if (!this.image) {
+                        this.image = this.images[0];
+                    }
+                    this.log.d('image1:', this.image,
+                               'image.filename:', this.image.filename);
+                    this.distance = this.image.distance;
+                    this.focalLength = this.image.focalLength;
+                    this.filename = this.image.filename;
+                    this.rebuildForm();
+                    this.log.d('image:', this.image,
+                               'image.filename:', this.image.filename);
+                    this.inputForm.controls['fileUrlField'].setValue(
+                        this.image.filename);
+                },
+                (res: HttpErrorResponse) => {
+                    this.log.er(res.message);
+                    this.onError(res.message);
                 }
-                this.log.d('image0:', this.image);
-                if (!this.image) {
-                    this.image = this.images[0];
-                }
-                this.log.d('image1:', this.image,
-                           'image.filename:', this.image.filename);
-                this.distance = this.image.distance;
-                this.focalLength = this.image.focalLength;
-                this.filename = this.image.filename;
-                this.rebuildForm();
-                this.log.d('image:', this.image,
-                           'image.filename:', this.image.filename);
-                this.inputForm.controls['fileUrlField'].setValue(
-                    this.image.filename);
-            },
-            (res: HttpErrorResponse) => {
-                this.log.er(res.message);
-                this.onError(res.message);
-            }
-        );
+            ));
     }
 
     ngOnInit() {
@@ -109,10 +109,11 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             this.filename = filenameParam;
         }
         this.loadAll();
-        this.subscription = this.dataService.commentData$
-            .subscribe((comment) => this.setComment(comment));
-        this.imageLoadedSubscription = this.dataService.imageLoadedData$
-            .subscribe(() => this.changeSize());
+        this.subscriptions.push(
+            this.dataService.commentData$
+                .subscribe((comment) => this.setComment(comment)));
+        this.subscriptions.push(this.dataService.imageLoadedData$
+                                .subscribe(() => this.changeSize()));
         this.createForm();
         this.log.d('defects:', this.defects);
     }
@@ -122,12 +123,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     }
 
     ngOnDestroy() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-        }
-        if (this.imageLoadedSubscription) {
-            this.imageLoadedSubscription.unsubscribe();
-        }
+        this.subscriptions.forEach((subscription) => subscription.unsubscribe());
     }
 
     createForm() {
@@ -165,12 +161,14 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         //         this.focalLength = focalLength;
         //         this.changeSize();
         //     });
-        this.inputForm.get('defect').valueChanges
-            .debounceTime(500)
-            .subscribe((defect) => this.loadAnnotation(defect));
-        this.inputForm.get('fileUrlField').valueChanges
-            .debounceTime(1000)
-            .subscribe((fileUrl) => this.setImage(fileUrl));
+        this.subscriptions.push(
+            this.inputForm.get('defect').valueChanges
+                .debounceTime(500)
+                .subscribe((defect) => this.loadAnnotation(defect)));
+        this.subscriptions.push(
+            this.inputForm.get('fileUrlField').valueChanges
+                .debounceTime(1000)
+                .subscribe((fileUrl) => this.setImage(fileUrl)));
         this.inputForm.get('brightnessLevel').valueChanges
             .debounceTime(500)
             .forEach((brightness) => this.brightness = brightness);
@@ -231,11 +229,11 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         this.inputForm.controls['columns'].setValue(
             Math.round(baseValue * this.dataService.image.naturalWidth),
             // 153,
-            {emitEvent: false});
+            { emitEvent: false });
         this.inputForm.controls['rows'].setValue(
             Math.round(baseValue * this.dataService.image.naturalHeight),
             // 115,
-            {emitEvent: false});
+            { emitEvent: false });
         this.log.d('focalLength:', this.focalLength,
                    'distance:', this.distance,
                    'squareSize:', this.squareSize,
@@ -245,15 +243,17 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
 
     setComment(comment) {
         this.inputForm.controls['comment'].setValue(comment.comment,
-                                                    {emitEvent: false});
+                                                    { emitEvent: false });
         this.coordinate = { coordinate: comment.coordinate };
         const coordinates = this.coordinate.coordinate.split(',');
-        this.inputForm.controls['coordinateXField'].setValue(coordinates[0], {emitEvent: false});
-        this.inputForm.controls['coordinateYField'].setValue(coordinates[1], {emitEvent: false});
+        this.inputForm.controls['coordinateXField'].setValue(
+            coordinates[0], { emitEvent: false });
+        this.inputForm.controls['coordinateYField'].setValue(
+            coordinates[1], { emitEvent: false });
         if (comment.showOnly) {
-            this.inputForm.controls['comment'].disable({emitEvent: false});
+            this.inputForm.controls['comment'].disable({ emitEvent: false });
         } else {
-            this.inputForm.controls['comment'].enable({emitEvent: false});
+            this.inputForm.controls['comment'].enable({ emitEvent: false });
         }
         this.log.d('comment from view:', comment);
     }
@@ -310,18 +310,19 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                                    ? DefectName.SCALING : DefectName.POPOUT);
         }
 
-        this.annotationService.queryWithImageIdDefectAndSquareSize(
-            this.image.id, this.squareSize, defect).subscribe(
-                (res: HttpResponse<Annotation>) => {
-                    this.annotation = res.body;
-                    this.annotation = res.body;
-                    this.log.d('annotation:', this.annotation);
-                    this.changeAnnotation();
-                },
-                (res: HttpErrorResponse) => {
-                    this.log.er(res.message);
-                    this.onError(res.message);
-                });
+        this.subscriptions.push(
+            this.annotationService.queryWithImageIdDefectAndSquareSize(
+                this.image.id, this.squareSize, defect).subscribe(
+                    (res: HttpResponse<Annotation>) => {
+                        this.annotation = res.body;
+                        this.annotation = res.body;
+                        this.log.d('annotation:', this.annotation);
+                        this.changeAnnotation();
+                    },
+                    (res: HttpErrorResponse) => {
+                        this.log.er(res.message);
+                        this.onError(res.message);
+                    }));
     }
 
     changeAnnotation() {
@@ -332,7 +333,8 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
     }
 
     getRectangles() {
-        this.rectangleService.queryWithAnnotationId(this.annotation.id)
+        this.subscriptions.push(
+            this.rectangleService.queryWithAnnotationId(this.annotation.id)
             .subscribe(
                 (res: HttpResponse<Map<string, Rectangle>>) => {
                     this.log.d('rectangles:', res.body);
@@ -344,29 +346,30 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                     this.log.er(res.message);
                     this.dataService.notifyRedraw(new Map<string, Rectangle>());
                     this.dialogRef.close();
-                });
+                }));
     }
 
     loadScaleOrPopout(defect) {
-        this.annotationService.queryWithImageIdDefectAndSquareSize(
-            this.image.id, this.squareSize, defect).subscribe(
-                (res: HttpResponse<Annotation>) => {
-                    const a = res.body;
-                    this.log.d('annotation:', a);
-                    this.rectangleService.queryWithAnnotationId(a.id).subscribe(
-                        (response: HttpResponse<Map<string, Rectangle>>) => {
-                            this.rectangles2 = response.body;
-                            this.log.d('rectangles for a:', response.body);
+        this.subscriptions.push(
+            this.annotationService.queryWithImageIdDefectAndSquareSize(
+                this.image.id, this.squareSize, defect).subscribe(
+                    (res: HttpResponse<Annotation>) => {
+                        const a = res.body;
+                        this.log.d('annotation:', a);
+                        this.rectangleService.queryWithAnnotationId(a.id).subscribe(
+                            (response: HttpResponse<Map<string, Rectangle>>) => {
+                                this.rectangles2 = response.body;
+                                this.log.d('rectangles for a:', response.body);
                         },
-                        (response: HttpErrorResponse) => {
-                            this.onError(response.message);
-                            this.log.er(response.message);
-                        });
-                },
-                (res: HttpErrorResponse) => {
-                    this.log.er(res.message);
-                    this.onError(res.message);
-                });
+                            (response: HttpErrorResponse) => {
+                                this.onError(response.message);
+                                this.log.er(response.message);
+                            });
+                    },
+                    (res: HttpErrorResponse) => {
+                        this.log.er(res.message);
+                        this.onError(res.message);
+                    }));
     }
 
     openLoadingDialog() {
