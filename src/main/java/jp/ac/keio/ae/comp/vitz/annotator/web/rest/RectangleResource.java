@@ -651,7 +651,7 @@ s in body
              truePositive.size(), falseNegative.size(),
              falsePositive.size(),
              c.columns * c.rows - falseNegative.size() - falsePositive.size()
-             + truePositive.size(),
+             - truePositive.size(),
              truePositive.size() / (double) target.size(),
              truePositive.size() / (double) base.size(),
              (2 * truePositive.size()) / (double) (base.size() + target.size()));
