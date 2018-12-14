@@ -624,13 +624,13 @@ s in body
                   + " imageId:{}, defect:{}", annotationId, imageId, defect);
         Annotation annotation = annotationRepository.findOne(annotationId);
         Set<String> base = new HashSet<>
-            (rectangleRepository.findByAnnotationId(annotationId).stream()
+            (rectangleRepository.findByImageIdAndSquareSizeAndDefectName
+             (imageId, annotation.getSquareSize(), defect).stream()
              .map(r -> String.format("%s,%s", r.getCoordinateX(),
                                      r.getCoordinateY()))
              .collect(Collectors.toList()));
         Set<String> target = new HashSet<>
-            (rectangleRepository.findByImageIdAndSquareSizeAndDefectName
-             (imageId, annotation.getSquareSize(), defect).stream()
+            (rectangleRepository.findByAnnotationId(annotationId).stream()
              .map(r -> String.format("%s,%s", r.getCoordinateX(),
                                      r.getCoordinateY()))
              .collect(Collectors.toList()));
