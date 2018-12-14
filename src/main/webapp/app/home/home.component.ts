@@ -124,12 +124,17 @@ export class HomeComponent implements OnInit {
                 + '_'
                 + result.filename.substring(result.filename.lastIndexOf('/') + 1,
                                             result.filename.lastIndexOf('.'))
-                + '_' + this.annotation.defect + '.jpg';
+                + '_' + this.annotation.defect;
             this.log.d(`filename:${filename}`);
             if (result) {
                 this.downloadFileService.results(
                     `api/rectangles/compare/${this.annotation.id}/`
-                    + `${result.id}/${this.annotation.defect}`, filename);
+                        + `${result.id}/${this.annotation.defect}`,
+                    filename + '.jpg');
+                this.downloadFileService.results(
+                    `api/rectangles/confusionmatrix/${this.annotation.id}/`
+                        + `${result.id}/${this.annotation.defect}`,
+                    filename + '.csv');
             } else {
                 this.log.er(`result is null for ${filename}`);
             }

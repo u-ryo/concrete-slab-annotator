@@ -47,6 +47,7 @@ import java.time.ZonedDateTime;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -337,7 +338,8 @@ s in body
      * @param squareSize squareSize
      * @return the AnnotationXml Zip with status 200 (OK)
      */
-    @GetMapping(value="/rectangles/xml/{squareSize}/all", produces="application/zip")
+    @GetMapping(value = "/rectangles/xml/{squareSize}/all",
+                produces = "application/zip")
     @Timed
     public void getAllAnnotationXml(HttpServletResponse response,
                                     @PathVariable Integer squareSize)
@@ -363,20 +365,7 @@ s in body
             folder = filename.substring(index, lastIndex);
         }
 
-        int width = image.getWidth();
-        int height = image.getHeight();
-        double distance = image.getDistance();
-        int focalLength = image.getFocalLength();
-        double rate = distance * RATE / focalLength / squareSize;
-        int columns = (int) Math.round(rate * width);
-        int rows = (int) Math.round(rate * height);
-        // int columns = 153;
-        // int rows = 115;
-        double intervalX = width / (double) columns;
-        double intervalY = height / (double) rows;
-        log.debug("squareSize:{},width:{},distance:{},focalLength:{},rate:{},"
-                  + "columns:{},intervalX:{}", squareSize, width, distance,
-                  focalLength, rate, columns, intervalX);
+        Condition c = getCondition(image, squareSize);
 
         if (withNoAnnotation) {
             Map<String, List<Rectangle>> rectanglesMap =
@@ -386,15 +375,15 @@ s in body
                          (r -> r.getCoordinateX() + "," + r.getCoordinateY()));
             return createAnnotationXml(folder,
                                        filename.substring(lastIndex + 1),
-                                       width, height,
+                                       c.width, c.height,
                                        createObjects(rectanglesMap,
-                                                     columns, rows,
-                                                     intervalX, intervalY));
+                                                     c.columns, c.rows,
+                                                     c.intervalX, c.intervalY));
         }
         return createAnnotationXml(folder, filename.substring(lastIndex + 1),
-                                   width, height,
-                                   createObjects(rectangles, intervalX,
-                                                 intervalY));
+                                   c.width, c.height,
+                                   createObjects(rectangles, c.intervalX,
+                                                 c.intervalY));
     }
 
     private List<AnnotationXml.Obj> createObjects(Set<Rectangle> rectangles,
@@ -474,7 +463,8 @@ s in body
      * @param since Year Month Date
      * @return the AnnotationXml Zip with status 200 (OK)
      */
-    @GetMapping(value="/rectangles/xml/{squareSize}/{since}", produces="application/zip")
+    @GetMapping(value = "/rectangles/xml/{squareSize}/{since}",
+                produces = "application/zip")
     @Timed
     public void getAnnotationXmlSince(HttpServletResponse response,
                                       @PathVariable Integer squareSize,
@@ -518,7 +508,7 @@ s in body
     }
 
     /**
-     * GET /rectangles/compare/{annotationId}/{imageId}/{defect} : 
+     * GET /rectangles/compare/{annotationId}/{imageId}/{defect} :
      * get compared annotation image with specified squareSize, annotationId
      * and imageId with defect
      *
@@ -528,7 +518,8 @@ s in body
      * @param defect defect for specifying annotation id
      * @return jpg image with annotations by annotationId(red) and by imageId/defect(green)
      */
-    @GetMapping(value="/rectangles/compare/{annotationId}/{imageId}/{defect}", produces="image/jpeg")
+    @GetMapping(value = "/rectangles/compare/{annotationId}/{imageId}/{defect}",
+                produces = MediaType.IMAGE_JPEG_VALUE)
     @Timed
     public void getComparedJpg(HttpServletResponse response,
                                @PathVariable Long annotationId,
@@ -542,33 +533,20 @@ s in body
                            + imageId + "_" + defect + ".jpg");
         response.setContentType(MediaType.IMAGE_JPEG_VALUE);
         Annotation annotation = annotationRepository.findOne(annotationId);
-        Image image = annotation.getImage();
-        int squareSize = annotation.getSquareSize(),
-            width = image.getWidth(),
-            height = image.getHeight(),
-            focalLength = image.getFocalLength();
-        double distance = image.getDistance(),
-            rate = distance * RATE / focalLength / squareSize;
-        int columns = (int) Math.round(rate * width),
-            rows = (int) Math.round(rate * height);
-        double intervalX = width / (double) columns,
-            intervalY = height / (double) rows;
-        log.debug("columns:{},rows:{},intervalX:{},intervalY:{}",
-                  columns, rows, intervalX, intervalY);
-
+        Condition c = getCondition(annotation);
         IMOps op =
             ((IMOperation) new IMOperation()
-             .addImage(image.getFilename()
+             .addImage(annotation.getImage().getFilename()
                        .replace(properties.getImageURLOrig(),
                                 properties.getImageURLReplace())));
         drawRectanglesIM4Java
             (rectangleRepository.findByAnnotationId(annotationId), RED, op,
-             intervalX, intervalY);
+             c.intervalX, c.intervalY);
 
         drawRectanglesIM4Java
             (rectangleRepository.findByImageIdAndSquareSizeAndDefectName
-             (imageId, annotation.getSquareSize(), defect), GREEN, op,
-             intervalX, intervalY);
+             (imageId, c.squareSize, defect), GREEN, op,
+             c.intervalX, c.intervalY);
 
         BufferedOutputStream stream =
             new BufferedOutputStream (response.getOutputStream());
@@ -583,6 +561,34 @@ s in body
         stream.flush();
     }
 
+    private Condition getCondition(Annotation annotation) {
+        return getCondition(annotation.getImage(), annotation.getSquareSize());
+    }
+
+    private Condition getCondition(Image image, int squareSize) {
+        Condition c = new Condition();
+        c.squareSize = squareSize;
+        c.width = image.getWidth();
+        c.height = image.getHeight();
+        int focalLength = image.getFocalLength();
+        double distance = image.getDistance(),
+            rate = distance * RATE / focalLength / c.squareSize;
+        c.columns = (int) Math.round(rate * c.width);
+        c.rows = (int) Math.round(rate * c.height);
+        // int columns = 153;
+        // int rows = 115;
+        c.intervalX = c.width / (double) c.columns;
+        c.intervalY = c.height / (double) c.rows;
+        log.debug("columns:{},rows:{},intervalX:{},intervalY:{}",
+                  c.columns, c.rows, c.intervalX, c.intervalY);
+        return c;
+    }
+
+    class Condition {
+        int squareSize, width, height, columns, rows;
+        double intervalX, intervalY;
+    }
+
     private void drawRectanglesIM4Java(Set<Rectangle> rectangles, String color,
                                        IMOps op,
                                        double intervalX, double intervalY) {
@@ -595,5 +601,61 @@ s in body
                        (int) (r.getCoordinateY() * intervalY),
                        (int) (r.getCoordinateX() * intervalX + intervalX),
                        (int) (r.getCoordinateY() * intervalY + intervalY))));
+    }
+
+    /**
+     * GET /rectangles/compare/{annotationId}/{imageId}/{defect} :
+     * get a confusion matrix with specified squareSize, annotationId
+     * and imageId with defect
+     *
+     * @param annotationId annotationId to be compared
+     * @param imageId imageId for specifying annotation id
+     * @param defect defect for specifying annotation id
+     * @return csv with a confusion matrix
+     */
+    @GetMapping(value = "/rectangles/confusionmatrix/{annotationId}/{imageId}/{defect}",
+                produces = "text/csv")
+    @Timed
+    public String getConfusionMatrix(@PathVariable Long annotationId,
+                                     @PathVariable Long imageId,
+                                     @PathVariable DefectName defect)
+        throws IOException {
+        log.debug("REST request to get a confusion matrix with annotationId:{},"
+                  + " imageId:{}, defect:{}", annotationId, imageId, defect);
+        Annotation annotation = annotationRepository.findOne(annotationId);
+        Set<String> base = new HashSet<>
+            (rectangleRepository.findByAnnotationId(annotationId).stream()
+             .map(r -> String.format("%s,%s", r.getCoordinateX(),
+                                     r.getCoordinateY()))
+             .collect(Collectors.toList()));
+        Set<String> target = new HashSet<>
+            (rectangleRepository.findByImageIdAndSquareSizeAndDefectName
+             (imageId, annotation.getSquareSize(), defect).stream()
+             .map(r -> String.format("%s,%s", r.getCoordinateX(),
+                                     r.getCoordinateY()))
+             .collect(Collectors.toList()));
+        Set<String> truePositive = new HashSet<>(base);
+        truePositive.retainAll(target);
+        Set<String> falseNegative = new HashSet<>(base);
+        falseNegative.removeAll(target);
+        Set<String> falsePositive = new HashSet<>(target);
+        falsePositive.removeAll(base);
+
+        Condition c = getCondition(annotation);
+        Image targetImage = imageRepository.findOne(imageId);
+
+        String result = String.format
+            ("target:%s%nbase:%s,%d,%d%n,%d,%d%n,precision,%f%n,recall,%f%n"
+             + ",f-measure,%f%n", targetImage.getFilename(),
+             annotation.getImage().getFilename(),
+             truePositive.size(), falseNegative.size(),
+             falsePositive.size(),
+             c.columns * c.rows - falseNegative.size() - falsePositive.size()
+             + truePositive.size(),
+             truePositive.size() / (double) target.size(),
+             truePositive.size() / (double) base.size(),
+             (2 * truePositive.size()) / (double) (base.size() + target.size()));
+        log.debug("confusion matrix:{}", result);
+        return result;
     }
 }

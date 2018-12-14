@@ -30,7 +30,7 @@ export class DownloadFileService {
             } else {
                 resType = ['text', 'application/xml'];
             }
-        } else if (url.indexOf('csv') > 0) {
+        } else if (url.indexOf('csv') > 0 || filename.indexOf('csv') > 0) {
             resType = ['text', 'text/csv'];
         } else if (filename.indexOf('.jpg') > 0) {
             resType = ['blob', 'image/jpeg'];
