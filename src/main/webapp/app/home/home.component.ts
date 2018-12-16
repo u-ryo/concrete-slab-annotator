@@ -108,7 +108,7 @@ export class HomeComponent implements OnInit {
 
     openCompareDialog() {
         const idx = this.filename.indexOf('Capture');
-        const filenameTrunk = this.filename.substring(idx, idx + 12);
+        const filenameTrunk = this.filename.substring(idx, idx + 12); // 12 = 'CaptureNNNNN'.length
         const dialogRef = this.dialog.open(
             CompareDialogComponent, {
                 disableClose: true,
@@ -116,7 +116,11 @@ export class HomeComponent implements OnInit {
                 data: {
                     from: this.filename,
                     images: this.images.filter(
-                        (i) => i.filename.indexOf(filenameTrunk) > 0)
+                        (i) => i.filename.indexOf(filenameTrunk) > 0
+                            && i.filename !== this.filename)
+                        .concat(this.images.filter(
+                            (i) => i.filename.indexOf(filenameTrunk) < 0
+                                && i.filename !== this.filename))
                 }});
 
         dialogRef.afterClosed().subscribe((result) => {
