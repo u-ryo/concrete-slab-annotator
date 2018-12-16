@@ -113,7 +113,8 @@ export class HomeComponent implements OnInit {
                 width: '90%',
                 data: {
                     from: this.filename,
-                    images: this.images
+                    images: this.images,
+                    to: this.filename
                 }});
 
         dialogRef.afterClosed().subscribe((result) => {
@@ -122,18 +123,20 @@ export class HomeComponent implements OnInit {
                 this.filename.substring(this.filename.lastIndexOf('/') + 1,
                                         this.filename.lastIndexOf('.'))
                 + '_'
-                + result.filename.substring(result.filename.lastIndexOf('/') + 1,
-                                            result.filename.lastIndexOf('.'))
+                + result.substring(result.lastIndexOf('/') + 1,
+                                   result.lastIndexOf('.'))
                 + '_' + this.annotation.defect;
             this.log.d(`filename:${filename}`);
+            const id = (this.images.filter((i) => i.filename === result))[0].id;
+            this.log.d(`id:${id}`);
             if (result) {
                 this.downloadFileService.results(
                     `api/rectangles/compare/${this.annotation.id}/`
-                        + `${result.id}/${this.annotation.defect}`,
+                        + `${id}/${this.annotation.defect}`,
                     filename + '.jpg');
                 this.downloadFileService.results(
                     `api/rectangles/confusionmatrix/${this.annotation.id}/`
-                        + `${result.id}/${this.annotation.defect}`,
+                        + `${id}/${this.annotation.defect}`,
                     filename + '.csv');
             } else {
                 this.log.er(`result is null for ${filename}`);
