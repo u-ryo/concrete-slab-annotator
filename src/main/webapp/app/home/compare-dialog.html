@@ -2,12 +2,11 @@
 <mat-dialog-content>
   <p jhiTranslate="global.menu.admin.downloads.whatCompareTo">What will you compare to?</p>
   <mat-form-field class="w-100">
-    <input matInput type="text" placeholder="Select Image URL" required [(ngModel)]="data.to" list="targetFileUrls"/>
-    <datalist id="targetFileUrls">
-      <option *ngFor="let image of data.images" [disabled]="image.filename === data.from">
+    <mat-select placeholder="Select Image URL" required [(ngModel)]="data.to">
+      <mat-option *ngFor="let image of data.images" [value]="image" [disabled]="image.filename === data.from">
         {{image.filename}}
-      </option>
-    </datalist>
+      </mat-option>
+    </mat-select>
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions align="end">

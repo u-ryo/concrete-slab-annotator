@@ -107,40 +107,40 @@ export class HomeComponent implements OnInit {
     }
 
     openCompareDialog() {
+        const idx = this.filename.indexOf('Capture');
+        const filenameTrunk = this.filename.substring(idx, idx + 13);
         const dialogRef = this.dialog.open(
             CompareDialogComponent, {
                 disableClose: true,
                 width: '90%',
                 data: {
                     from: this.filename,
-                    images: this.images,
-                    to: this.filename
+                    images: this.images.filter(
+                        (i) => i.filename.indexOf(filenameTrunk) > 0)
                 }});
 
         dialogRef.afterClosed().subscribe((result) => {
             this.log.d(`result:${result}`);
+            if (!result) {
+                this.log.er(`result is null for ${this.filename}`);
+                return;
+            }
             const filename =
                 this.filename.substring(this.filename.lastIndexOf('/') + 1,
                                         this.filename.lastIndexOf('.'))
                 + '_'
-                + result.substring(result.lastIndexOf('/') + 1,
-                                   result.lastIndexOf('.'))
+                + result.filename.substring(result.filename.lastIndexOf('/') + 1,
+                                            result.filename.lastIndexOf('.'))
                 + '_' + this.annotation.defect;
             this.log.d(`filename:${filename}`);
-            const id = (this.images.filter((i) => i.filename === result))[0].id;
-            this.log.d(`id:${id}`);
-            if (result) {
-                this.downloadFileService.results(
-                    `api/rectangles/compare/${this.annotation.id}/`
-                        + `${id}/${this.annotation.defect}`,
-                    filename + '.jpg');
-                this.downloadFileService.results(
-                    `api/rectangles/confusionmatrix/${this.annotation.id}/`
-                        + `${id}/${this.annotation.defect}`,
-                    filename + '.csv');
-            } else {
-                this.log.er(`result is null for ${filename}`);
-            }
+            this.downloadFileService.results(
+                `api/rectangles/compare/${this.annotation.id}/`
+                    + `${result.id}/${this.annotation.defect}`,
+                filename + '.jpg');
+            this.downloadFileService.results(
+                `api/rectangles/confusionmatrix/${this.annotation.id}/`
+                    + `${result.id}/${this.annotation.defect}`,
+                filename + '.csv');
         });
     }
 }
