@@ -108,7 +108,7 @@ export class HomeComponent implements OnInit {
 
     openCompareDialog() {
         const idx = this.filename.indexOf('Capture');
-        const filenameTrunk = this.filename.substring(idx, idx + 13);
+        const filenameTrunk = this.filename.substring(idx, idx + 12);
         const dialogRef = this.dialog.open(
             CompareDialogComponent, {
                 disableClose: true,
