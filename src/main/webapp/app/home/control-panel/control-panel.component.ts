@@ -12,6 +12,7 @@ import { JhiAlertService } from 'ng-jhipster';
 import { Level, Log } from 'ng2-logger/client';
 import { LocalStorage, SharedStorage } from 'ngx-store';
 import { MatDialog } from '@angular/material';
+import { Principal } from '../../shared';
 import { Rectangle } from '../../entities/rectangle/rectangle.model';
 import { RectangleService } from '../../entities/rectangle/rectangle.service';
 import { Subscription } from 'rxjs/Subscription';
@@ -50,6 +51,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
                 private formBuilder: FormBuilder,
                 private imageService: ImageService,
                 private jhiAlertService: JhiAlertService,
+                private principal: Principal,
                 private rectangleService: RectangleService,
                 private router: Router) {
         if (!DEBUG_INFO_ENABLED) {
@@ -377,6 +379,10 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
             disableClose: true,
             width: '50%'
         });
+    }
+
+    isAuthenticated() {
+        return this.principal.isAuthenticated();
     }
 }
 

@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.zip.ZipException;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -499,6 +500,20 @@ s in body
                                 (new ZipEntry(xml.filename()
                                               .replace(".jpg", ".xml")));
                             marshaller.marshal(xml, zos);
+                        } catch (ZipException e) {
+                            log.error("Zip Exception occurred. filename:{}",
+                                      xml.filename(), e);
+                            try {
+                                zos.putNextEntry
+                                    (new ZipEntry(xml.folder().substring
+                                                  (xml.folder().lastIndexOf("/")
+                                                   + 1) + "_" + xml.filename()
+                                                  .replace(".jpg", ".xml")));
+                                marshaller.marshal(xml, zos);
+                            } catch (IOException | JAXBException ex) {
+                                log.error("Exception again. filename:{}",
+                                          xml.filename(), ex);
+                            }
                         } catch (IOException | JAXBException e) {
                             log.error("IO/JAXB Exception occurred. filename:{}",
                                       xml.filename(), e);
