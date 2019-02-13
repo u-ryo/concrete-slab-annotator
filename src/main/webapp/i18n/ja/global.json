@@ -37,6 +37,7 @@
                 "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)",
                 "downloads": {
                     "accesslog": "アクセスログ",
+                    "annotationcsv": "アノテーションCSV",
                     "annotationxml": "アノテーションXML",
                     "allannotationxml": "全アノテーションXML",
                     "comparation": "アノテーション比較",

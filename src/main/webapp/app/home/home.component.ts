@@ -99,6 +99,14 @@ export class HomeComponent implements OnInit {
             `${f}.${this.annotation.squareSize}.xml`);
     }
 
+    downloadImageCsv() {
+        this.log.i(`filename:${this.filename}`);
+        const f = this.filename.substring(this.filename.lastIndexOf('/') + 1);
+        this.downloadFileService.results(
+            `api/rectangles/csv/image/${this.annotation.image.id}/${this.annotation.squareSize}`,
+            `${f}.${this.annotation.squareSize}.csv`);
+    }
+
     downloadAllXml() {
         const f = 'annotations.zip';
         this.log.i(`filename:${f}`);

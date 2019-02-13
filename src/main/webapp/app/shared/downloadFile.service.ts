@@ -31,7 +31,7 @@ export class DownloadFileService {
                 resType = ['text', 'application/xml'];
             }
         } else if (url.indexOf('csv') > 0 || filename.indexOf('csv') > 0) {
-            resType = ['text', 'text/csv'];
+            resType = ['text', 'application/octet-stream'];
         } else if (filename.indexOf('.jpg') > 0) {
             resType = ['blob', 'image/jpeg'];
         }

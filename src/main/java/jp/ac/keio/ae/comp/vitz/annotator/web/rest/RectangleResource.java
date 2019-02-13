@@ -1,10 +1,14 @@
 package jp.ac.keio.ae.comp.vitz.annotator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import jp.ac.keio.ae.comp.vitz.annotator.config.ApplicationProperties;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.AccessLog;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Annotation;
+import jp.ac.keio.ae.comp.vitz.annotator.domain.AnnotationCsvBean;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.AnnotationXml;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Image;
 import jp.ac.keio.ae.comp.vitz.annotator.domain.Rectangle;
@@ -672,5 +676,108 @@ s in body
              (2 * truePositive.size()) / (double) (base.size() + target.size()));
         log.debug("confusion matrix:{}", result);
         return result;
+    }
+
+    /**
+     * GET  /rectangles/csv/image/{imageId}/{squareSize} :
+     * get the rectangles CSV which belong to the annotations
+     * with the specified imageId.
+     *
+     * @param imageId imageId of rectangles belong to
+     * @param squareSize squareSize
+     * @return the Annotation CSV with status 200 (OK)
+     */
+    @GetMapping(value = "/rectangles/csv/image/{imageId}/{squareSize}",
+                produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+                + "; charset=Shift_JIS; Content-Disposition: attachment")
+    @ResponseBody
+    @Timed
+    public String getImageAnnotationCsv
+        (@PathVariable Long imageId, @PathVariable Integer squareSize)
+        throws JsonProcessingException {
+        log.debug("REST request to get AnnotationCsv with imageId:{} "
+                  + "squareSize:{}", imageId, squareSize);
+
+        Condition condition =
+            getCondition(imageRepository.findOne(imageId), squareSize);
+        Map<String, AnnotationCsvBean> annotationCsvBeansMap =
+            IntStream.range(0, condition.columns * condition.rows)
+            .mapToObj(i -> new AnnotationCsvBean()
+                      .coordinateX(i % condition.columns)
+                      .coordinateY(i / condition.columns)
+                      .xMin((int) ((i % condition.columns) * condition.intervalX))
+                      .yMin((int) ((i / condition.columns) * condition.intervalY))
+                      .xMax((int) (((i % condition.columns) + 1) * condition.intervalX))
+                      .yMax((int) (((i / condition.columns) + 1) * condition.intervalY)))
+            .collect(Collectors.toMap
+                     (b -> b.coordinateX() + "," + b.coordinateY(),
+                      b -> b,
+                      (b1, b2) -> b2));
+        log.debug("annotationCsvBeansMap:{}", new java.util.TreeMap(annotationCsvBeansMap));
+
+        Set<Annotation> annotations =
+            annotationRepository.findByImageIdAndSquareSize(imageId, squareSize);
+        log.debug("annotations:{}", annotations);
+        annotations.forEach(a ->
+                            rectangleRepository.findByAnnotationId(a.getId())
+                            .forEach(r -> setDefect(r, a.getDefect(),
+                                                    annotationCsvBeansMap)));
+        log.debug("final annotationCsvBeansMap:{}", new java.util.TreeMap(annotationCsvBeansMap));
+        CsvMapper mapper = new CsvMapper();
+        CsvSchema schema =
+            mapper.schemaFor(AnnotationCsvBean.class).withHeader();
+        return mapper.writer(schema).writeValueAsString(annotationCsvBeansMap.values());
+    }
+
+    private void setDefect(Rectangle r, DefectName defect,
+                           Map<String, AnnotationCsvBean> annotationCsvBeansMap) {
+        String key = r.getCoordinateX() + "," + r.getCoordinateY();
+        AnnotationCsvBean bean = annotationCsvBeansMap.get(key);
+        log.debug("key:{}, bean:{}", key, bean);
+        if (bean == null) {
+            return;
+        }
+        switch (defect) {
+        case CRACK:
+            bean.crack(1);
+            break;
+        case EFFLORESCENCE:
+            bean.efflorescence(1);
+            break;
+        case DONT_CARE:
+            bean.dontCare(1);
+            break;
+        case SPALLING:
+            bean.spalling(1);
+            break;
+        case POPOUT:
+            bean.popout(1);
+            break;
+        case SCALING:
+            bean.scaling(1);
+            break;
+        case CHALK:
+            bean.chalk(1);
+            break;
+        case WETTING:
+            bean.wetting(1);
+            break;
+        case RUST_FLUID:
+            bean.rustFluid(1);
+            break;
+        case REINFORCEMENT_EXPOSURE:
+            bean.reinforcementExposure(1);
+            break;
+        case HONEY_COMB:
+            bean.honeyComb(1);
+            break;
+        case AIR_VOID:
+            bean.airVoid(1);
+            break;
+        case STAIN_DISCOLORATION:
+            bean.stainDiscoloration(1);
+            break;
+        default:
+        }
     }
 }
