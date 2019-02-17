@@ -23,19 +23,34 @@
               Access Log CSV
             </span>
           </button>
-          <button mat-menu-item (click)="downloadImageCsv()">
+          <button mat-menu-item (click)="downloadImage('csv')">
             <span jhiTranslate="global.menu.admin.downloads.annotationcsv">
               Annotation CSV
             </span>
           </button>
-          <button mat-menu-item (click)="downloadImageXml()">
+          <button mat-menu-item (click)="downloadAll('csv')">
+            <span jhiTranslate="global.menu.admin.downloads.allannotationcsv">
+              All Annotation CSV
+            </span>
+          </button>
+          <button mat-menu-item (click)="openSinceDialog('csv')">
+            <span jhiTranslate="global.menu.admin.downloads.sinceannotationcsv">
+              Annotation CSV Since...
+            </span>
+          </button>
+          <button mat-menu-item (click)="downloadImage('xml')">
             <span jhiTranslate="global.menu.admin.downloads.annotationxml">
               Annotation XML
             </span>
           </button>
-          <button mat-menu-item (click)="downloadAllXml()">
+          <button mat-menu-item (click)="downloadAll('xml')">
             <span jhiTranslate="global.menu.admin.downloads.allannotationxml">
               All Annotation XML
+            </span>
+          </button>
+          <button mat-menu-item (click)="openSinceDialog('xml')">
+            <span jhiTranslate="global.menu.admin.downloads.sinceannotationxml">
+              Annotation XML Since...
             </span>
           </button>
           <button mat-menu-item (click)="openCompareDialog()">

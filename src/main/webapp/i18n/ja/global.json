@@ -38,8 +38,15 @@
                 "downloads": {
                     "accesslog": "アクセスログ",
                     "annotationcsv": "アノテーションCSV",
+                    "allannotationcsv": "全アノテーションCSV",
+                    "sinceannotationcsv": "指定日以降のアノテーションCSV...",
+                    "since": {
+                        "title": "いつ以降のアノテーションを取得しますか?",
+                        "when": "指定日"
+                    },
                     "annotationxml": "アノテーションXML",
                     "allannotationxml": "全アノテーションXML",
+                    "sinceannotationxml": "指定日以降のアノテーションXML...",
                     "comparation": "アノテーション比較",
                     "whatCompareTo": "どの画像と比較しますか?"
                 }

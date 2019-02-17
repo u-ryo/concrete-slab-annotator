@@ -24,12 +24,10 @@ export class DownloadFileService {
         // https://angular.io/guide/http#adding-headers
         let headers = new HttpHeaders();
         let resType;
-        if (url.indexOf('xml') > 0) {
-            if (url.indexOf('all') > 0) {
-                resType = ['arraybuffer', 'application/zip'];
-            } else {
-                resType = ['text', 'application/xml'];
-            }
+        if (url.indexOf('all') > 0 || filename.endsWith('.zip')) {
+            resType = ['arraybuffer', 'application/zip'];
+        } else if (url.indexOf('xml') > 0) {
+            resType = ['text', 'application/xml'];
         } else if (url.indexOf('csv') > 0 || filename.indexOf('csv') > 0) {
             resType = ['text', 'application/octet-stream'];
         } else if (filename.indexOf('.jpg') > 0) {

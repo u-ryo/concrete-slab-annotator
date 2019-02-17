@@ -780,4 +780,96 @@ s in body
         default:
         }
     }
+
+    /**
+     * GET  /rectangles/csv/{squareSize}/all : get all the rectangles CSV with specified squareSize
+     *
+     * @param response injected HttpServletResponse
+     * @param squareSize squareSize
+     * @return the AnnotationCsvBean Zip with status 200 (OK)
+     */
+    @GetMapping(value = "/rectangles/csv/{squareSize}/all",
+                produces = "application/zip")
+    @Timed
+    public void getAllAnnotationCsv(HttpServletResponse response,
+                                    @PathVariable Integer squareSize)
+        throws IOException {
+        log.debug("REST request to get all AnnotationCsv with squareSize:{}",
+                  squareSize);
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                          "attachment;filename=annotations.zip");
+        getAnnotationCsv(response, imageRepository.findAll(), squareSize);
+    }
+
+    /**
+     * GET  /rectangles/csv/{squareSize}/{since} : get the rectangles CSSV with specified squareSize since specified date
+     *
+     * @param response injected HttpServletResponse
+     * @param squareSize squareSize
+     * @param since Year Month Date
+     * @return the AnnotationCsv Zip with status 200 (OK)
+     */
+    @GetMapping(value = "/rectangles/csv/{squareSize}/{since}",
+                produces = "application/zip")
+    @Timed
+    public void getAnnotationCsvSince(HttpServletResponse response,
+                                      @PathVariable Integer squareSize,
+                                      @DateTimeFormat(pattern="yyyyMMdd")
+                                      @PathVariable LocalDate since)
+        throws IOException {
+        log.debug("REST request to get all AnnotationCsv with squareSize:{} "
+                  + "since {}", squareSize, since);
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                          "attachment;filename=annotations_" + since + ".zip");
+        getAnnotationCsv(response,
+                         imageRepository.findSince(since.atStartOfDay(TOKYO)),
+                         squareSize);
+    }
+
+    private void getAnnotationCsv(HttpServletResponse response,
+                                  List<Image> images, int squareSize)
+        throws IOException {
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        String[] filenames = new String[2];
+        try (ZipOutputStream zos = new ZipOutputStream
+             (new BufferedOutputStream(response.getOutputStream()))) {
+            images.stream()
+                .map(image -> {
+                        String filename = image.getFilename();
+                        filenames[0] =
+                            filename.substring(filename.lastIndexOf("/") + 1)
+                            .replace(".jpg", ".csv");
+                        filenames[1] =
+                            filename.substring(filename.lastIndexOf("/") - 1)
+                            .replace(".jpg", ".csv");
+                        try {
+                            return getImageAnnotationCsv(image.getId(),
+                                                         squareSize);
+                        } catch (JsonProcessingException e) {
+                            log.error("JsonProcessingException on {}", filename, e);
+                            return "";
+                        }
+                    })
+                .filter(csv -> csv != null)
+                .forEach(csv -> {
+                        try {
+                            zos.putNextEntry(new ZipEntry(filenames[0]));
+                            zos.write(csv.getBytes());
+                        } catch (ZipException e) {
+                            log.error("Zip Exception occurred. filename:{}",
+                                      filenames[0], e);
+                            try {
+                                zos.putNextEntry(new ZipEntry(filenames[1]));
+                                zos.write(csv.getBytes());
+                            } catch (IOException ex) {
+                                log.error("Exception again. filename:{}",
+                                          filenames[1], ex);
+                            }
+                        } catch (IOException e) {
+                            log.error("IOException occurred. filename:{}",
+                                      filenames[0], e);
+                        }
+                    });
+        }
+    }
 }

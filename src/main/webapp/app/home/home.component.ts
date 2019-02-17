@@ -10,6 +10,7 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 
 import { Account, LoginModalService, Principal } from '../shared';
+import { DatePipe } from '@angular/common';
 import { DownloadFileService } from '../shared/downloadFile.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
@@ -17,6 +18,10 @@ export interface CompareDialogData {
     from: string;
     to: string;
     images: Image[];
+}
+
+export interface SinceDialogData {
+    since: Date;
 }
 
 @Component({
@@ -34,6 +39,7 @@ export class HomeComponent implements OnInit {
     private log = Log.create('home', Level.ERROR, Level.WARN, Level.INFO);
 
     constructor(
+        private datePipe: DatePipe,
         public dialog: MatDialog,
         private downloadFileService: DownloadFileService,
         private eventManager: JhiEventManager,
@@ -91,27 +97,18 @@ export class HomeComponent implements OnInit {
             `${f}.${this.annotation.defect}.${this.annotation.squareSize}.xml`);
     }
 
-    downloadImageXml() {
-        this.log.i(`filename:${this.filename}`);
+    downloadImage(format) {
         const f = this.filename.substring(this.filename.lastIndexOf('/') + 1);
         this.downloadFileService.results(
-            `api/rectangles/xml/image/${this.annotation.image.id}/${this.annotation.squareSize}`,
+            `api/rectangles/${format}/image/${this.annotation.image.id}/${this.annotation.squareSize}`,
             `${f}.${this.annotation.squareSize}.xml`);
     }
 
-    downloadImageCsv() {
-        this.log.i(`filename:${this.filename}`);
-        const f = this.filename.substring(this.filename.lastIndexOf('/') + 1);
-        this.downloadFileService.results(
-            `api/rectangles/csv/image/${this.annotation.image.id}/${this.annotation.squareSize}`,
-            `${f}.${this.annotation.squareSize}.csv`);
-    }
-
-    downloadAllXml() {
+    downloadAll(format) {
         const f = 'annotations.zip';
-        this.log.i(`filename:${f}`);
+        this.log.d(`filename:${f}, format:${format}`);
         this.downloadFileService.results(
-            `api/rectangles/xml/${this.annotation.squareSize}/all`, f);
+            `api/rectangles/${format}/${this.annotation.squareSize}/all`, f);
     }
 
     openCompareDialog() {
@@ -155,6 +152,26 @@ export class HomeComponent implements OnInit {
                 filename + '.csv');
         });
     }
+
+    openSinceDialog(format) {
+        const dialogRef = this.dialog.open(
+            SinceDialogComponent, {
+                disableClose: true,
+                data: { since: new Date() }});
+
+        dialogRef.afterClosed().subscribe((result) => {
+            this.log.d(`result:${result}, since:${result.since}`);
+            if (!result || !result.since) {
+                this.log.er(`result/since is null`);
+                return;
+            }
+            const since = this.datePipe.transform(result.since, 'yyyyMMdd');
+            const f = `annotations_${format}_since_${since}.zip`;
+            this.log.d(`filename:${f}, format:${format}`);
+            this.downloadFileService.results(
+            `api/rectangles/${format}/${this.annotation.squareSize}/${since}`, f);
+        });
+    }
 }
 
 @Component({
@@ -165,4 +182,14 @@ export class CompareDialogComponent {
     constructor(
         public dialogRef: MatDialogRef<CompareDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: CompareDialogData) {}
+}
+
+@Component({
+    selector: 'jhi-since-dialog',
+    templateUrl: 'since-dialog.html'
+})
+export class SinceDialogComponent {
+    constructor(
+        public dialogRef: MatDialogRef<SinceDialogComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: SinceDialogData) {}
 }

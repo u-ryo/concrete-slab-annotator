@@ -38,8 +38,15 @@
                 "downloads": {
                     "accesslog": "Access Log",
                     "annotationcsv": "Annotation CSV",
+                    "allannotationcsv": "All Annotation CSV",
+                    "sinceannotationcsv": "Annotation CSV Since...",
+                    "since": {
+                        "title": "Since what date do you want to get annotations?",
+                        "when": "Since Date"
+                    },
                     "annotationxml": "Annotation XML",
                     "allannotationxml": "All Annotation XML",
+                    "sinceannotationxml": "Annotation XML Since...",
                     "comparation": "Compare Annotations",
                     "whatCompareTo": "To which image do you compare?"
                 }
