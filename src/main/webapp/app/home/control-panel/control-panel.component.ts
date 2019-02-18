@@ -273,7 +273,11 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         const imgs = this.images.filter((i) => i.filename === fileUrl);
         this.log.d('imgs:', imgs, 'images:', this.images);
         if (imgs.length === 0) {
+            this.inputForm.controls['lock'].setValue(true);
+            this.inputForm.controls['lock'].disable();
             return;
+        } else {
+            this.inputForm.controls['lock'].enable();
         }
         this.image = imgs[0];
         this.focalLength = this.image.focalLength;
