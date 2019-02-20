@@ -1,0 +1,13 @@
+<h1 mat-dialog-title jhiTranslate="global.menu.admin.downloads.since.title">Annotations Since</h1>
+<mat-dialog-content>
+  <p jhiTranslate="global.menu.admin.downloads.since.when">Since what date do you want the annotations?</p>
+  <mat-form-field>
+    <input matInput [matDatepicker]="picker" placeholder="Choose a date" required [(ngModel)]="data.since">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button [attr.disabled]="data.since ? null : true" [mat-dialog-close]="data" cdkFocusInitial>OK</button>
+</mat-dialog-actions>
