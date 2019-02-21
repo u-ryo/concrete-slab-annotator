@@ -89,19 +89,19 @@ export class HomeComponent implements OnInit {
             'api/access-logs/csv', 'accesslog.csv');
     }
 
-    downloadAnnotationXml() {
-        this.log.i(`filename:${this.filename}`);
-        const f = this.filename.substring(this.filename.lastIndexOf('/') + 1);
-        this.downloadFileService.results(
-            `api/rectangles/xml/annotation/${this.annotation.id}`,
-            `${f}.${this.annotation.defect}.${this.annotation.squareSize}.xml`);
-    }
+    // downloadAnnotation(format) {
+    //     this.log.i(`filename:${this.filename}, format:${format}`);
+    //     const f = this.filename.substring(this.filename.lastIndexOf('/') + 1);
+    //     this.downloadFileService.results(
+    //         `api/rectangles/${format}/annotation/${this.annotation.id}`,
+    //         `${f}.${this.annotation.defect}.${this.annotation.squareSize}.${format}`);
+    // }
 
     downloadImage(format) {
         const f = this.filename.substring(this.filename.lastIndexOf('/') + 1);
         this.downloadFileService.results(
             `api/rectangles/${format}/image/${this.annotation.image.id}/${this.annotation.squareSize}`,
-            `${f}.${this.annotation.squareSize}.xml`);
+            `${f}.${this.annotation.squareSize}.${format}`);
     }
 
     downloadAll(format) {

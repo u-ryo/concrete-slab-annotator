@@ -286,17 +286,17 @@ s in body
      * @param annotationId annotationId of rectangles belong to
      * @return the AnnotationXml with status 200 (OK)
      */
-    @GetMapping("/rectangles/xml/annotation/{annotationId}")
-    @Timed
-    public AnnotationXml getAnnotationXml(@PathVariable Long annotationId) {
-        log.debug("REST request to get AnnotationXml with annotationId:{}",
-                  annotationId);
-        Annotation annotation = annotationRepository.findOne(annotationId);
-        int squareSize = annotation.getSquareSize();
-        return getAnnotationXml
-            (annotation.getImage(), squareSize,
-             rectangleRepository.findByAnnotationId(annotationId), true);
-    }
+    // @GetMapping("/rectangles/xml/annotation/{annotationId}")
+    // @Timed
+    // public AnnotationXml getAnnotationXml(@PathVariable Long annotationId) {
+    //     log.debug("REST request to get AnnotationXml with annotationId:{}",
+    //               annotationId);
+    //     Annotation annotation = annotationRepository.findOne(annotationId);
+    //     int squareSize = annotation.getSquareSize();
+    //     return getAnnotationXml
+    //         (annotation.getImage(), squareSize,
+    //          rectangleRepository.findByAnnotationId(annotationId), true);
+    // }
 
     /**
      * GET  /rectangles/xml/image/{imageId}/{squareSize} : get the rectangles XML which belong to the annotations with the specified imageId.
